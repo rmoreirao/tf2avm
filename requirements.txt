@@ -11,7 +11,7 @@ typer~=0.12.3
 orjson~=3.10.0
 python-hcl2~=4.3.0
 
-# (Optional dev/test - uncomment if needed)
-# pytest~=8.2.0
+# Dev / Test
+pytest~=8.2.0
 # ruff~=0.5.7
 # mypy~=1.10.0
