@@ -6,6 +6,8 @@ from schemas import RepoInput, RepoManifest, FileManifest
 
 @agent_step("repo_scanner")
 def scan_repo(repo_input: RepoInput) -> RepoManifest:
+    
+
     # Stubbed data per spec
     files = [
         FileManifest(path="main.tf", resources=[{"type": "azurerm_virtual_network", "name": "vnet1"}]),

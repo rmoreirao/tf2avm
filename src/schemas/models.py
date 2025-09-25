@@ -5,7 +5,9 @@ from pydantic import BaseModel, Field
 
 
 class RepoInput(BaseModel):
-    repo_url: str = Field(..., description="URL or path to the Terraform repository")
+    repo_folder: Optional[str] = Field(
+        default=None, description="Specific folder within the repo to target"
+    )
 
 
 class FileManifest(BaseModel):
