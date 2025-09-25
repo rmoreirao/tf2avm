@@ -193,3 +193,142 @@ These are intentionally not inside `requirements.txt` because they are installed
 * For local iterative development, you may optionally adopt `uv` or `pip-tools` for lockfile generation; this is out-of-scope for the initial minimal spec.
 * If GPU or alternative inference backends are introduced later (e.g., local models), add conditional extras (e.g., `transformers`, `accelerate`).
 * Keep import usage minimal inside agents to make unit testing easier (allowing selective dependency injection / mocking).
+
+---
+
+## 10. Testing Strategy & Structure
+
+### 10.1 Goals
+
+Provide fast feedback (unit-level) and confidence (end-to-end) that the sequential migration workflow behaves as expected while we still rely on stubbed agent outputs. The testing strategy is intentionally layered so real parsing / validation logic can be introduced without rewriting the suite.
+
+### 10.2 Test Pyramid (Current Stage)
+
+| Layer | Purpose | Examples |
+|-------|---------|----------|
+| Unit | Individual agent stub returns deterministic schema-compliant data | `tests/test_agent_stubs.py` |
+| Workflow (Smoke) | End-to-end orchestration sanity (no fixtures) | `tests/test_workflow_smoke.py` |
+| End-to-End (Fixture) | Realistic repo fixture drives full flow, validates artifacts | `tests/test_e2e_fixture_repo_basic.py` |
+
+### 10.3 Directory Layout
+
+```
+tests/
+    fixtures/
+        repo_basic/
+            main.tf
+            network.tf
+            variables.tf
+            outputs.tf
+    test_agent_stubs.py
+    test_workflow_smoke.py
+    test_e2e_fixture_repo_basic.py
+```
+
+### 10.4 Fixture: `repo_basic`
+
+Represents the canonical minimal Terraform repository used for the E2E test. Files mirror the functional specification resources (vnet + subnet) to keep assertions aligned with the stub outputs.
+
+| File | Purpose |
+|------|---------|
+| `main.tf` | Defines `azurerm_virtual_network` resource |
+| `network.tf` | Defines `azurerm_subnet` resource |
+| `variables.tf` | Provides `location` variable |
+| `outputs.tf` | Exposes `vnet_id` output |
+
+### 10.5 E2E Test Assertions
+
+The end-to-end test (`test_e2e_fixture_repo_basic.py`) verifies:
+
+1. Workflow returns a `FinalOutcome` with `status == "failed"` (current validator stub behavior).
+2. A markdown report is generated under `./output/reports/`.
+3. Report contains required sections and mappings:
+     * `# Conversion Report: repo1`
+     * `## ✅ Converted Files`
+     * `## ⚠️ Issues Found`
+     * Lines referencing `azurerm_virtual_network` and `avm-res-network-virtualnetwork`.
+     * Error line: `Missing required variable 'dns_servers'`.
+4. Converted placeholder files are written to `./output/repo1_avm/` with the four expected filenames.
+5. Converted files begin with the text header `// Converted placeholder`.
+6. Idempotency: a second invocation with the same fixture yields the same `status`.
+
+### 10.6 Idempotency & Isolation
+
+Tests clean any pre-existing `./output` directory (where appropriate) to avoid false positives. The E2E test uses only the committed fixture—no network, cloning, or external Terraform tooling required at this stage.
+
+### 10.7 Adding Future Scenarios (Planned)
+
+| Scenario | Fixture Folder | Purpose |
+|----------|----------------|---------|
+| Unmapped resource | `repo_unmapped` | Validate population of `unmapped` list |
+| Empty repo | `repo_empty` | Scanner edge case handling |
+| Success path | Re-use `repo_basic` + env flag | Exercise validator success branch |
+| Complex dependencies | `repo_complex_network` | Test future graph-based dependency extraction |
+
+### 10.8 Execution Instructions
+
+Install dependencies (includes `pytest`) and run tests:
+
+```bash
+pip install -r requirements.txt
+pytest -q
+```
+
+Run a single test file:
+```bash
+pytest tests/test_e2e_fixture_repo_basic.py -q
+```
+
+Show detailed output:
+```bash
+pytest -vv
+```
+
+Optional (future) markers (e.g., when CLI or integration tests are added):
+```bash
+pytest -m e2e
+```
+
+### 10.9 Logging During Tests
+
+`structlog` emits JSON by default. To switch to a human-readable console renderer during local test runs:
+
+```bash
+LOG_LEVEL=INFO TRACE=0 pytest -q
+```
+
+### 10.10 Quality Gates (Initial Phase)
+
+Currently enforced implicitly by the suite:
+
+| Gate | Mechanism |
+|------|-----------|
+| Schema integrity | Pydantic model instantiation in agents/tests |
+| Basic orchestration correctness | Smoke + E2E workflow tests |
+| Artifact generation | Assertions on report + converted files |
+| Determinism | Idempotency re-run assertion |
+
+Future additions may include type checking (mypy), linting (ruff), and security scanning (bandit / checkov integration) once real validation is implemented.
+
+### 10.11 Test Evolution Policy
+
+As stub logic is replaced:
+* Keep existing assertions as a baseline; widen (not remove) checks when outputs become richer.
+* Introduce parametrization instead of hard-coded status assertions when validator can both pass/fail.
+* Add markers (`@pytest.mark.integration`) for tests invoking real Terraform / external tools to keep default suite fast.
+
+---
+
+## 11. Roadmap (Testing-Relevant Highlights)
+
+| Milestone | Testing Impact |
+|-----------|----------------|
+| Real HCL parsing | Add assertions for resource count from actual parse |
+| Live AVM index retrieval | Mock HTTP layer + add failure injection test |
+| Terraform CLI validation | Add integration test with local Terraform binary detection |
+| Human-in-the-loop gating | Simulate paused state & resume test |
+| Parallelization (later) | Ensure deterministic aggregation order or adjust tests to be order-agnostic |
+
+---
+
+*Document updated to include comprehensive test structure and execution guidance.*

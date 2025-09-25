@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, UTC
 from .base import agent_step
 from schemas import MappingResult, ValidationResult, ConversionResult, ReviewReport
 
@@ -36,6 +36,6 @@ def build_report(mapping: MappingResult, validation: ValidationResult, conversio
         mappings="\n".join(mappings_list),
         issues="\n".join(issues_list),
         path=conversion.converted_repo_path,
-        ts=datetime.utcnow().isoformat(),
+        ts=datetime.now(UTC).isoformat(),
     )
     return ReviewReport(markdown=markdown)
