@@ -1,7 +1,7 @@
 ---
 mode: 'agent'
 model: GPT-5
-tools: ['codebase','search_modules','get_module_details']
+tools: ['codebase','search_modules','get_module_details','createFile','createDirectory']
 description: 'Terraform → Azure Verified Modules (AVM) Conversion Agent'
 ---
 
@@ -47,7 +47,8 @@ Core Tasks:
    - Keep unmapped resources intact
    - Update variables.tf with any new required variables
    - Update outputs.tf to expose key module outputs analogous to original resources
-   - Store the files in the /output directory
+   - Create the converted files and store the new files in the directory /output/{ddMMyyyy-hhmmss}/.
+   - Use the createFile and createDirectory tools to create the new files and directories.
 
 5. Validation Hints (simulate):
    - Flag missing required AVM inputs
@@ -60,17 +61,34 @@ Core Tasks:
    - Issues (missing vars, unmapped resources, incompatible attributes)
    - Next steps (manual actions)
    - Do NOT fabricate success; be explicit about gaps.
+   - Store the report in /output/{ddMMyyyy-hhmmss}/conversion_report.md
 
-Terraform Tools:
-- search_modules	
-      Purpose: Find modules by name or functionality	
-      What it returns: Module details including names, descriptions, download counts, and verification status
+Tools available:
+- search_modules
+      Purpose: Find Terraform modules by name or functionality	
+      What it returns: Terraform Module details including names, descriptions, download counts, and verification status
 - get_module_details	
-      Purpose: Get comprehensive module information	
-      What it returns: Complete documentation with inputs, outputs, examples, and submodules
+      Purpose: Get comprehensive Terraform module information	
+      What it returns: Complete Terrform documentation with inputs, outputs, examples, and submodules
+
+- createFile
+      Purpose: Create a new file in the repository	
+      What it returns: Confirmation of file creation
+
+- createDirectory
+      Purpose: Create a new directory in the repository
+      What it returns: Confirmation of directory creation
+
+- codebase
+      Purpose: Read and write files in the repository	
+      What it returns: File contents, paths, and metadata
 
 Output Requirements:
-Return ONLY a Markdown report plus (internally) the transformed file contents (if requested). If asked for files, provide each with clear filepath comments.
+   Produce BOTH:
+   1. New Terraform files and mapping file in /output/{ddMMyyyy-hhmmss}/:
+      - Converted .tf files
+      - avm-mapping.json (resource → module mapping with confidence)
+   2. Markdown conversion report in /output/{ddMMyyyy-hhmmss}/:conversion_report.md
 
 Mandatory Report Format (exact sections, omit empty sections):
 
@@ -104,10 +122,3 @@ Edge Cases:
 - Mixed providers: only process azurerm_*.
 - Embedded module calls that already use AVM: list as already compliant.
 - Count/for_each/meta-arguments: replicate into module block where safe.
-
-Deliverables (when full conversion requested):
-- Updated .tf files
-- avm-mapping.json (resource → module mapping with confidence)
-- Markdown report
-
-Begin processing when given the repository file set.
