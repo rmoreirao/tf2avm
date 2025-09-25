@@ -82,10 +82,10 @@ def build_graph():
     return g.compile()
 
 
-def run_workflow(repo_url: str) -> FinalOutcome:
+def run_workflow(repo_folder: str) -> FinalOutcome:
     graph = build_graph()
     # Provide required list field explicitly to avoid pydantic validation error when LangGraph coerces state
-    initial_state = {"repo_input": RepoInput(repo_url=repo_url), "internal_errors": []}
+    initial_state = {"repo_input": RepoInput(repo_folder=repo_folder), "internal_errors": []}
     final_state = graph.invoke(initial_state)
     outcome: FinalOutcome = final_state["final_outcome"]
     _logger.info("workflow.complete", status=outcome.status, report=outcome.report_path)

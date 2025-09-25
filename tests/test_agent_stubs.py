@@ -8,7 +8,7 @@ from schemas import RepoInput
 
 
 def test_agent_chain_stubs(tmp_path):
-    repo_input = RepoInput(repo_url="https://example/repo.git")
+    repo_input = RepoInput(repo_folder="https://example/repo.git")
     manifest = scan_repo(repo_input)
     index = fetch_index(manifest)
     mapping = map_resources(manifest, index)

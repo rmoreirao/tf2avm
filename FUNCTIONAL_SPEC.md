@@ -42,7 +42,7 @@ Manage the overall workflow and coordinate other agents.
 
 ```json
 {
-  "repo_url": "https://dev.azure.com/org/project/_git/repo1"
+  "repo_folder": "https://dev.azure.com/org/project/_git/repo1"  # may also be a local path
 }
 ```
 

@@ -34,7 +34,7 @@ from pydantic import BaseModel
 from typing import List, Optional
 
 class RepoInput(BaseModel):
-    repo_url: str
+    repo_folder: str  # local path or remote identifier
 
 class FileManifest(BaseModel):
     path: str

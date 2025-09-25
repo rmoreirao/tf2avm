@@ -8,9 +8,9 @@ app = typer.Typer(add_completion=False)
 
 
 @app.command()
-def migrate(repo_url: str = typer.Option(..., help="Repo URL or path")):
+def migrate(repo_folder: str = typer.Option(..., '--repo-folder', help="Repository local path or remote identifier")):
     """Run the Terraform -> AVM migration workflow (stub outputs)."""
-    outcome = run_workflow(repo_url)
+    outcome = run_workflow(repo_folder)
     typer.echo(json.dumps(outcome.model_dump(), indent=2))
 
 

@@ -5,9 +5,7 @@ from pydantic import BaseModel, Field
 
 
 class RepoInput(BaseModel):
-    repo_folder: Optional[str] = Field(
-        default=None, description="Specific folder within the repo to target"
-    )
+    repo_folder: str = Field(description="Repository local path or remote identifier (URL)")
 
 
 class FileManifest(BaseModel):
