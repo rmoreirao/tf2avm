@@ -47,7 +47,8 @@ Core Tasks:
    - Keep unmapped resources intact
    - Update variables.tf with any new required variables
    - Update outputs.tf to expose key module outputs analogous to original resources
-   - Create the converted files and store the new files in the directory /output/{ddMMyyyy-hhmmss}/.
+   - Create the converted files and store the new files in the directory /output/{ddMMyyyy-hhmmss}/migrated.
+   - Create a copy of the original TF files on the folder /output/{ddMMyyyy-hhmmss}/original.
    - Use the createFile and createDirectory tools to create the new files and directories.
 
 5. Validation Hints (simulate):
@@ -86,7 +87,8 @@ Tools available:
 Output Requirements:
    Produce BOTH:
    1. New Terraform files and mapping file in /output/{ddMMyyyy-hhmmss}/:
-      - Converted .tf files
+      - Converted .tf files (/output/{ddMMyyyy-hhmmss}/migrated/)
+      - Original .tf files (/output/{ddMMyyyy-hhmmss}/original/)
       - avm-mapping.json (resource → module mapping with confidence)
    2. Markdown conversion report in /output/{ddMMyyyy-hhmmss}/:conversion_report.md
 
