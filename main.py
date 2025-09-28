@@ -12,12 +12,17 @@ from semantic_kernel import Kernel
 from semantic_kernel.utils.logging import setup_logging
 from semantic_kernel.functions import kernel_function
 from semantic_kernel.connectors.ai.open_ai import AzureChatCompletion
-from semantic_kernel.connectors.ai.function_choice_behavior import FunctionChoiceBehavior
-from semantic_kernel.connectors.ai.chat_completion_client_base import ChatCompletionClientBase
+from semantic_kernel.connectors.ai.function_choice_behavior import (
+    FunctionChoiceBehavior,
+)
+from semantic_kernel.connectors.ai.chat_completion_client_base import (
+    ChatCompletionClientBase,
+)
 from semantic_kernel.contents.chat_history import ChatHistory
 from semantic_kernel.functions.kernel_arguments import KernelArguments
 from semantic_kernel.connectors.mcp import MCPStdioPlugin
 from semantic_kernel.agents import ChatCompletionAgent, ChatHistoryAgentThread
+from semantic_kernel.functions import kernel_function
 
 from semantic_kernel.connectors.ai.open_ai.prompt_execution_settings.azure_chat_prompt_execution_settings import (
     AzureChatPromptExecutionSettings,
@@ -27,229 +32,247 @@ from semantic_kernel.connectors.ai.open_ai.prompt_execution_settings.azure_chat_
 
 load_dotenv()  # Ensure to load environment variables from a .env file if needed
 
-class FileSystemManager:
+
+class FileSystemManagerPlugin:
     def __init__(self, base_path="d:/repos/tf2avm"):
         self.base_path = Path(base_path)
-        
-    def create_output_directory(self):
-        timestamp = datetime.now().strftime("%d%m%Y-%H%M%S")
-        output_dir = self.base_path / "output" / timestamp
-        output_dir.mkdir(parents=True, exist_ok=True)
-        return output_dir
-    
-    def read_tf_files(self, directory_path=None):
+
+    @kernel_function(
+        description="Read all Terraform (.tf) files from a specified directory path. Returns a dictionary of file paths and their contents.",
+        name="read_tf_files",
+    )
+    def read_tf_files(self, directory_path: str = None) -> dict:
+        """Read all .tf files from the specified directory and return as a dictionary with filename as key and content as value."""
         search_path = Path(directory_path) if directory_path else self.base_path
         tf_files = {}
         for tf_file in search_path.glob("**/*.tf"):
             try:
-                with open(tf_file, 'r', encoding='utf-8') as f:
+                with open(tf_file, "r", encoding="utf-8") as f:
                     tf_files[str(tf_file.relative_to(search_path))] = f.read()
             except Exception as e:
                 print(f"Error reading {tf_file}: {e}")
         return tf_files
-    
-    def write_file(self, output_dir, filename, content):
-        file_path = output_dir / filename
+
+    @kernel_function(
+        description="Write content to a file in the specified output directory. Returns the path to the created file.",
+        name="write_file",
+    )
+    def write_file(self, output_dir: str, filename: str, content: str) -> str:
+        """Write content to a file in the output directory and return the file path."""
+        file_path = Path(output_dir) / filename
         file_path.parent.mkdir(parents=True, exist_ok=True)
-        with open(file_path, 'w', encoding='utf-8') as f:
+        with open(file_path, "w", encoding="utf-8") as f:
             f.write(content)
         return str(file_path)
 
-class TerraformAnalyzer:
-    def __init__(self):
-        self.azurerm_resources = []
-        self.variables = []
-        self.outputs = []
-        self.modules = []
-    
-    def parse_tf_content(self, tf_files):
-        """Basic parsing to identify azurerm resources, variables, outputs"""
-        for filename, content in tf_files.items():
-            # Simple regex-based parsing (could be enhanced with HCL parser)
-            
-            # Find azurerm resources
-            resource_pattern = r'resource\s+"(azurerm_\w+)"\s+"([^"]+)"'
-            resources = re.findall(resource_pattern, content)
-            for resource_type, resource_name in resources:
-                self.azurerm_resources.append({
-                    'file': filename,
-                    'type': resource_type,
-                    'name': resource_name,
-                    'full_address': f'{resource_type}.{resource_name}'
-                })
-            
-            # Find variables
-            var_pattern = r'variable\s+"([^"]+)"'
-            variables = re.findall(var_pattern, content)
-            for var_name in variables:
-                self.variables.append({
-                    'file': filename,
-                    'name': var_name
-                })
-            
-            # Find outputs
-            output_pattern = r'output\s+"([^"]+)"'
-            outputs = re.findall(output_pattern, content)
-            for output_name in outputs:
-                self.outputs.append({
-                    'file': filename,
-                    'name': output_name
-                })
-        
-        return {
-            'resources': self.azurerm_resources,
-            'variables': self.variables,
-            'outputs': self.outputs
-        }
 
 def validate_environment():
     """Validate required environment variables"""
     required_vars = [
         "AZURE_OPENAI_DEPLOYMENT_NAME",
-        "AZURE_OPENAI_API_KEY", 
+        "AZURE_OPENAI_API_KEY",
         "AZURE_OPENAI_ENDPOINT",
-        "AZURE_OPENAI_API_VERSION"
+        "AZURE_OPENAI_API_VERSION",
     ]
-    
+
     missing_vars = [var for var in required_vars if not os.getenv(var)]
     if missing_vars:
         raise ValueError(f"Missing required environment variables: {missing_vars}")
-    
+
     return True
+
 
 async def main():
     # Enable logging for debugging
     logging.basicConfig(level=logging.INFO)
     logger = logging.getLogger(__name__)
-    
+
     try:
         # Validate environment before starting
         validate_environment()
         logger.info("Environment validation passed")
-        
+
         async with MCPStdioPlugin(
-                name="Terraform",
-                description="Search for current Terraform provider documentation, modules, and policies from the Terraform registry.",
-                command="docker",
-                args=["run","-i","--rm","hashicorp/terraform-mcp-server"]
-            ) as terraform_plugin:
-            
+            name="Terraform",
+            description="Search for current Terraform provider documentation, modules, and policies from the Terraform registry.",
+            command="docker",
+            args=["run", "-i", "--rm", "hashicorp/terraform-mcp-server"],
+        ) as terraform_plugin:
             logger.info("Terraform MCP Plugin initialized successfully")
-            
+
             kernel = Kernel()
 
             # Add Azure OpenAI chat completion
             chat_completion_service = AzureChatCompletion(
-                deployment_name=os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME"),  
+                deployment_name=os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME"),
                 api_key=os.getenv("AZURE_OPENAI_API_KEY"),
                 endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
-                api_version=os.getenv("AZURE_OPENAI_API_VERSION")
+                api_version=os.getenv("AZURE_OPENAI_API_VERSION"),
             )
-            
+
             kernel.add_service(chat_completion_service)
-            kernel.add_plugin(terraform_plugin, plugin_name="Terraform")
 
             agent = ChatCompletionAgent(
-                    service=chat_completion_service,
-                    kernel=kernel,
-                    name="TerraformAVMAgent",
-                    instructions="""You are a Terraform → Azure Verified Modules (AVM) Conversion Agent.
+                service=chat_completion_service,
+                kernel=kernel,
+                name="TerraformAVMAgent",
+                instructions="""Role: Terraform → Azure Verified Modules (AVM) Conversion Agent
 
-Your primary goal is to convert existing Terraform repositories containing Azure (azurerm_*) resources into AVM-based structures.
+Goal:
+Convert a given Terraform repository containing Azure (azurerm_*) resources into an AVM-based Terraform structure. Replace eligible azurerm_* resources with the correct AVM resource/module calls while preserving intent. Produce a Markdown conversion report summarizing actions, mappings, issues, and next steps.
 
-Core Capabilities:
-1. Parse Terraform files (.tf) to identify azurerm_* resources, variables, outputs, and modules
-2. Search for appropriate AVM modules using the Terraform registry tools
-3. Map azurerm_* resources to their AVM module equivalents
-4. Generate converted Terraform files with module blocks replacing resource blocks
-5. Produce comprehensive conversion reports
+Inputs (provided as context):
+- Folder with the Terraform files to convert.
+- Output folder for the converted files - consider that this folder already exists.
 
-Workflow for conversion requests:
-1. Analyze input Terraform files for azurerm_* resources
-2. Use search_modules to find matching AVM modules
-3. Use get_module_details to get comprehensive module documentation
-4. Create conversion mappings (resource → AVM module)
-5. Generate converted files in /output/{timestamp}/ directory
-6. Produce detailed conversion report
+Authoritative References (you must rely on these conceptually):
+- Official AVM module registry naming (e.g., avm-res-network-virtualnetwork)
+- Terraform Registry module input/output variables for matched AVM modules
+- Standard azurerm provider schema (for source resources)
 
-Always be explicit about:
-- Successful conversions vs. unmapped resources
-- Missing required variables
-- Potential breaking changes
-- Required manual actions
+>>>>> Core Tasks:
+1. Parse all Terraform files:
+   - Collect resources (type, name, attributes)
+   - Collect variables, outputs, locals, module calls
+   - Build simple dependency awareness (e.g., referencing order)
 
-Format responses as structured reports with clear sections for conversions, issues, and next steps.""",
-                    plugins=[terraform_plugin],
-                )
+2. Determine AVM Mappings:
+   - For each azurerm_* resource, attempt to map to an AVM module
+   - Use Terraform Tools search_modules and get_module_details to find best matches
+   - Record: original resource address → AVM module name, confidence
+   - If no AVM equivalent, mark unmapped (do NOT delete original; leave as-is)
+
+3. Plan Conversion:
+   - Group related resources if a single AVM module supersedes multiple (only if clear)
+   - Identify required AVM inputs missing from existing variables
+   - Propose new variables where necessary
+
+4. Perform Conversion:
+   - Replace eligible azurerm_* resource blocks with module blocks:
+     module "<logical_name>" {
+       source  = "Azure/<avm-module-name>/azurerm"
+       version = "<best-known-version or placeholder>"
+       # Map attributes (preserve semantics)
+     }
+   - Preserve comments when possible
+   - Keep unmapped resources intact
+   - Update variables.tf with any new required variables
+   - Update outputs.tf to expose key module outputs analogous to original resources
+   - Create the converted files and store the new files in the directory /output/{ddMMyyyy-hhmmss}/migrated.
+   - Create a copy of the original TF files on the folder /output/{ddMMyyyy-hhmmss}/original.
+   - Use the createFile and createDirectory tools to create the new files and directories.
+
+5. Validation Hints (simulate):
+   - Flag missing required AVM inputs
+   - Flag attributes that have no direct AVM equivalent
+   - Flag potential breaking changes (naming, implicit dependencies)
+
+6. Produce Report (exact format below):
+   - Converted files list
+   - Successful mappings (original → AVM)
+   - Issues (missing vars, unmapped resources, incompatible attributes)
+   - Next steps (manual actions)
+   - Do NOT fabricate success; be explicit about gaps.
+   - Store the report in /output/{ddMMyyyy-hhmmss}/conversion_report.md
+
+   
+6.1 Mandatory Report Format (exact sections, omit empty sections):
+
+# Conversion Report: <repo_name>
+
+## ✅ Converted Files
+- <file> → AVM
+...
+
+## ✅ Successful Mappings
+- <azurerm_type> → <avm-module-name>
+...
+
+## ⚠️ Issues Found
+- <issue 1>
+- <issue 2>
+
+## 🔧 Next Steps
+- <action 1>
+- <action 2>
+
+7. Tools available:
+- search_modules
+      Purpose: Find Terraform modules by name or functionality	
+      What it returns: Terraform Module details including names, descriptions, download counts, and verification status
+- get_module_details	
+      Purpose: Get comprehensive Terraform module information	
+      What it returns: Complete Terraform documentation with inputs, outputs, examples, and submodules
+
+- read_tf_files
+      Purpose: Read all Terraform (.tf) files from a specified directory path
+      What it returns: Dictionary of file paths and their contents
+
+- write_file
+      Purpose: Write content to a file in the specified output directory
+      What it returns: Path to the created file
+
+8. Output Requirements:
+   Produce BOTH:
+   1. New Terraform converted files and mapping file. Use the available tools to create the files and directories:
+      - Converted .tf files (/output/{ddMMyyyy-hhmmss}/migrated/)
+      - Original .tf files (/output/{ddMMyyyy-hhmmss}/original/)
+      - avm-mapping.json (resource → module mapping with confidence)
+   2. Markdown conversion report in /output/{ddMMyyyy-hhmmss}/:conversion_report.md
+
+
+9. Rules:
+- Do not guess AVM modules if uncertain; mark unmapped.
+- Preserve original variable naming unless conflicting.
+- Use placeholder versions if unknown (e.g., ">= 1.0.0") and note in Issues.
+- Avoid removing functionality (log instead).
+- If nothing convertible: produce report with empty Converted Files and full rationale.
+- Be deterministic and concise.
+- Edge Cases:
+    - Mixed providers: only process azurerm_*.
+    - Embedded module calls that already use AVM: list as already compliant.
+    - Count/for_each/meta-arguments: replicate into module block where safe.
+
+>>>>> Instructions:
+- Validate the Inputs and make no assumptions.
+- If you don't understand something, ask for clarification and don't make assumptions. On this case, don't execute any steps.
+- Use the tools provided.
+- Plan all the steps before executing the steps: create a step-by-step plan and execute the steps one by one. Output the plan as part of the final Output.
+- Generate the full Output in a single response.
+
+""",
+                plugins=[terraform_plugin, FileSystemManagerPlugin()],
+            )
 
             # Initialize file system manager and analyzer
-            fs_manager = FileSystemManager()
-            tf_analyzer = TerraformAnalyzer()
 
             thread: ChatHistoryAgentThread | None = None
 
+            # Create the output directory
+            output_folder = f"output/{datetime.now().strftime('%d%m%Y-%H%M%S')}"
+            os.makedirs(output_folder, exist_ok=True)
+
             # Conversion scenarios
-            conversion_requests = [
-                {
-                    "description": "Convert Virtual Network Resources to AVM",
-                    "context": "Analyze current directory for azurerm_virtual_network, azurerm_subnet resources and convert to avm-res-network-virtualnetwork module"
-                }
-            ]
+            response = await agent.get_response(
+                messages="Convert files from folder D:\\repos\\tf2avm\\tests\\fixtures\\repo_tf_basic to output folder " + output_folder,
+                thread=thread,
+            )
+            thread = response.thread
 
-            for request in conversion_requests:
-                print(f"\n=== Processing: {request['description']} ===")
-                
-                # Read current Terraform files from test fixture
-                tf_files = fs_manager.read_tf_files("tests/fixtures/repo_basic")
-                if not tf_files:
-                    print("No .tf files found in test fixture directory")
-                    continue
-                    
-                # Analyze Terraform content
-                tf_analyzer = TerraformAnalyzer()  # Reset for each request
-                analysis = tf_analyzer.parse_tf_content(tf_files)
-                print(f"Found {len(analysis['resources'])} azurerm resources")
-                
-                # Create context message with file contents and analysis
-                context_message = f"""
-CONVERSION REQUEST: {request['description']}
-
-CONTEXT: {request['context']}
-
-TERRAFORM FILES ANALYSIS:
-- Files found: {list(tf_files.keys())}
-- azurerm resources: {[r['full_address'] for r in analysis['resources']]}
-- Variables: {[v['name'] for v in analysis['variables']]}
-- Outputs: {[o['name'] for o in analysis['outputs']]}
-
-TERRAFORM FILE CONTENTS:
-{chr(10).join([f"=== {filename} ==={chr(10)}{content}{chr(10)}" for filename, content in tf_files.items()])}
-
-Please perform the AVM conversion following the established workflow:
-1. Search for appropriate AVM modules for each azurerm resource
-2. Create conversion mappings
-3. Generate converted Terraform files
-4. Provide detailed conversion report
-
-Create output files in /output/{{timestamp}}/ directory structure.
-"""
-
-                response = await agent.get_response(messages=[context_message], thread=thread)
-                thread = response.thread
-
-                # Process the response
-                response_text = str(response.message.content)
-                print(f"Conversion Result:\n{response_text}")
-                print("-" * 50)
+            # Process the response
+            response_text = str(response.message.content)
+            print(f"Conversion Result:\n{response_text}")
+            print("-" * 50)
 
             # Cleanup
             if thread:
                 await thread.delete()
                 print("Thread cleaned up")
-            
+
     except Exception as e:
         logger.error(f"Error during conversion process: {e}")
         raise
+
 
 # Run the main function
 if __name__ == "__main__":
