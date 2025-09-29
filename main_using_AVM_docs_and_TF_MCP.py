@@ -149,6 +149,7 @@ Authoritative References (you must rely on these conceptually):
     - Read the mapping from the "Published modules" section
     - Display Name represents the azurerm resource type (e.g., "Virtual Network" → azurerm_virtual_network)
     - Module Name represents the AVM module name (e.g., "avm-res-network-virtualnetwork")
+    - Store the mapping in 
 
 3. Determine AVM Mappings:
    - For each azurerm_* resource, attempt to map to an AVM module from the previous step
@@ -167,8 +168,7 @@ Authoritative References (you must rely on these conceptually):
    - Keep unmapped resources intact
    - Update variables.tf with any new required variables
    - Update outputs.tf to expose key module outputs analogous to original resources
-   - Create the converted files and store the new files in the directory /output/{ddMMyyyy-hhmmss}/migrated.
-   - Create a copy of the original TF files on the folder /output/{ddMMyyyy-hhmmss}/original.
+   - Create the converted files and store the new files in the directory /output/{yyyyMMdd-HHmmss}/migrated.
    - Use the createFile and createDirectory tools to create the new files and directories.
 
 6. Validation Hints (simulate):
@@ -182,7 +182,7 @@ Authoritative References (you must rely on these conceptually):
    - Issues (missing vars, unmapped resources, incompatible attributes)
    - Next steps (manual actions)
    - Do NOT fabricate success; be explicit about gaps.
-   - Store the report in /output/{ddMMyyyy-hhmmss}/conversion_report.md
+   - Store the report in /output/{yyyyMMdd-HHmmss}/conversion_report.md
 
    
 7.1 Mandatory Report Format (exact sections, omit empty sections):
@@ -225,10 +225,9 @@ Authoritative References (you must rely on these conceptually):
 9. Output Requirements:
    Produce BOTH:
    1. New Terraform converted files and mapping file. Use the available tools to create the files and directories:
-      - Converted .tf files (/output/{ddMMyyyy-hhmmss}/migrated/)
-      - Original .tf files (/output/{ddMMyyyy-hhmmss}/original/)
+      - Converted .tf files (/output/{yyyyMMdd-HHmmss}/migrated/)
       - avm-mapping.json (resource → module mapping with confidence)
-   2. Markdown conversion report in /output/{ddMMyyyy-hhmmss}/:conversion_report.md
+   2. Markdown conversion report in /output/{yyyyMMdd-HHmmss}/:conversion_report.md
 
 
 10. Rules:
@@ -243,7 +242,7 @@ Authoritative References (you must rely on these conceptually):
     - Embedded module calls that already use AVM: list as already compliant.
     - Count/for_each/meta-arguments: replicate into module block where safe.
 
->>>>> Instructions:
+>>>>> Agent Instructions:
 - Validate the Inputs and make no assumptions.
 - If you don't understand something, ask for clarification and don't make assumptions. On this case, don't execute any steps.
 - Use the tools provided.
@@ -256,13 +255,23 @@ Authoritative References (you must rely on these conceptually):
 
             thread: ChatHistoryAgentThread | None = None
 
-            # Create the output directory
-            output_folder = f"output/{datetime.now().strftime('%d%m%Y-%H%M%S')}"
+            # Create the output directory format yyyyMMdd-HHmmss
+            output_folder = f"output/{datetime.now().strftime('%Y%m%d-%H%M%S')}"
             os.makedirs(output_folder, exist_ok=True)
 
             # Conversion scenarios
+            input_folder = "D:\\repos\\tf2avm\\tests\\fixtures\\repo_tf_basic"
+
+            # Copy original files to output folder
+            original_output_folder = os.path.join(output_folder, "original")
+            os.makedirs(original_output_folder, exist_ok=True)
+            fs_manager = FileSystemManagerPlugin()
+            tf_files = fs_manager.read_tf_files(input_folder)
+            for filename, content in tf_files.items():
+                fs_manager.write_file(original_output_folder, filename, content)
+
             response = await agent.get_response(
-                messages="Convert files from folder D:\\repos\\tf2avm\\tests\\fixtures\\repo_tf_basic to output folder " + output_folder,
+                messages="Convert files from folder " + input_folder + " to output folder " + output_folder,
                 thread=thread,
             )
             thread = response.thread
