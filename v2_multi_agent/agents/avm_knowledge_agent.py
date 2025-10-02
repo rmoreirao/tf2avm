@@ -11,7 +11,7 @@ class AVMKnowledgeAgent:
     AVM Knowledge Agent - Azure Verified Modules expert.
     
     Responsibilities:
-    - Fetch AVM module index from official sources
+    - Fetch AVM module index from official source
     - Parse and maintain AVM module mappings
     - Provide module documentation and requirements
     """
@@ -64,7 +64,7 @@ Process:
 1. Fetch the AVM module index from the official documentation
 2. Parse the "Published modules" section to extract module information
 3. Create mappings between Display Names (Azure resource types) and Module Names
-4. For each relevant module, note the source repository and version information
+4. For each relevant module, note the version information
 
 Mapping JSON output format:
 
@@ -72,7 +72,6 @@ Mapping JSON output format:
     {
         "displayName": "Module Display Name",
         "moduleName": "avm_module_name",
-        "source": "https://github.com/Azure/avm-modules",
         "version": "x.y.z"
     },
     ...

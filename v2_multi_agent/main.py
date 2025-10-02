@@ -40,7 +40,7 @@ class TerraformAVMOrchestrator:
         agent = agent_class()
         return await agent.initialize()
     
-    async def convert_repository(self, repo_path: str, output_dir: Optional[str] = None) -> Dict[str, Any]:
+    async def convert_repository(self, repo_path: str, output_dir: str) -> Dict[str, Any]:
         """
         Convert a Terraform repository to use Azure Verified Modules.
         
@@ -56,10 +56,6 @@ class TerraformAVMOrchestrator:
             repo_path_obj = Path(repo_path)
             if not repo_path_obj.exists() or not repo_path_obj.is_dir():
                 raise FileNotFoundError(f"Repository path '{repo_path}' does not exist or is not a directory.")
-
-            if not output_dir:
-                timestamp = datetime.now().strftime('%Y%m%d-%H%M%S')
-                output_dir = f"output/{timestamp}"
             
             # Create output directory
             Path(output_dir).mkdir(parents=True, exist_ok=True)
@@ -94,13 +90,17 @@ class TerraformAVMOrchestrator:
         """Run the agents in sequence without complex handoff orchestration."""
 
 
-        # # Step 1: Repository Scanner Agent
-        # self.logger.info("Step 1: Running Repository Scanner Agent")
-        # scanner_agent = await self._create_and_initialize_agent(RepoScannerAgent)
-        # scanner_result = await scanner_agent.get_response(
-        #     f"Scan and analyze Terraform repository at '{repo_path}'."
-        # )
-        # self._log_agent_response("RepoScannerAgent", scanner_result)
+        # Step 1: Repository Scanner Agent
+        self.logger.info("Step 1: Running Repository Scanner Agent")
+        scanner_agent = await self._create_and_initialize_agent(RepoScannerAgent)
+        scanner_result = await scanner_agent.get_response(
+            f"Scan and analyze Terraform repository at '{repo_path}'."
+        )
+        self._log_agent_response("RepoScannerAgent", scanner_result)
+
+        # store the results on output folder
+        with open(f"{output_dir}/repo_scan.md", "w") as f:
+            f.write(str(scanner_result))
         
         # Step 2: AVM Knowledge Agent
         self.logger.info("Step 2: Running AVM Knowledge Agent")
@@ -112,9 +112,7 @@ class TerraformAVMOrchestrator:
 
         # store the results on output folder
         with open(f"{output_dir}/avm_knowledge.json", "w") as f:
-            json.dump(knowledge_result, f)
-
-        exit()
+            f.write(str(knowledge_result))
 
         # Step 4: Mapping Agent
         self.logger.info("Step 4: Running Mapping Agent")
@@ -123,7 +121,13 @@ class TerraformAVMOrchestrator:
             f"Map Terraform resources to AVM modules. Repository: {str(scanner_result)} AVM Knowledge: {str(knowledge_result)}"
         )
         self._log_agent_response("MappingAgent", mapping_result)
-        
+
+        # store the results on output folder
+        with open(f"{output_dir}/mapping.md", "w") as f:
+            f.write(str(mapping_result))
+
+        exit()
+
         # Step 5: Converter Agent
         self.logger.info("Step 5: Running Converter Agent")
         converter_agent = await self._create_and_initialize_agent(ConverterAgent)
@@ -196,7 +200,8 @@ if __name__ == "__main__":
         try:
             await orchestrator.initialize()
             result = await orchestrator.convert_repository(
-                repo_path="D:\\repos\\tf2avm\\tests\\fixtures\\repo_tf_basic"
+                repo_path="D:\\repos\\tf2avm\\tests\\fixtures\\repo_tf_basic",
+                output_dir="D:\\repos\\tf2avm\\tests\\test_run\\repo_tf_basic\\output\\" + datetime.now().strftime("%Y%m%d_%H%M%S")
             )
             print(f"Test conversion result: {result}")
         finally:
