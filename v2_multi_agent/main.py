@@ -1,15 +1,15 @@
 import asyncio
 from datetime import datetime
-import json
 from pathlib import Path
 import traceback
-from typing import Dict, Any, Optional
+from typing import Dict, Any
 
 from config.settings import get_settings, validate_environment
 from config.logging import setup_logging
 from agents.repo_scanner_agent import RepoScannerAgent
 from agents.avm_knowledge_agent import AVMKnowledgeAgent
 from agents.mapping_agent import MappingAgent
+from agents.converter_planning_agent import ConverterPlanningAgent
 from agents.converter_agent import ConverterAgent
 from agents.validator_agent import ValidatorAgent
 from agents.report_agent import ReportAgent
@@ -48,6 +48,7 @@ class TerraformAVMOrchestrator:
         Args:
             repo_path: Path to the Terraform repository
             output_dir: Optional output directory (will be generated if not provided)
+            (Interactive) Will pause after planning for user approval in CLI mode.
             
         Returns:
             Dict containing conversion results and metadata
@@ -89,7 +90,7 @@ class TerraformAVMOrchestrator:
             }
     
     async def _run_sequential_workflow(self, repo_path: str, output_dir: str) -> str:
-        """Run the agents in sequence without complex handoff orchestration."""
+        """Run the agents in sequence with an interactive approval gate after planning."""
 
 
         # Step 1: Repository Scanner Agent
@@ -128,16 +129,32 @@ class TerraformAVMOrchestrator:
         with open(f"{output_dir}/mapping.md", "w", encoding="utf-8") as f:
             f.write(str(mapping_result))
 
-        exit()
+        # Step 4: Converter Planning Agent
+        self.logger.info("Step 4: Running Converter Planning Agent")
+        planning_agent = await self._create_and_initialize_agent(ConverterPlanningAgent)
+        planning_prompt = (
+            "Create a detailed Terraform to AVM conversion plan based on repository scan and mapping results. "
+            f"Repository Scan: {str(scanner_result)} Mapping: {str(mapping_result)}"
+        )
+        planning_result = await planning_agent.get_response(planning_prompt)
+        self._log_agent_response("ConverterPlanningAgent", planning_result)
+        with open(f"{output_dir}/conversion_plan.md", "w", encoding="utf-8") as f:
+            f.write(str(planning_result))
 
-        # Step 4: Converter Agent
-        self.logger.info("Step 4: Running Converter Agent")
+        # Ask user for approval to proceed
+        approved = await self._prompt_user_approval()
+        if not approved:
+            self.logger.info("User declined to proceed after planning stage. Aborting further conversion steps.")
+            return "Conversion halted after planning (user declined)."
+
+        # Step 5: Converter Agent
+        self.logger.info("Step 5: Running Converter Agent (user approved)")
         converter_agent = await self._create_and_initialize_agent(ConverterAgent)
         converter_result = await converter_agent.get_response(
             f"Convert Terraform files to AVM modules. Output directory: '{output_dir}'. Mappings: {str(mapping_result)}"
         )
         self._log_agent_response("ConverterAgent", converter_result)
-        
+
         # Step 6: Validator Agent
         self.logger.info("Step 6: Running Validator Agent")
         validator_agent = await self._create_and_initialize_agent(ValidatorAgent)
@@ -145,7 +162,7 @@ class TerraformAVMOrchestrator:
             f"Validate converted files in '{output_dir}'. Conversion results: {str(converter_result)}"
         )
         self._log_agent_response("ValidatorAgent", validator_result)
-        
+
         # Step 7: Report Agent
         self.logger.info("Step 7: Running Report Agent")
         report_agent = await self._create_and_initialize_agent(ReportAgent)
@@ -153,7 +170,7 @@ class TerraformAVMOrchestrator:
             f"Generate final conversion report in '{output_dir}'. All results: Scanner: {str(scanner_result)}, Mapping: {str(mapping_result)}, Conversion: {str(converter_result)}, Validation: {str(validator_result)}"
         )
         self._log_agent_response("ReportAgent", report_result)
-        
+
         return str(report_result)
     
     def _log_agent_response(self, agent_name: str, response) -> None:
@@ -164,6 +181,16 @@ class TerraformAVMOrchestrator:
             response_text = str(response) if response else "No response"
         self.logger.info(f"[{agent_name}] Response: {response_text}")
         print(f"[{agent_name}]: {response_text}")
+
+    async def _prompt_user_approval(self) -> bool:
+        """Prompt user to approve moving from planning to conversion. Returns True if approved."""
+        try:
+            # Use a thread to avoid blocking the event loop
+            response = await asyncio.to_thread(input, "A conversion plan has been generated (conversion_plan.md). Proceed with conversion? [y/N]: ")
+            return response.strip().lower() in ("y", "yes")
+        except Exception as e:
+            self.logger.warning(f"Failed to capture user approval input: {e}. Defaulting to not approved.")
+            return False
     
     async def cleanup(self):
         """Clean up resources."""

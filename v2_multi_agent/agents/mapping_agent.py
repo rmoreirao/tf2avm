@@ -83,7 +83,7 @@ Mapping process:
 4. For the resources which are not mappable to AVM modules, but are child resources of mappable resources:
     - In many cases, child resources are managed within the context of their parent resources in AVM modules.
     - Check if these child resources are being handled as inputs or configurations within the parent AVM module.
-    - Use the get_module_details tool to verify if the parent module includes management for these child resources.
+    - Use the get_avm_module_inputs tool to retrieve the input parameters for the parent module and check if they include the child resources.
     - If they are, document how they are managed within the parent module and propose the migration strategy accordingly.
     - If they are not, document them as unmappable resources with explanations.
     
@@ -93,11 +93,10 @@ Mapping process:
    - Complex resources that require manual intervention
 
 Available tools:
-- get_module_details: Get detailed information about specific AVM modules
-- search_terraform_modules: Search for additional modules if needed
+- get_avm_module_inputs: Retrieve input parameters for a specific AVM module
 
 When complete, hand off to the Converter Agent with:
-- Detailed mapping plan for each resource
+- Detailed mapping plan for each resource and file
 - Confidence assessments
 - List of unmappable resources
 - Required variable changes

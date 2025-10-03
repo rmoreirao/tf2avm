@@ -1,3 +1,5 @@
+import json
+import aiohttp
 from semantic_kernel.functions import kernel_function
 from semantic_kernel.connectors.mcp import MCPStdioPlugin
 
@@ -59,3 +61,32 @@ class TerraformPlugin:
             return "Terraform syntax appears valid"
         else:
             return "Terraform syntax validation failed"
+        
+    
+    # Retrieve input parameters for a specific AVM module
+    @kernel_function(
+        description="Retrieve input parameters for a specific AVM module.",
+        name="get_avm_module_inputs",
+    )
+    async def get_avm_module_inputs(self, module_name: str, module_version: str) -> str:
+        # do not use the mcp plugin here
+        # fetch the module details from url https://registry.terraform.io/v1/modules/Azure/{module name}/azurerm/{module version}
+
+        # log
+        print(f"Fetching input parameters for module: {module_name}, version: {module_version}")
+
+        module_details_url = f"https://registry.terraform.io/v1/modules/Azure/{module_name}/azurerm/{module_version}"
+        async with aiohttp.ClientSession() as session:
+            async with session.get(module_details_url) as response:
+                if response.status == 200:
+                    module_details = await response.json()
+                    # input are on module_details['root']['inputs']
+                    inputs = module_details.get("root", {}).get("inputs", [])
+                    # print inputs
+                    ret_inputs = json.dumps(inputs, indent=2)
+                    print(f"Module inputs: {ret_inputs}")
+                    return ret_inputs
+                else:
+                    raise ValueError(f"Failed to retrieve module details for {module_name} version {module_version}. HTTP Status: {response.status}")
+                    return f"Failed to retrieve module details for {module_name} version {module_version}. HTTP Status: {response.status}"
+        
