@@ -3,6 +3,7 @@ from pathlib import Path
 import json
 import re
 from datetime import datetime
+import hcl2
 
 
 class FileSystemPlugin:
@@ -115,12 +116,20 @@ class FileSystemPlugin:
         
         return json.dumps(result, indent=2)
 
-    @kernel_function(
-        description="Generate a timestamped output directory path.",
-        name="generate_output_dir",
-    )
-    def generate_output_dir(self, base_output_dir: str) -> str:
-        """Generate a timestamped output directory path."""
-        timestamp = datetime.now().strftime('%Y%m%d-%H%M%S')
-        output_dir = Path(base_output_dir) / timestamp
-        return str(output_dir)
+
+    # # Function to parse Terraform files using hcl2 library
+    # @kernel_function(
+    #     description="Parse Terraform file content and extract resources, variables, outputs.",
+    #     name="parse_terraform_file_hcl2",
+    # )
+    # def parse_terraform_file_hcl2(self, folder_path: str) -> str:
+    #     """Parse Terraform file content using hcl2 and extract key components."""
+    #     try:
+    #         hcl_data = {}
+    #         for tf_file in Path(folder_path).glob("*.tf"):
+    #             with tf_file.open("r", encoding="utf-8", errors="ignore") as f:
+    #                 file_content = f.read()
+    #                 hcl_data[tf_file.name] = hcl2.loads(file_content)
+    #         return json.dumps(hcl_data, indent=2)
+    #     except Exception as e:
+    #         return json.dumps({"error": str(e)}, indent=2)

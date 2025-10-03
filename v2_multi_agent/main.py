@@ -2,6 +2,7 @@ import asyncio
 from datetime import datetime
 import json
 from pathlib import Path
+import traceback
 from typing import Dict, Any, Optional
 
 from config.settings import get_settings, validate_environment
@@ -75,14 +76,15 @@ class TerraformAVMOrchestrator:
                 "result": str(result),
                 "timestamp": datetime.now().isoformat()
             }
-            
         except Exception as e:
-            self.logger.error(f"Error during conversion: {e}")
+            full_traceback = traceback.format_exc()
+            self.logger.error(f"Error during conversion: {e}\n{full_traceback}")
             return {
                 "status": "failed",
                 "repo_path": repo_path,
                 "output_directory": output_dir,
                 "error": str(e),
+                "traceback": full_traceback,
                 "timestamp": datetime.now().isoformat()
             }
     
@@ -99,9 +101,9 @@ class TerraformAVMOrchestrator:
         self._log_agent_response("RepoScannerAgent", scanner_result)
 
         # store the results on output folder
-        with open(f"{output_dir}/repo_scan.md", "w") as f:
+        with open(f"{output_dir}/repo_scan.md", "w", encoding="utf-8") as f:
             f.write(str(scanner_result))
-        
+               
         # Step 2: AVM Knowledge Agent
         self.logger.info("Step 2: Running AVM Knowledge Agent")
         knowledge_agent = await self._create_and_initialize_agent(AVMKnowledgeAgent)
@@ -111,11 +113,11 @@ class TerraformAVMOrchestrator:
         self._log_agent_response("AVMKnowledgeAgent", knowledge_result)
 
         # store the results on output folder
-        with open(f"{output_dir}/avm_knowledge.json", "w") as f:
+        with open(f"{output_dir}/avm_knowledge.json", "w", encoding="utf-8") as f:
             f.write(str(knowledge_result))
 
-        # Step 4: Mapping Agent
-        self.logger.info("Step 4: Running Mapping Agent")
+        # Step 3: Mapping Agent
+        self.logger.info("Step 3: Running Mapping Agent")
         mapping_agent = await self._create_and_initialize_agent(MappingAgent)
         mapping_result = await mapping_agent.get_response(
             f"Map Terraform resources to AVM modules. Repository: {str(scanner_result)} AVM Knowledge: {str(knowledge_result)}"
@@ -123,13 +125,13 @@ class TerraformAVMOrchestrator:
         self._log_agent_response("MappingAgent", mapping_result)
 
         # store the results on output folder
-        with open(f"{output_dir}/mapping.md", "w") as f:
+        with open(f"{output_dir}/mapping.md", "w", encoding="utf-8") as f:
             f.write(str(mapping_result))
 
         exit()
 
-        # Step 5: Converter Agent
-        self.logger.info("Step 5: Running Converter Agent")
+        # Step 4: Converter Agent
+        self.logger.info("Step 4: Running Converter Agent")
         converter_agent = await self._create_and_initialize_agent(ConverterAgent)
         converter_result = await converter_agent.get_response(
             f"Convert Terraform files to AVM modules. Output directory: '{output_dir}'. Mappings: {str(mapping_result)}"

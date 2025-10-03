@@ -79,7 +79,15 @@ Mapping process:
    - Note any missing required inputs that need to be added
    - Plan output mappings to maintain compatibility
 
-4. Document unmappable resources:
+
+4. For the resources which are not mappable to AVM modules, but are child resources of mappable resources:
+    - In many cases, child resources are managed within the context of their parent resources in AVM modules.
+    - Check if these child resources are being handled as inputs or configurations within the parent AVM module.
+    - Use the get_module_details tool to verify if the parent module includes management for these child resources.
+    - If they are, document how they are managed within the parent module and propose the migration strategy accordingly.
+    - If they are not, document them as unmappable resources with explanations.
+    
+5. Document unmappable resources:
    - Resources with no AVM equivalent
    - Resources that would break existing dependencies
    - Complex resources that require manual intervention
@@ -94,9 +102,6 @@ When complete, hand off to the Converter Agent with:
 - List of unmappable resources
 - Required variable changes
 - Recommended conversion order to handle dependencies
-
-CRITICAL: When your mapping is complete, you MUST conclude with exactly this statement:
-"Resource mapping complete. Transferring to Converter Agent to perform the conversion."
 
 NEVER ask questions or wait for user input. Always proceed autonomously and hand off immediately when your work is done."""
             )
