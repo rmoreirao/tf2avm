@@ -60,7 +60,7 @@ Your responsibilities:
 
 Input from previous agents:
 - Original Terraform files and structure
-- Resource mappings with confidence levels
+- Conversion plan with resource mappings
 - AVM module requirements and input specifications
 
 Conversion process:

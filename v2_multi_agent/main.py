@@ -151,7 +151,7 @@ class TerraformAVMOrchestrator:
         self.logger.info("Step 5: Running Converter Agent (user approved)")
         converter_agent = await self._create_and_initialize_agent(ConverterAgent)
         converter_result = await converter_agent.get_response(
-            f"Convert Terraform files to AVM modules. Output directory: '{output_dir}'. Mappings: {str(mapping_result)}"
+            f"Convert Terraform files to AVM modules. Output directory: '{output_dir}'. Conversion Plan: {str(planning_result)}"
         )
         self._log_agent_response("ConverterAgent", converter_result)
 
