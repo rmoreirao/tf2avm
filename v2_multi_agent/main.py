@@ -7,7 +7,7 @@ from typing import Dict, Any
 
 from config.settings import get_settings, validate_environment
 from config.logging import setup_logging
-from v2_multi_agent.agents.tf_metadata_agent import TFMetadataAgent
+from agents.tf_metadata_agent import TFMetadataAgent
 from agents.avm_knowledge_agent import AVMKnowledgeAgent
 from agents.mapping_agent import MappingAgent
 from agents.converter_planning_agent import ConverterPlanningAgent
@@ -152,7 +152,7 @@ class TerraformAVMOrchestrator:
         # Step 5: Converter Agent
         self.logger.info("Step 5: Running Converter Agent (user approved)")
         converter_agent = await ConverterAgent.create()
-        converter_result = await converter_agent.run_conversion(planning_result, migrated_output_dir, repo_path)
+        converter_result = await converter_agent.run_conversion(planning_result, migrated_output_dir, tf_files)
         self._log_agent_response("ConverterAgent", converter_result)
 
         # Step 6: Validator Agent

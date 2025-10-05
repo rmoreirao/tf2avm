@@ -77,45 +77,6 @@ class FileSystemPlugin:
         
         return f"Copied {len(copied_files)} files to {dest_dir}"
 
-    @kernel_function(
-        description="Parse Terraform file content and extract resources, variables, outputs.",
-        name="parse_terraform_file",
-    )
-    def parse_terraform_file(self, file_content: str) -> str:
-        """Parse Terraform file content and extract key components."""
-        # Simple regex-based parsing for Terraform components
-        result = {
-            "resources": [],
-            "variables": [],
-            "outputs": [],
-            "locals": []
-        }
-        
-        # Extract resources
-        resource_pattern = r'resource\s+"([^"]+)"\s+"([^"]+)"\s*\{'
-        for match in re.finditer(resource_pattern, file_content):
-            result["resources"].append({
-                "type": match.group(1),
-                "name": match.group(2)
-            })
-        
-        # Extract variables
-        variable_pattern = r'variable\s+"([^"]+)"\s*\{'
-        for match in re.finditer(variable_pattern, file_content):
-            result["variables"].append(match.group(1))
-        
-        # Extract outputs
-        output_pattern = r'output\s+"([^"]+)"\s*\{'
-        for match in re.finditer(output_pattern, file_content):
-            result["outputs"].append(match.group(1))
-        
-        # Extract locals
-        locals_pattern = r'locals\s*\{'
-        if re.search(locals_pattern, file_content):
-            result["locals"].append("locals_block_found")
-        
-        return json.dumps(result, indent=2)
-
 
     # # Function to parse Terraform files using hcl2 library
     # @kernel_function(
