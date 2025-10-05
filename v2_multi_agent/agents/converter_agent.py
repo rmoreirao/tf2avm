@@ -5,7 +5,6 @@ from config.settings import get_settings
 from config.logging import get_logger
 from plugins.filesystem_plugin import FileSystemPlugin
 from plugins.terraform_plugin import TerraformPlugin
-import json
 
 
 class ConverterAgent:
@@ -19,36 +18,35 @@ class ConverterAgent:
     - Generate converted files
     """
     
-    def __init__(self):
+    def __init__(self, agent: ChatCompletionAgent):
         self.logger = get_logger(__name__)
         self.settings = get_settings()
-        self.agent = None
+        self.agent = agent
         
-    async def initialize(self):
-        """
-        Initialize the agent with Azure OpenAI service, plugins, and a conversion plan.
-        """
+    @classmethod
+    async def create(cls) -> 'ConverterAgent':
+        """Factory method to create and initialize the agent."""
+        logger = get_logger(__name__)
+        settings = get_settings()
         
-    
         # Create kernel and add services
         kernel = Kernel()
         
         chat_completion_service = AzureChatCompletion(
-            deployment_name=self.settings.azure_openai_deployment_name,
-            api_key=self.settings.azure_openai_api_key,
-            endpoint=self.settings.azure_openai_endpoint,
-            api_version=self.settings.azure_openai_api_version,
+            deployment_name=settings.azure_openai_deployment_name,
+            api_key=settings.azure_openai_api_key,
+            endpoint=settings.azure_openai_endpoint,
+            api_version=settings.azure_openai_api_version,
         )
         
         kernel.add_service(chat_completion_service)
         
         # Initialize plugins
-        filesystem_plugin = FileSystemPlugin(self.settings.base_path)
+        filesystem_plugin = FileSystemPlugin(settings.base_path)
         terraform_plugin = TerraformPlugin()
         
-    
         # Create the agent
-        self.agent = ChatCompletionAgent(
+        agent = ChatCompletionAgent(
             service=chat_completion_service,
             kernel=kernel,
             name="ConverterAgent",
@@ -86,8 +84,8 @@ Available tools:
 Never ask for clarifications; proceed autonomously."""
         )
         
-        self.logger.info("Converter Agent initialized successfully with conversion plan")
-        return self.agent
+        logger.info("Converter Agent initialized successfully with conversion plan")
+        return cls(agent)
 
 
     async def run_conversion(self, conversion_plan: str, output_dir: str, repo_path: str) -> str:

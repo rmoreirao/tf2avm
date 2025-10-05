@@ -17,31 +17,35 @@ class ReportAgent:
     - Create final deliverables
     """
     
-    def __init__(self):
+    def __init__(self, agent: ChatCompletionAgent):
         self.logger = get_logger(__name__)
         self.settings = get_settings()
-        self.agent = None
+        self.agent = agent
         
-    async def initialize(self):
-        """Initialize the agent with Azure OpenAI service and plugins."""
+    @classmethod
+    async def create(cls) -> 'ReportAgent':
+        """Factory method to create and initialize the agent."""
+        logger = get_logger(__name__)
+        settings = get_settings()
+        
         try:
             # Create kernel and add services
             kernel = Kernel()
             
             chat_completion_service = AzureChatCompletion(
-                deployment_name=self.settings.azure_openai_deployment_name,
-                api_key=self.settings.azure_openai_api_key,
-                endpoint=self.settings.azure_openai_endpoint,
-                api_version=self.settings.azure_openai_api_version,
+                deployment_name=settings.azure_openai_deployment_name,
+                api_key=settings.azure_openai_api_key,
+                endpoint=settings.azure_openai_endpoint,
+                api_version=settings.azure_openai_api_version,
             )
             
             kernel.add_service(chat_completion_service)
             
             # Initialize plugins
-            filesystem_plugin = FileSystemPlugin(self.settings.base_path)
+            filesystem_plugin = FileSystemPlugin(settings.base_path)
             
             # Create the agent
-            self.agent = ChatCompletionAgent(
+            agent = ChatCompletionAgent(
                 service=chat_completion_service,
                 kernel=kernel,
                 name="ReportAgent",
@@ -137,9 +141,26 @@ CRITICAL: When your report generation is complete, you MUST conclude with exactl
 NEVER ask questions or wait for user input. Always proceed autonomously and complete the workflow."""
             )
             
-            self.logger.info("Report Agent initialized successfully")
-            return self.agent
+            logger.info("Report Agent initialized successfully")
+            return cls(agent)
             
         except Exception as e:
-            self.logger.error(f"Failed to initialize Report Agent: {e}")
+            logger.error(f"Failed to initialize Report Agent: {e}")
             raise
+            
+    async def generate_report(self, all_results: dict, output_dir: str) -> str:
+        """
+        Generate comprehensive conversion report based on all agent results.
+        Returns final conversion report and creates supporting files.
+        """
+        
+        # Format all results into a comprehensive message
+        results_summary = (
+            f"Generate final conversion report in '{output_dir}'. "
+            f"Scanner: {all_results.get('scanner', 'N/A')}, "
+            f"Mapping: {all_results.get('mapping', 'N/A')}, "
+            f"Conversion: {all_results.get('conversion', 'N/A')}, "
+            f"Validation: {all_results.get('validation', 'N/A')}"
+        )
+        
+        return await self.agent.get_response(results_summary)

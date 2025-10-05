@@ -21,29 +21,33 @@ class ConverterPlanningAgent:
     - STOP the workflow until explicit user approval is granted
     """
 
-    def __init__(self):
+    def __init__(self, agent: ChatCompletionAgent):
         self.logger = get_logger(__name__)
         self.settings = get_settings()
-        self.agent = None
+        self.agent = agent
 
-    async def initialize(self):
-        """Initialize the agent with Azure OpenAI service and plugins."""
+    @classmethod
+    async def create(cls) -> 'ConverterPlanningAgent':
+        """Factory method to create and initialize the agent."""
+        logger = get_logger(__name__)
+        settings = get_settings()
+        
         try:
             kernel = Kernel()
 
             chat_completion_service = AzureChatCompletion(
-                deployment_name=self.settings.azure_openai_deployment_name,
-                api_key=self.settings.azure_openai_api_key,
-                endpoint=self.settings.azure_openai_endpoint,
-                api_version=self.settings.azure_openai_api_version,
+                deployment_name=settings.azure_openai_deployment_name,
+                api_key=settings.azure_openai_api_key,
+                endpoint=settings.azure_openai_endpoint,
+                api_version=settings.azure_openai_api_version,
             )
 
             kernel.add_service(chat_completion_service)
 
-            filesystem_plugin = FileSystemPlugin(self.settings.base_path)
+            filesystem_plugin = FileSystemPlugin(settings.base_path)
             terraform_plugin = TerraformPlugin()
 
-            self.agent = ChatCompletionAgent(
+            agent = ChatCompletionAgent(
                 service=chat_completion_service,
                 kernel=kernel,
                 name="ConverterPlanningAgent",
@@ -132,9 +136,21 @@ Conversion planning complete. Awaiting user approval before executing conversion
 """
             )
 
-            self.logger.info("Converter Planning Agent initialized successfully")
-            return self.agent
+            logger.info("Converter Planning Agent initialized successfully")
+            return cls(agent)
 
         except Exception as e:
-            self.logger.error(f"Failed to initialize Converter Planning Agent: {e}")
+            logger.error(f"Failed to initialize Converter Planning Agent: {e}")
             raise
+
+    async def create_conversion_plan(self, repo_scan_result: str, mapping_result: str, repo_path: str) -> str:
+        """
+        Create a detailed conversion plan based on repository scan and mapping results.
+        Returns detailed conversion plan in markdown format.
+        """
+        
+        message = (
+            "Create a detailed Terraform to AVM conversion plan based on repository scan and mapping results. "
+            f"Repository Scan: {repo_scan_result} Mapping: {mapping_result} Repo Path: {repo_path}"
+        )
+        return await self.agent.get_response(message)

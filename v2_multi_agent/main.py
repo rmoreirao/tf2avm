@@ -37,11 +37,6 @@ class TerraformAVMOrchestrator:
             self.logger.error(f"Failed to initialize orchestrator: {e}")
             raise
     
-    async def _create_and_initialize_agent(self, agent_class):
-        """Helper method to create and initialize an agent on-demand."""
-        agent = agent_class()
-        return await agent.initialize()
-    
     async def convert_repository(self, repo_path: str, output_dir: str) -> Dict[str, Any]:
         """
         Convert a Terraform repository to use Azure Verified Modules.
@@ -102,10 +97,8 @@ class TerraformAVMOrchestrator:
 
         # Step 1: Repository Scanner Agent
         self.logger.info("Step 1: Running Repository Scanner Agent")
-        scanner_agent = await self._create_and_initialize_agent(RepoScannerAgent)
-        scanner_result = await scanner_agent.get_response(
-            f"Scan and analyze Terraform repository at '{repo_path}'."
-        )
+        scanner_agent = await RepoScannerAgent.create()
+        scanner_result = await scanner_agent.scan_repository(repo_path)
         self._log_agent_response("RepoScannerAgent", scanner_result)
 
         # store the results on output folder
@@ -114,10 +107,8 @@ class TerraformAVMOrchestrator:
                
         # Step 2: AVM Knowledge Agent
         self.logger.info("Step 2: Running AVM Knowledge Agent")
-        knowledge_agent = await self._create_and_initialize_agent(AVMKnowledgeAgent)
-        knowledge_result = await knowledge_agent.get_response(
-            "Gather AVM module knowledge based on repository scan results."
-        )
+        knowledge_agent = await AVMKnowledgeAgent.create()
+        knowledge_result = await knowledge_agent.fetch_avm_knowledge()
         self._log_agent_response("AVMKnowledgeAgent", knowledge_result)
 
         # store the results on output folder
@@ -126,10 +117,8 @@ class TerraformAVMOrchestrator:
 
         # Step 3: Mapping Agent
         self.logger.info("Step 3: Running Mapping Agent")
-        mapping_agent = await self._create_and_initialize_agent(MappingAgent)
-        mapping_result = await mapping_agent.get_response(
-            f"Map Terraform resources to AVM modules. Repository: {str(scanner_result)} AVM Knowledge: {str(knowledge_result)}"
-        )
+        mapping_agent = await MappingAgent.create()
+        mapping_result = await mapping_agent.create_mappings(str(scanner_result), str(knowledge_result))
         self._log_agent_response("MappingAgent", mapping_result)
 
         # store the results on output folder
@@ -138,12 +127,8 @@ class TerraformAVMOrchestrator:
 
         # Step 4: Converter Planning Agent
         self.logger.info("Step 4: Running Converter Planning Agent")
-        planning_agent = await self._create_and_initialize_agent(ConverterPlanningAgent)
-        planning_prompt = (
-            "Create a detailed Terraform to AVM conversion plan based on repository scan and mapping results. "
-            f"Repository Scan: {str(scanner_result)} Mapping: {str(mapping_result)}"
-        )
-        planning_result = await planning_agent.get_response(planning_prompt)
+        planning_agent = await ConverterPlanningAgent.create()
+        planning_result = await planning_agent.create_conversion_plan(str(scanner_result), str(mapping_result), repo_path)
         self._log_agent_response("ConverterPlanningAgent", planning_result)
         with open(f"{output_dir}/conversion_plan.md", "w", encoding="utf-8") as f:
             f.write(str(planning_result))
@@ -160,27 +145,31 @@ class TerraformAVMOrchestrator:
 
         # Step 5: Converter Agent
         self.logger.info("Step 5: Running Converter Agent (user approved)")
-        converter_agent = ConverterAgent()
-        await converter_agent.initialize()
+        converter_agent = await ConverterAgent.create()
         converter_result = await converter_agent.run_conversion(planning_result, migrated_output_dir, repo_path)
         self._log_agent_response("ConverterAgent", converter_result)
 
-        exit()
-
         # Step 6: Validator Agent
         self.logger.info("Step 6: Running Validator Agent")
-        validator_agent = await self._create_and_initialize_agent(ValidatorAgent)
-        validator_result = await validator_agent.get_response(
-            f"Validate converted files in '{output_dir}'. Conversion results: {str(converter_result)}"
-        )
+        validator_agent = await ValidatorAgent.create()
+        validator_result = await validator_agent.validate_conversion(repo_path, str(migrated_output_dir), str(converter_result))
         self._log_agent_response("ValidatorAgent", validator_result)
 
         # Step 7: Report Agent
         self.logger.info("Step 7: Running Report Agent")
-        report_agent = await self._create_and_initialize_agent(ReportAgent)
-        report_result = await report_agent.get_response(
-            f"Generate final conversion report in '{output_dir}'. All results: Scanner: {str(scanner_result)}, Mapping: {str(mapping_result)}, Conversion: {str(converter_result)}, Validation: {str(validator_result)}"
-        )
+        report_agent = await ReportAgent.create()
+        
+        # Prepare all results for the report
+        all_results = {
+            "scanner": str(scanner_result),
+            "knowledge": str(knowledge_result),
+            "mapping": str(mapping_result),
+            "planning": str(planning_result),
+            "conversion": str(converter_result),
+            "validation": str(validator_result)
+        }
+        
+        report_result = await report_agent.generate_report(all_results, output_dir)
         self._log_agent_response("ReportAgent", report_result)
 
         return str(report_result)
