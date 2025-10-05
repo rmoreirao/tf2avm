@@ -155,6 +155,8 @@ class TerraformAVMOrchestrator:
         converter_result = await converter_agent.run_conversion(planning_result, migrated_output_dir, tf_files)
         self._log_agent_response("ConverterAgent", converter_result)
 
+        exit()
+
         # Step 6: Validator Agent
         self.logger.info("Step 6: Running Validator Agent")
         validator_agent = await ValidatorAgent.create()

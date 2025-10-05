@@ -88,6 +88,8 @@ For EACH resource to convert provide subsections:
 - Attribute → Input Mapping Table:
 | Original Attribute | Handling | AVM Input | Transform | Notes |
 |--------------------|----------|-----------|----------|-------|
+- Make sure that all required inputs of the AVM module are covered.
+- Validate that old attributes map correctly to new inputs, noting any transformations or any attribute removals.
 - Outputs Impacted / Re-mapped:
 - Dependencies (Upstream):
 - Dependents (Downstream):
