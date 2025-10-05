@@ -1,6 +1,7 @@
 import asyncio
 from datetime import datetime
 from pathlib import Path
+import shutil
 import traceback
 from typing import Dict, Any
 
@@ -141,17 +142,24 @@ class TerraformAVMOrchestrator:
         with open(f"{output_dir}/conversion_plan.md", "w", encoding="utf-8") as f:
             f.write(str(planning_result))
 
-        # Ask user for approval to proceed
-        approved = await self._prompt_user_approval()
-        if not approved:
-            self.logger.info("User declined to proceed after planning stage. Aborting further conversion steps.")
-            return "Conversion halted after planning (user declined)."
+        # # Ask user for approval to proceed
+        # approved = await self._prompt_user_approval()
+        # if not approved:
+        #     self.logger.info("User declined to proceed after planning stage. Aborting further conversion steps.")
+        #     return "Conversion halted after planning (user declined)."
+
+        # copy the TF files to output dir / original
+        self.logger.info(f"Copying original TF files to output directory {output_dir}/original")
+        original_output_dir = Path(output_dir) / "original"
+        original_output_dir.mkdir(parents=True, exist_ok=True)
+        for tf_file in Path(repo_path).rglob("*.tf"):
+            shutil.copy(tf_file, original_output_dir / tf_file.name)
 
         # Step 5: Converter Agent
         self.logger.info("Step 5: Running Converter Agent (user approved)")
         converter_agent = await self._create_and_initialize_agent(ConverterAgent)
         converter_result = await converter_agent.get_response(
-            f"Convert Terraform files to AVM modules. Output directory: '{output_dir}'. Conversion Plan: {str(planning_result)}"
+            f"Convert Terraform files to AVM modules. Output directory: '{output_dir}'. Original TF files folder: {str(repo_path)}. Conversion Plan: {str(planning_result)}"
         )
         self._log_agent_response("ConverterAgent", converter_result)
 
