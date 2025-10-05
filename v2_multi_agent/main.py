@@ -93,6 +93,12 @@ class TerraformAVMOrchestrator:
     async def _run_sequential_workflow(self, repo_path: str, output_dir: str) -> str:
         """Run the agents in sequence with an interactive approval gate after planning."""
 
+                # copy the TF files to output dir / original
+        self.logger.info(f"Copying original TF files to output directory {output_dir}/original")
+        original_output_dir = Path(output_dir) / "original"
+        original_output_dir.mkdir(parents=True, exist_ok=True)
+        for tf_file in Path(repo_path).rglob("*.tf"):
+            shutil.copy(tf_file, original_output_dir / tf_file.name)
 
         # Step 1: Repository Scanner Agent
         self.logger.info("Step 1: Running Repository Scanner Agent")
@@ -148,20 +154,18 @@ class TerraformAVMOrchestrator:
         #     self.logger.info("User declined to proceed after planning stage. Aborting further conversion steps.")
         #     return "Conversion halted after planning (user declined)."
 
-        # copy the TF files to output dir / original
-        self.logger.info(f"Copying original TF files to output directory {output_dir}/original")
-        original_output_dir = Path(output_dir) / "original"
-        original_output_dir.mkdir(parents=True, exist_ok=True)
-        for tf_file in Path(repo_path).rglob("*.tf"):
-            shutil.copy(tf_file, original_output_dir / tf_file.name)
+        # create the migrated folder
+        migrated_output_dir = Path(output_dir) / "migrated"
+        migrated_output_dir.mkdir(parents=True, exist_ok=True)
 
         # Step 5: Converter Agent
         self.logger.info("Step 5: Running Converter Agent (user approved)")
-        converter_agent = await self._create_and_initialize_agent(ConverterAgent)
-        converter_result = await converter_agent.get_response(
-            f"Convert Terraform files to AVM modules. Output directory: '{output_dir}'. Original TF files folder: {str(repo_path)}. Conversion Plan: {str(planning_result)}"
-        )
+        converter_agent = ConverterAgent()
+        await converter_agent.initialize()
+        converter_result = await converter_agent.run_conversion(planning_result, migrated_output_dir, repo_path)
         self._log_agent_response("ConverterAgent", converter_result)
+
+        exit()
 
         # Step 6: Validator Agent
         self.logger.info("Step 6: Running Validator Agent")
