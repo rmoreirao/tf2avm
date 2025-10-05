@@ -99,12 +99,13 @@ Mapping process:
 Available tools:
 - get_avm_module_inputs: Retrieve input parameters for a specific AVM module
 
-When complete, hand off to the Converter Agent with:
+Output:
 - Detailed mapping plan for each resource and file
 - Confidence assessments
 - List of unmappable resources
 - Required variable changes
 - Recommended conversion order to handle dependencies
+- Input parameters of the AVM modules being used
 
 NEVER ask questions or wait for user input. Always proceed autonomously and hand off immediately when your work is done."""
             )

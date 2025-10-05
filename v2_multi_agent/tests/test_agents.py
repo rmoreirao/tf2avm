@@ -4,7 +4,7 @@ from pathlib import Path
 from unittest.mock import Mock, patch
 
 from agents.triage_agent import TriageAgent
-from agents.repo_scanner_agent import RepoScannerAgent
+from v2_multi_agent.agents.tf_metadata_agent import TFMetadataAgent
 from agents.avm_knowledge_agent import AVMKnowledgeAgent
 from agents.mapping_agent import MappingAgent
 from agents.converter_agent import ConverterAgent
@@ -43,7 +43,7 @@ class TestAgents:
     async def test_repo_scanner_agent_initialization(self, mock_settings):
         """Test that Repository Scanner Agent can be initialized."""
         with patch('agents.repo_scanner_agent.AzureChatCompletion'):
-            agent = RepoScannerAgent()
+            agent = TFMetadataAgent()
             assert agent is not None
     
     @pytest.mark.asyncio

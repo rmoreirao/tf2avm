@@ -7,7 +7,7 @@ from typing import Dict, Any
 
 from config.settings import get_settings, validate_environment
 from config.logging import setup_logging
-from agents.repo_scanner_agent import RepoScannerAgent
+from v2_multi_agent.agents.tf_metadata_agent import TFMetadataAgent
 from agents.avm_knowledge_agent import AVMKnowledgeAgent
 from agents.mapping_agent import MappingAgent
 from agents.converter_planning_agent import ConverterPlanningAgent
@@ -103,9 +103,9 @@ class TerraformAVMOrchestrator:
 
         # Step 1: Repository Scanner Agent
         self.logger.info("Step 1: Running Repository Scanner Agent")
-        scanner_agent = await RepoScannerAgent.create()
+        scanner_agent = await TFMetadataAgent.create()
         scanner_result = await scanner_agent.scan_repository(tf_files)
-        self._log_agent_response("RepoScannerAgent", scanner_result)
+        self._log_agent_response("TFMetadataAgent", scanner_result)
 
         # store the results on output folder
         with open(f"{output_dir}/repo_scan.md", "w", encoding="utf-8") as f:
@@ -134,7 +134,7 @@ class TerraformAVMOrchestrator:
         # Step 4: Converter Planning Agent
         self.logger.info("Step 4: Running Converter Planning Agent")
         planning_agent = await ConverterPlanningAgent.create()
-        planning_result = await planning_agent.create_conversion_plan(str(scanner_result), str(mapping_result), repo_path)
+        planning_result = await planning_agent.create_conversion_plan(str(scanner_result), str(mapping_result), tf_files)
         self._log_agent_response("ConverterPlanningAgent", planning_result)
         with open(f"{output_dir}/conversion_plan.md", "w", encoding="utf-8") as f:
             f.write(str(planning_result))

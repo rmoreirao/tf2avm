@@ -3,7 +3,6 @@ from semantic_kernel.connectors.ai.open_ai import AzureChatCompletion
 from semantic_kernel import Kernel
 from config.settings import get_settings
 from config.logging import get_logger
-from plugins.filesystem_plugin import FileSystemPlugin
 from plugins.terraform_plugin import TerraformPlugin
 
 
@@ -44,38 +43,37 @@ class ConverterPlanningAgent:
 
             kernel.add_service(chat_completion_service)
 
-            filesystem_plugin = FileSystemPlugin(settings.base_path)
-            terraform_plugin = TerraformPlugin()
-
             agent = ChatCompletionAgent(
                 service=chat_completion_service,
                 kernel=kernel,
                 name="ConverterPlanningAgent",
                 description="Produces a detailed Terraform->AVM conversion plan requiring human approval before execution.",
-                plugins=[filesystem_plugin, terraform_plugin],
                 instructions="""You are the Converter Planning Agent in the Terraform to Azure Verified Modules (AVM) workflow.
 
-Your mission: Create a PRECISE, ACTIONABLE CONVERSION PLAN based on: (1) Repository scan results, (2) AVM knowledge, (3) Resource mapping output. You DO NOT perform any file mutation. You ONLY plan.
+Your mission: Create a PRECISE, ACTIONABLE CONVERSION PLAN based on: (1) Repository scan results, (2) AVM knowledge, (3) Resource mapping output, and (4) Terraform file contents. You DO NOT perform any file mutation. You ONLY plan.
+
+Input format:
+You will receive file contents directly in the message, formatted as:
+File: relative_path/filename.tf
+Content:
+[file content]
+---
 
 STRICT BEHAVIOR:
-- NEVER modify files. Only read / analyze.
+- NEVER modify files. Only analyze provided file contents.
 - ALWAYS output the full plan in Markdown using the exact structure defined below.
 - DO NOT ask questions. Proceed autonomously.
 - Conclude with: "Conversion planning complete. Awaiting user approval before executing conversion." EXACTLY.
-
-Available tooling (invoke when helpful):
-- read_tf_files: Inspect raw Terraform source
-- parse_terraform_file: Structural parsing / extraction
 
 Plan Structure (use ALL headings, even if some sections are empty—state 'None'):
 
 # Terraform → AVM Conversion Plan
 
 ## 1. Scope Summary
-- Total Terraform files analyzed: {n}
-- Total azurerm_* resources: {n}
-- Resources targeted for conversion: {n}
-- Resources excluded / unmappable: {n}
+- Total Terraform files analyzed: 
+- Total azurerm_* resources: 
+- Resources targeted for conversion: 
+- Resources excluded / unmappable:
 
 ## 2. Resource Conversion Table
 | Original Resource | File | Planned AVM Module | Confidence | Action | Notes |
@@ -143,14 +141,27 @@ Conversion planning complete. Awaiting user approval before executing conversion
             logger.error(f"Failed to initialize Converter Planning Agent: {e}")
             raise
 
-    async def create_conversion_plan(self, repo_scan_result: str, mapping_result: str, repo_path: str) -> str:
+    async def create_conversion_plan(self, repo_scan_result: str, mapping_result: str, tf_files: dict) -> str:
         """
-        Create a detailed conversion plan based on repository scan and mapping results.
-        Returns detailed conversion plan in markdown format.
+        Create a detailed conversion plan based on repository scan, mapping results, and Terraform file contents.
+        
+        Args:
+            repo_scan_result: Repository scan results from TFMetadataAgent
+            mapping_result: Resource mapping results from MappingAgent
+            tf_files: Dictionary mapping relative file paths to file contents
+                     e.g., {'main.tf': 'content...', 'variables.tf': 'content...'}
+        
+        Returns:
+            Detailed conversion plan in markdown format.
         """
         
+        # Format tf_files for the agent
+        files_summary = "\n".join([f"File: {path}\nContent:\n{content}\n---" for path, content in tf_files.items()])
+        
         message = (
-            "Create a detailed Terraform to AVM conversion plan based on repository scan and mapping results. "
-            f"Repository Scan: {repo_scan_result} Mapping: {mapping_result} Repo Path: {repo_path}"
+            "Create a detailed Terraform to AVM conversion plan based on repository scan, mapping results, and file contents.\n\n"
+            f"Repository Scan Results:\n{repo_scan_result}\n\n"
+            f"Mapping Results:\n{mapping_result}\n\n"
+            f"Terraform Files:\n{files_summary}"
         )
         return await self.agent.get_response(message)

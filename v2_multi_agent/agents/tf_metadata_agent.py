@@ -6,9 +6,9 @@ from config.logging import get_logger
 from plugins.terraform_plugin import TerraformPlugin
 
 
-class RepoScannerAgent:
+class TFMetadataAgent:
     """
-    Repository Scanner Agent - Terraform repository analysis specialist.
+    Terraform Metadata Agent - Terraform repository analysis specialist.
     
     Responsibilities:
     - Parse all Terraform files (.tf)
@@ -23,7 +23,7 @@ class RepoScannerAgent:
         self.agent = agent
         
     @classmethod
-    async def create(cls) -> 'RepoScannerAgent':
+    async def create(cls) -> 'TFMetadataAgent':
         """Factory method to create and initialize the agent."""
         logger = get_logger(__name__)
         settings = get_settings()
