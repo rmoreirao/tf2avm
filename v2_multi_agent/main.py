@@ -88,7 +88,13 @@ class TerraformAVMOrchestrator:
     async def _run_sequential_workflow(self, repo_path: str, output_dir: str) -> str:
         """Run the agents in sequence with an interactive approval gate after planning."""
 
-                # copy the TF files to output dir / original
+        # read all TF files and store in dictionary: relative folder/name -> content
+        tf_files = {}
+        for tf_file in Path(repo_path).rglob("*.tf"):
+            relative_path = tf_file.relative_to(repo_path)
+            tf_files[str(relative_path)] = tf_file.read_text(encoding="utf-8")
+
+        # copy the TF files to output dir / original
         self.logger.info(f"Copying original TF files to output directory {output_dir}/original")
         original_output_dir = Path(output_dir) / "original"
         original_output_dir.mkdir(parents=True, exist_ok=True)
@@ -98,7 +104,7 @@ class TerraformAVMOrchestrator:
         # Step 1: Repository Scanner Agent
         self.logger.info("Step 1: Running Repository Scanner Agent")
         scanner_agent = await RepoScannerAgent.create()
-        scanner_result = await scanner_agent.scan_repository(repo_path)
+        scanner_result = await scanner_agent.scan_repository(tf_files)
         self._log_agent_response("RepoScannerAgent", scanner_result)
 
         # store the results on output folder
