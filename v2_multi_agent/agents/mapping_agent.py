@@ -101,11 +101,12 @@ Available tools:
 
 Output:
 - Detailed mapping plan for each resource and file
+    - Input parameters of the AVM modules being used. ALWAYS list all the input parameters of the AVM modules (NEVER truncate the list). Identify required and optional inputs.
+    - Make sure that all inputs are listed, and NEVER truncate the list.
 - Confidence assessments
 - List of unmappable resources
 - Required variable changes
 - Recommended conversion order to handle dependencies
-- Input parameters of the AVM modules being used
 
 NEVER ask questions or wait for user input. Always proceed autonomously and hand off immediately when your work is done."""
             )
