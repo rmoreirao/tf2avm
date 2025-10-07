@@ -10,51 +10,46 @@ The v2 multi-agent system breaks down the conversion process into specialized ag
 
 ### Agents
 
-1. **Triage Agent** - Entry point coordinator and workflow orchestrator
-   - Validates inputs and environment
-   - Determines conversion strategy
-   - Routes to appropriate specialist agents
-
-2. **Repository Scanner Agent** - Terraform repository analysis specialist
+1. **Repository Scanner Agent** - Terraform repository analysis specialist
    - Parses all Terraform files (.tf)
    - Extracts resources, variables, outputs, locals
    - Identifies azurerm_* resources for conversion
 
-3. **AVM Knowledge Agent** - Azure Verified Modules expert
+2. **AVM Knowledge Agent** - Azure Verified Modules expert
    - Fetches AVM module index from official sources
    - Maintains AVM module mappings and documentation
    - Provides module requirements and compatibility information
 
-4. **Mapping Agent** - Resource mapping specialist
+3. **Converter Planning Agent** - Resource mapping and conversion planning specialist
    - Matches azurerm_* resources to AVM modules
    - Determines conversion confidence levels
+   - Creates detailed conversion plans with dependency analysis
    - Plans variable and output mappings
+   - Provides execution checklists
 
-5. **Converter Agent** - Code transformation specialist
+4. **Converter Agent** - Code transformation specialist
    - Transforms azurerm_* resources to AVM module calls
    - Updates variables.tf and outputs.tf
    - Preserves code structure and comments
 
-6. **Validator Agent** - Quality assurance specialist
+5. **Validator Agent** - Quality assurance specialist
    - Validates converted Terraform syntax
    - Checks for missing required inputs
    - Identifies potential breaking changes
 
-7. **Report Agent** - Documentation and reporting specialist
+6. **Report Agent** - Documentation and reporting specialist
    - Generates comprehensive conversion reports
    - Documents successful mappings and issues
    - Provides next steps and recommendations
 
-### Handoff Orchestration Flow
+### Workflow
 
 ```
-Triage Agent
-    ↓
 Repository Scanner Agent
     ↓
 AVM Knowledge Agent
     ↓
-Mapping Agent
+Converter Planning Agent (with integrated mapping)
     ↓
 Converter Agent
     ↓
@@ -62,8 +57,6 @@ Validator Agent
     ↓
 Report Agent
 ```
-
-Any agent can hand off to the Report Agent in case of critical errors.
 
 ## Prerequisites
 
@@ -152,9 +145,10 @@ output/
     │   ├── variables.tf
     │   ├── outputs.tf
     │   └── ...
-    ├── conversion_report.md    # Detailed conversion report
-    ├── avm-mapping.json       # Machine-readable mapping data
-    └── README.md              # Getting started guide
+    ├── conversion_plan.md     # Detailed conversion plan (includes mapping)
+    ├── conversion_report.md   # Final conversion report
+    ├── avm_knowledge.json     # AVM module knowledge base
+    └── repo_scan.md          # Repository analysis results
 ```
 
 ## Key Features

@@ -4,18 +4,21 @@ from semantic_kernel import Kernel
 from config.settings import get_settings
 from config.logging import get_logger
 from plugins.terraform_plugin import TerraformPlugin
+from plugins.http_plugin import HttpClientPlugin
 
 
 class ConverterPlanningAgent:
-    """Converter Planning Agent - Creates a detailed, reviewable conversion plan before code transformation.
+    """Converter Planning Agent - Creates detailed conversion plans with integrated resource mapping.
 
     Responsibilities:
-    - Ingest mapping results and repository scan outputs
-    - Re-read / parse Terraform source files to understand current state (resources, variables, outputs, dependencies)
-    - Produce a DETAILED conversion plan (no code changes) describing exactly how each azurerm_* resource will be migrated to AVM modules
-    - Identify required variable additions / refactors and output changes
+    - Ingest repository scan results and AVM knowledge
+    - Map azurerm_* resources to appropriate AVM modules
+    - Determine conversion confidence levels and identify unmappable resources
+    - Parse Terraform source files to understand current state (resources, variables, outputs, dependencies)
+    - Produce a DETAILED conversion plan describing exactly how each azurerm_* resource will be migrated to AVM modules
+    - Plan required variable additions/refactors and output changes
     - Highlight dependency ordering & sequencing for safe conversion
-    - Flag risky / ambiguous mappings needing human validation
+    - Flag risky/ambiguous mappings needing human validation
     - Provide an execution checklist the Converter Agent will follow
     - STOP the workflow until explicit user approval is granted
     """
@@ -35,104 +38,116 @@ class ConverterPlanningAgent:
             kernel = Kernel()
 
             chat_completion_service = AzureChatCompletion(
-                deployment_name=settings.azure_openai_deployment_name,
-                api_key=settings.azure_openai_api_key,
-                endpoint=settings.azure_openai_endpoint,
-                api_version=settings.azure_openai_api_version,
+                deployment_name=settings.azure_openai_reasoning_deployment_name,
+                api_key=settings.azure_openai_reasoning_api_key,
+                endpoint=settings.azure_openai_reasoning_endpoint,
+                api_version=settings.azure_openai_reasoning_api_version,
             )
 
             kernel.add_service(chat_completion_service)
+
+            # Initialize plugins
+            terraform_plugin = TerraformPlugin()
+            http_plugin = HttpClientPlugin()
 
             agent = ChatCompletionAgent(
                 service=chat_completion_service,
                 kernel=kernel,
                 name="ConverterPlanningAgent",
-                description="Produces a detailed Terraform->AVM conversion plan requiring human approval before execution.",
+                description="Produces detailed Terraform->AVM conversion plans with integrated resource mapping functionality.",
+                plugins=[terraform_plugin, http_plugin],
                 instructions="""You are the Converter Planning Agent in the Terraform to Azure Verified Modules (AVM) workflow.
 
-Your mission: Create a PRECISE, ACTIONABLE CONVERSION PLAN based on: (1) Repository scan results, (2) AVM knowledge, (3) Resource mapping output, and (4) Terraform file contents. You DO NOT perform any file mutation. You ONLY plan.
+Your mission: Create a PRECISE, ACTIONABLE CONVERSION PLAN with integrated resource mapping based on: (1) Repository scan results, (2) AVM knowledge base, and (3) Terraform file contents. You DO NOT perform any file mutation. You ONLY analyze and plan.
+
+CORE RESPONSIBILITIES:
+1. RESOURCE MAPPING: Match azurerm_* resources to appropriate AVM modules using the provided AVM knowledge
+2. CONFIDENCE ASSESSMENT: Determine conversion confidence levels for each mapping
+3. DETAILED PLANNING: Create comprehensive conversion plans for each resource
+4. DEPENDENCY ANALYSIS: Identify conversion order based on resource dependencies
+5. VARIABLE & OUTPUT STRATEGY: Plan necessary variable and output changes
 
 Input format:
-You will receive file contents directly in the message, formatted as:
-File: relative_path/filename.tf
-Content:
-[file content]
----
+- Repository Scan Results: Structured analysis of Terraform resources
+- AVM Knowledge: JSON array of available AVM modules with display names and module names
+- Terraform Files: File contents formatted as File: path\\nContent:\\n[content]\\n---
+
+MAPPING PROCESS (Integrated):
+1. For each azurerm_* resource from repository scan match to an AVM module from the AVM knowledge:
+    - Match resource type to available AVM modules using displayName mappings
+    - Assign confidence score: High (90-100%), Medium (60-89%), Low (30-59%), None (0-29%)
+    - Document mappings, limitations and alternative approaches
+   
+2. Resource parameters mapping and analysis:
+    - For each AVM module match, use the get_avm_module_inputs tool to retrieve input parameters for the module
+    - Analyse all input parameters (required and optional) and compare against the resource attributes
+    - Make sure all required inputs can be satisfied by existing attributes or variables
+    - If required inputs cannot be satisfied, document what is missing and propose solution
+    - Assess compatibility between resource attributes and module requirements
+    - Document attribute to input mappings in a table format
+
+3. For the resources which are not directly mappable to AVM modules:
+    - If the resource is a child resource of a mappable resource:
+        - In many cases, child resources are managed within the context of their parent resources in AVM modules.
+        - Check if these child resources are being handled as inputs or configurations within the parent AVM module.
+        - Use the input parameters retrieved for parent AVM module to check if they include the child resources.
+        - Try to match the child resource attributes to the parent module inputs.
+        - If they are, document how they are managed within the parent module and propose the migration strategy accordingly.
+        - If they are not, document them as unmappable resources with explanations that "Child resources are not mappable to parent module inputs."
+
+Available tools:
+- get_avm_module_inputs: Retrieve input parameters for a specific AVM module
 
 STRICT BEHAVIOR:
-- NEVER modify files. Only analyze provided file contents.
 - ALWAYS output the full plan in Markdown using the exact structure defined below.
 - DO NOT ask questions. Proceed autonomously.
-- Conclude with: "Conversion planning complete. Awaiting user approval before executing conversion." EXACTLY.
+- Include mapping analysis as part of the planning process.
 
 Plan Structure (use ALL headings, even if some sections are empty—state 'None'):
 
 # Terraform → AVM Conversion Plan
 
-## 1. Scope Summary
-- Total Terraform files analyzed: 
-- Total azurerm_* resources: 
-- Resources targeted for conversion: 
-- Resources excluded / unmappable:
-
-## 2. Resource Conversion Table
+## 1. Resource Conversion Table
 | Original Resource | File | Planned AVM Module | Confidence | Action | Notes |
 |-------------------|------|--------------------|-----------|--------|-------|
 | azurerm_* | path | avm-res-* or (None) | High/Medium/Low | convert/skip/manual | brief rationale |
 
-## 3. Detailed Per-Resource Plans
+## 2. Detailed Per-Resource Plans
 For EACH resource to convert provide subsections:
-### 3.x {resource_type}.{name}
+### 2.x {resource_type}.{name}
 - Source File: {path}
 - Proposed AVM Module: {module_name} (version if known)
-- Attribute → Input Mapping Table:
-| Original Attribute | Handling | AVM Input | Transform | Notes |
-|--------------------|----------|-----------|----------|-------|
-- Make sure that all required inputs of the AVM module are covered.
-- Validate that old attributes map correctly to new inputs, noting any transformations or any attribute removals.
+- Mapping Confidence: High/Medium/Low with justification
+- Resource Input Name → AVM Input Mapping Table:
+| Resource Input Name | Input Value | AVM Input Name | Input Value | AVM Optional or Required | Handling | Transform | Notes |
+|--------------------|-------------|---------------|-------------|-------------------------|----------|-----------|-------|
+|                    |             |               |             |                         |          |           |       |
+- Make sure to include in the "Input Mapping Table":
+    - all required AVM module inputs.
+    - Attributes Available on Current resource which are not mappable to AVM module inputs
+
 - Outputs Impacted / Re-mapped:
 - Dependencies (Upstream):
 - Dependents (Downstream):
-- Diagnostics / Child Resources Handling:
+- Child Resources / Diagnostics Handling:
 - Risk Level: High/Medium/Low (justify)
-- Manual Review Required?: Yes/No (if Yes, list items)
 
-## 4. Variables Plan
-### 4.1 Existing Variables Reused
+## 3. Variables Plan
+### 3.1 Existing Variables Reused
 List variable names reused as-is.
-### 4.2 New Variables Required
-| Variable | Type (guess) | Source (resource/module) | Reason | Default? |
-|----------|--------------|--------------------------|--------|----------|
-### 4.3 Variables To Deprecate / Remove
+### 3.2 New Variables Required
+| Variable | Type | Source | Reason | Default? |
+|----------|------|--------|--------|----------|
+### 3.3 Variables To Deprecate / Remove
 | Variable | Reason | Replacement | Action |
 |----------|--------|------------|--------|
 
-## 5. Outputs Plan
+## 4. Outputs Plan
 | Original Output | Current Source | New Source (Module Output) | Change Type | Notes |
 |-----------------|----------------|---------------------------|------------|-------|
 
-## 6. Dependency Execution Order
-Provide an ordered list of module conversions honoring dependencies.
 
-## 7. File-Level Change Summary
-| File | Planned Changes | New Files Generated Later | Notes |
-|------|-----------------|---------------------------|-------|
-
-## 8. Risks & Mitigations
-| Risk | Impact | Mitigation | Owner (Tool/User) |
-|------|--------|-----------|-------------------|
-
-## 9. Manual Review Checklist
-Bullet list of concrete validation actions a human must perform BEFORE approving.
-
-## 10. Approval Gate Instructions
-Explain that conversion will only proceed when the orchestrator is run with approve flag.
-
-## 11. Summary Statement
-Brief summary of readiness.
-
-END YOUR OUTPUT WITH THIS EXACT LINE (no extra commentary):
-Conversion planning complete. Awaiting user approval before executing conversion.
+END YOUR OUTPUT.
 """
             )
 
@@ -143,27 +158,27 @@ Conversion planning complete. Awaiting user approval before executing conversion
             logger.error(f"Failed to initialize Converter Planning Agent: {e}")
             raise
 
-    async def create_conversion_plan(self, repo_scan_result: str, mapping_result: str, tf_files: dict) -> str:
+    async def create_conversion_plan(self, repo_scan_result: str, avm_knowledge: str, tf_files: dict) -> str:
         """
-        Create a detailed conversion plan based on repository scan, mapping results, and Terraform file contents.
+        Create a detailed conversion plan with integrated resource mapping based on repository scan, AVM knowledge, and Terraform file contents.
         
         Args:
             repo_scan_result: Repository scan results from TFMetadataAgent
-            mapping_result: Resource mapping results from MappingAgent
+            avm_knowledge: AVM module knowledge from AVMKnowledgeAgent
             tf_files: Dictionary mapping relative file paths to file contents
                      e.g., {'main.tf': 'content...', 'variables.tf': 'content...'}
         
         Returns:
-            Detailed conversion plan in markdown format.
+            Detailed conversion plan with integrated mapping analysis in markdown format.
         """
         
         # Format tf_files for the agent
         files_summary = "\n".join([f"File: {path}\nContent:\n{content}\n---" for path, content in tf_files.items()])
         
         message = (
-            "Create a detailed Terraform to AVM conversion plan based on repository scan, mapping results, and file contents.\n\n"
+            "Create a detailed Terraform to AVM conversion plan with integrated resource mapping.\n\n"
             f"Repository Scan Results:\n{repo_scan_result}\n\n"
-            f"Mapping Results:\n{mapping_result}\n\n"
+            f"AVM Knowledge Base:\n{avm_knowledge}\n\n"
             f"Terraform Files:\n{files_summary}"
         )
         return await self.agent.get_response(message)

@@ -9,7 +9,6 @@ from config.settings import get_settings, validate_environment
 from config.logging import setup_logging
 from agents.tf_metadata_agent import TFMetadataAgent
 from agents.avm_knowledge_agent import AVMKnowledgeAgent
-from agents.mapping_agent import MappingAgent
 from agents.converter_planning_agent import ConverterPlanningAgent
 from agents.converter_agent import ConverterAgent
 from agents.validator_agent import ValidatorAgent
@@ -121,20 +120,10 @@ class TerraformAVMOrchestrator:
         with open(f"{output_dir}/avm_knowledge.json", "w", encoding="utf-8") as f:
             f.write(str(knowledge_result))
 
-        # Step 3: Mapping Agent
-        self.logger.info("Step 3: Running Mapping Agent")
-        mapping_agent = await MappingAgent.create()
-        mapping_result = await mapping_agent.create_mappings(str(scanner_result), str(knowledge_result))
-        self._log_agent_response("MappingAgent", mapping_result)
-
-        # store the results on output folder
-        with open(f"{output_dir}/mapping.md", "w", encoding="utf-8") as f:
-            f.write(str(mapping_result))
-
-        # Step 4: Converter Planning Agent
-        self.logger.info("Step 4: Running Converter Planning Agent")
+        # Step 3: Converter Planning Agent (now includes mapping functionality)
+        self.logger.info("Step 3: Running Converter Planning Agent (with integrated mapping)")
         planning_agent = await ConverterPlanningAgent.create()
-        planning_result = await planning_agent.create_conversion_plan(str(scanner_result), str(mapping_result), tf_files)
+        planning_result = await planning_agent.create_conversion_plan(str(scanner_result), str(knowledge_result), tf_files)
         self._log_agent_response("ConverterPlanningAgent", planning_result)
         with open(f"{output_dir}/conversion_plan.md", "w", encoding="utf-8") as f:
             f.write(str(planning_result))
@@ -149,29 +138,28 @@ class TerraformAVMOrchestrator:
         migrated_output_dir = Path(output_dir) / "migrated"
         migrated_output_dir.mkdir(parents=True, exist_ok=True)
 
-        # Step 5: Converter Agent
-        self.logger.info("Step 5: Running Converter Agent (user approved)")
+        # Step 4: Converter Agent
+        self.logger.info("Step 4: Running Converter Agent (user approved)")
         converter_agent = await ConverterAgent.create()
         converter_result = await converter_agent.run_conversion(planning_result, migrated_output_dir, tf_files)
         self._log_agent_response("ConverterAgent", converter_result)
 
         exit()
 
-        # Step 6: Validator Agent
-        self.logger.info("Step 6: Running Validator Agent")
+        # Step 5: Validator Agent
+        self.logger.info("Step 5: Running Validator Agent")
         validator_agent = await ValidatorAgent.create()
         validator_result = await validator_agent.validate_conversion(repo_path, str(migrated_output_dir), str(converter_result))
         self._log_agent_response("ValidatorAgent", validator_result)
 
-        # Step 7: Report Agent
-        self.logger.info("Step 7: Running Report Agent")
+        # Step 6: Report Agent
+        self.logger.info("Step 6: Running Report Agent")
         report_agent = await ReportAgent.create()
         
         # Prepare all results for the report
         all_results = {
             "scanner": str(scanner_result),
             "knowledge": str(knowledge_result),
-            "mapping": str(mapping_result),
             "planning": str(planning_result),
             "conversion": str(converter_result),
             "validation": str(validator_result)

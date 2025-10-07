@@ -158,7 +158,7 @@ NEVER ask questions or wait for user input. Always proceed autonomously and comp
         results_summary = (
             f"Generate final conversion report in '{output_dir}'. "
             f"Scanner: {all_results.get('scanner', 'N/A')}, "
-            f"Mapping: {all_results.get('mapping', 'N/A')}, "
+            f"Planning: {all_results.get('planning', 'N/A')}, "
             f"Conversion: {all_results.get('conversion', 'N/A')}, "
             f"Validation: {all_results.get('validation', 'N/A')}"
         )
