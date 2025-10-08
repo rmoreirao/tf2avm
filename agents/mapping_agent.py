@@ -115,6 +115,57 @@ NEVER ask questions or wait for user input. Always proceed autonomously and hand
         response = await self.agent.get_response(message)
         result = MappingAgentResult.model_validate(json.loads(response.message.content))
         return result
-    
-    async def review_mappings(self, previous_mapping_result: MappingAgentResult, avm_modules_details: List[AVMModule]) -> MappingAgentResult:
+
+    async def review_mappings(self, repo_scan_result: str, avm_knowledge: str, previous_mapping_result: MappingAgentResult, avm_modules_details: List[AVMModule]) -> MappingAgentResult:
+        """
+        Review and improve existing resource mappings using detailed AVM module information.
         
+        Args:
+            repo_scan_result: Repository scan results with azurerm_* resources
+            avm_knowledge: AVM Index knowledge base with available modules
+            previous_mapping_result: Previous mapping results to review and improve
+            avm_modules_details: Detailed AVM module information for better mapping accuracy
+            
+        Returns:
+            MappingAgentResult: Updated mapping results with improved accuracy
+        """
+
+        self.logger.info("Starting mapping review process")
+        
+        # Prepare the detailed module information for the agent
+        avm_details_summary = self._format_avm_details(avm_modules_details)
+        
+        # Prepare previous mapping summary for context
+        previous_mapping_summary = self._format_previous_mappings(previous_mapping_result)
+        
+        # Create comprehensive message for the agent
+        message = f"""Review and improve resource mappings using detailed AVM module information.
+
+    Repository Scan Results:
+    {repo_scan_result}
+
+    AVM Knowledge Base:
+    {avm_knowledge}
+
+    Previous Mapping Results:
+    {previous_mapping_summary}
+
+    Detailed AVM Module Information:
+    {avm_details_summary}
+
+    Please review the previous mappings and:
+    1. Validate existing mappings against detailed module specifications
+    2. Improve confidence scores based on detailed module information
+    3. Re-evaluate unmapped resources - check if child resources are handled within parent AVM modules
+    4. Update mappings where detailed module inputs/outputs provide better matches
+    5. Document any changes made and rationale for improvements"""
+
+        # Get response from the agent
+        response = await self.agent.get_response(message)
+        
+        # Parse and validate the response
+        result = MappingAgentResult.model_validate(json.loads(response.content))
+        
+        self.logger.info(f"Mapping review completed. Found {len(result.resource_mappings)} mappings, {len(result.unmapped_resources)} unmapped")
+        
+        return result

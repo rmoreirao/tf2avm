@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 import shutil
 import traceback
-from typing import Dict, Any
+from typing import Dict, Any, List
 
 from agents.avm_resource_details_agent import AVMResourceDetailsAgent
 from config.settings import get_settings, validate_environment
@@ -136,25 +136,30 @@ class TerraformAVMOrchestrator:
         # filter all mappings where target_module is not None
         valid_mappings = [m for m in mapping_result.mappings if m.target_module is not None]
         # store the module detail in dictionary: module_name -> details
-        modules_details: Dict[str, AVMResourceDetailsAgentResult] = {}
+        modules_details: List[AVMResourceDetailsAgentResult] = []
 
         for mapping in valid_mappings:
             self.logger.info(f"Fetching details for AVM module: {mapping.target_module.name}, version: {mapping.target_module.version}")
 
-            modules_details[mapping.target_module.name] = await avm_resource_details_agent.fetch_avm_resource_details(mapping.target_module.name, mapping.target_module.version)
+            module_detail = await avm_resource_details_agent.fetch_avm_resource_details(mapping.target_module.name, mapping.target_module.version)
+            modules_details.append(module_detail)
             # self._log_agent_response(f"AVMResourceDetailsAgent - {mapping.target_module.name} {mapping.target_module.version}", modules_details)
 
         with open(f"{output_dir}/04_avm_module_details.json", "w", encoding="utf-8") as f:
-            f.write(json.dumps({k: v.model_dump() for k, v in modules_details.items()}, indent=2))
+            f.write(json.dumps([v.model_dump() for v in modules_details], indent=2))
 
         
         # if there are resources without mappings, execute again the planning agent with the AVM resource details
-        if len(valid_mappings) < len(tf_metadata_agent_output.resources):
+        if len(valid_mappings) < len(mapping_result.mappings):
             self.logger.info("Some resources do not have mappings. Re-running planning with AVM resource details integrated.")
-            
-            
-        
 
+            mapping_result : MappingAgentResult = await mapping_agent.review_mappings( str(tf_metadata_agent_output), str(knowledge_result), mapping_result, modules_details)
+            self._log_agent_response("MappingAgent", mapping_result)
+
+            with open(f"{output_dir}/03_retry_mappings.json", "w", encoding="utf-8") as f:
+                f.write(mapping_result.model_dump_json(indent=2))
+        
+        exit()
 
         self.logger.info("Step 4: Running Converter Planning Agent (with integrated mapping)")
         planning_agent = await ConverterPlanningAgent.create()
