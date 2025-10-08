@@ -14,7 +14,7 @@ from agents.converter_planning_agent import ConverterPlanningAgent
 from agents.converter_agent import ConverterAgent
 from agents.validator_agent import ValidatorAgent
 from agents.report_agent import ReportAgent
-from schemas.models import TerraformMetadataAgentResult
+from schemas.models import AVMKnowledgeResult, TerraformMetadataAgentResult
 
 
 class TerraformAVMOrchestrator:
@@ -115,12 +115,12 @@ class TerraformAVMOrchestrator:
         # Step 2: AVM Knowledge Agent
         self.logger.info("Step 2: Running AVM Knowledge Agent")
         knowledge_agent = await AVMKnowledgeAgent.create()
-        knowledge_result = await knowledge_agent.fetch_avm_knowledge()
+        knowledge_result : AVMKnowledgeResult = await knowledge_agent.fetch_avm_knowledge()
         self._log_agent_response("AVMKnowledgeAgent", knowledge_result)
 
         # store the results on output folder
         with open(f"{output_dir}/02_avm_knowledge.json", "w", encoding="utf-8") as f:
-            f.write(str(knowledge_result))
+            f.write(knowledge_result.model_dump_json(indent=2))
 
         exit()
 

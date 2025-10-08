@@ -18,25 +18,37 @@ class TerraformMetadataAgentResult(BaseModel):
     """Result of repository scanning."""
     azurerm_resources: List[TerraformResource] = Field(description="List of Azure Resource Manager resources found in the repository")
     
+class AVMModuleInput(BaseModel):
+    """Represents a module input parameter."""
+    name: str = Field(description="Name of the input parameter")
+    type: str = Field(description="Type of the input parameter")
+    description: Optional[str] = Field(default=None, description="Description of the input parameter")
+    required: bool = Field(default=True, description="Whether the input is required")
+    default: Optional[str] = Field(default=None, description="Default value if any")
+
+
+class AVMModuleOutput(BaseModel):
+    """Represents a module output value."""
+    name: str = Field(description="Name of the output value")
+    description: Optional[str] = Field(default=None, description="Description of the output value")
+    sensitive: bool = Field(default=False, description="Whether the output is sensitive")
 
 
 class AVMModule(BaseModel):
     """Represents an Azure Verified Module."""
-    name: str
-    display_name: str
-    description: Optional[str] = None
-    source_url: Optional[str] = None
-    version: Optional[str] = None
-    inputs: List[Dict[str, Any]] = []
-    outputs: List[Dict[str, Any]] = []
-
+    name: str = Field(description="The module name")
+    display_name: str = Field(description="Human-readable display name of the module")
+    terraform_registry_url: str = Field(default=None, description="URL to the Terraform registry entry")
+    source_code_url: str = Field(default=None, description="URL to the source code repository")
+    version: str = Field(default=None, description="Version of the module")
+    description: Optional[str] = Field(default=None, description="Description of what the module does")
+    resources: Optional[List[str]] = Field(default=None, description="List of Terraform resources managed by this module")
+    inputs: Optional[List[AVMModuleInput]] = Field(default=None, description="List of input parameters for the module")
+    outputs: Optional[List[AVMModuleOutput]] = Field(default=None, description="List of output values from the module")
 
 class AVMKnowledgeResult(BaseModel):
     """Result of AVM knowledge gathering."""
-    modules: List[AVMModule]
-    index_url: str
-    fetch_timestamp: str
-    total_modules: int
+    modules: List[AVMModule] = Field(description="List of available AVM modules")
 
 
 class ResourceMapping(BaseModel):

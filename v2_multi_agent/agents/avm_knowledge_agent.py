@@ -1,9 +1,14 @@
+import json
 from semantic_kernel.agents import ChatCompletionAgent
 from semantic_kernel.connectors.ai.open_ai import AzureChatCompletion
 from semantic_kernel import Kernel
 from config.settings import get_settings
 from config.logging import get_logger
 from plugins.http_plugin import HttpClientPlugin
+from semantic_kernel.connectors.ai.open_ai import OpenAIChatCompletion, OpenAIChatPromptExecutionSettings
+from semantic_kernel.functions import KernelArguments
+
+from schemas.models import AVMKnowledgeResult
 
 
 class AVMKnowledgeAgent:
@@ -40,8 +45,11 @@ class AVMKnowledgeAgent:
             
             kernel.add_service(chat_completion_service)
             
+            execution_settings = OpenAIChatPromptExecutionSettings(response_format=AVMKnowledgeResult)
+
             # Initialize plugins
             http_plugin = HttpClientPlugin()
+            await http_plugin.fetch_url("https://azure.github.io/Azure-Verified-Modules/indexes/terraform/tf-resource-modules/")
             
             # Create the agent
             agent = ChatCompletionAgent(
@@ -50,6 +58,7 @@ class AVMKnowledgeAgent:
                 name="AVMKnowledgeAgent",
                 description="A specialist agent that gathers and maintains Azure Verified Modules knowledge.",
                 plugins=[http_plugin],
+                arguments=KernelArguments(execution_settings),
                 instructions="""You are the AVM Knowledge Agent for Terraform to Azure Verified Modules (AVM) conversion.
 
 Your responsibilities:
@@ -70,16 +79,8 @@ Process:
 3. Create mappings between Display Names (Azure resource types) and Module Names
 4. For each relevant module, note the version information
 
-Mapping JSON output format:
-
-[
-    {
-        "displayName": "Module Display Name",
-        "moduleName": "avm_module_name",
-        "version": "x.y.z"
-    },
-    ...
-]
+Output:
+Fill in only the fiedls on the JSON output: name, display_name, terraform_registry_url, source_code_url, version
 
 
 Only output the JSON mapping format. Output the full list and never truncate it. NEVER ask questions or wait for user input. Always proceed autonomously.
@@ -93,11 +94,13 @@ Only output the JSON mapping format. Output the full list and never truncate it.
             logger.error(f"Failed to initialize AVM Knowledge Agent: {e}")
             raise
             
-    async def fetch_avm_knowledge(self) -> str:
+    async def fetch_avm_knowledge(self) -> AVMKnowledgeResult:
         """
         Fetch AVM module knowledge from official sources.
         Returns JSON mapping of AVM modules.
         """
         
         message = "Gather AVM module knowledge from official sources."
-        return await self.agent.get_response(message)
+        response = await self.agent.get_response(message)
+        result = AVMKnowledgeResult.model_validate(json.loads(response.message.content))
+        return result
