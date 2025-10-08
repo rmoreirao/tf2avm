@@ -1,0 +1,112 @@
+{
+  "module": {
+    "name": "avm-res-certificateregistration-certificateorder",
+    "display_name": "Azure/avm-res-certificateregistration-certificateorder",
+    "version": "0.1.0",
+    "description": "Terraform Azure Verified Resource Module for Certificate Order",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-certificateregistration-certificateorder/azurerm",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-certificateregistration-certificateorder",
+    "requirements": [
+      "azapi ~> 2.5",
+      "modtm ~> 0.3",
+      "random ~> 3.7"
+    ],
+    "resources": [
+      "modtm_telemetry",
+      "azapi_resource",
+      "azapi_resource",
+      "azapi_resource",
+      "azapi_resource",
+      "random_uuid"
+    ],
+    "inputs": [
+      {
+        "name": "certificate_order_key_vault_stores",
+        "type": "map(object({\n    name                  = string\n    key_vault_id          = string\n    key_vault_secret_name = string\n    tags                  = optional(map(string))\n  }))",
+        "required": false
+      },
+      {
+        "name": "csr",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "role_assignments",
+        "type": "map(object({\n    role_definition_id_or_name             = string\n    principal_id                           = string\n    description                            = optional(string, null)\n    skip_service_principal_aad_check       = optional(bool, false)\n    condition                              = optional(string, null)\n    condition_version                      = optional(string, null)\n    delegated_managed_identity_resource_id = optional(string, null)\n    principal_type                         = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "validity_in_years",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "location",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "resource_group_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "auto_renew",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "distinguished_name",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "key_size",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "lock",
+        "type": "object({\n    kind = string\n    name = optional(string, null)\n  })",
+        "required": false
+      },
+      {
+        "name": "product_type",
+        "type": "string",
+        "required": false
+      }
+    ],
+    "outputs": [
+      {
+        "name": "resource",
+        "description": "The resource of app service certificate order",
+        "sensitive": false
+      },
+      {
+        "name": "resource_id",
+        "description": "The resource ID of app service certificate order",
+        "sensitive": false
+      },
+      {
+        "name": "resource_in_azurerm_schema",
+        "description": "The resource of app service certificate order in azurerm schema",
+        "sensitive": false
+      }
+    ]
+  }
+}

@@ -1,0 +1,215 @@
+{
+  "module": {
+    "name": "avm-res-cache-redis",
+    "display_name": "Azure/avm-res-cache-redis",
+    "version": "0.4.0",
+    "description": "To gain access, please finish setting up this repository now at: ",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-cache-redis/azurerm",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-cache-redis",
+    "requirements": [
+      "azapi ~> 2.0",
+      "azurerm ~> 4.0",
+      "modtm ~> 0.3",
+      "random ~> 3.5"
+    ],
+    "resources": [
+      "azurerm_redis_linked_server",
+      "azurerm_role_assignment",
+      "random_uuid",
+      "azurerm_redis_cache_access_policy_assignment",
+      "azurerm_monitor_diagnostic_setting",
+      "azurerm_private_endpoint",
+      "azurerm_private_endpoint",
+      "azurerm_private_endpoint_application_security_group_association",
+      "azurerm_redis_cache",
+      "azurerm_management_lock",
+      "modtm_telemetry",
+      "azurerm_redis_cache_access_policy",
+      "azurerm_redis_firewall_rule"
+    ],
+    "inputs": [
+      {
+        "name": "private_static_ip_address",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "resource_group_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "enable_non_ssl_port",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "tenant_settings",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "capacity",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "linked_redis_caches",
+        "type": "map(object({\n    linked_redis_cache_resource_id = string\n    linked_redis_cache_location    = string\n    server_role                    = string\n  }))",
+        "required": false
+      },
+      {
+        "name": "redis_version",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "role_assignments",
+        "type": "map(object({\n    role_definition_id_or_name             = string\n    principal_id                           = string\n    description                            = optional(string, null)\n    skip_service_principal_aad_check       = optional(bool, false)\n    condition                              = optional(string, null)\n    condition_version                      = optional(string, null)\n    delegated_managed_identity_resource_id = optional(string, null)\n    principal_type                         = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "sku_name",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "subnet_resource_id",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "managed_identities",
+        "type": "object({\n    system_assigned            = optional(bool, false)\n    user_assigned_resource_ids = optional(set(string), [])\n  })",
+        "required": false
+      },
+      {
+        "name": "cache_access_policies",
+        "type": "map(object({\n    name        = string\n    permissions = string\n  }))",
+        "required": false
+      },
+      {
+        "name": "cache_firewall_rules",
+        "type": "map(object({\n    name     = string\n    start_ip = string\n    end_ip   = string\n  }))",
+        "required": false
+      },
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "lock",
+        "type": "object({\n    kind = string\n    name = optional(string, null)\n  })",
+        "required": false
+      },
+      {
+        "name": "public_network_access_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "minimum_tls_version",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "patch_schedule",
+        "type": "set(object({\n    day_of_week        = optional(string, \"Saturday\")\n    maintenance_window = optional(string, \"PT5H\")\n    start_hour_utc     = optional(number, 0)\n  }))",
+        "required": false
+      },
+      {
+        "name": "redis_configuration",
+        "type": "object({\n    aof_backup_enabled                       = optional(bool)\n    aof_storage_connection_string_0          = optional(string)\n    aof_storage_connection_string_1          = optional(string)\n    enable_authentication                    = optional(bool)\n    active_directory_authentication_enabled  = optional(bool)\n    maxmemory_reserved                       = optional(number)\n    maxmemory_delta                          = optional(number)\n    maxfragmentationmemory_reserved          = optional(number)\n    maxmemory_policy                         = optional(string)\n    data_persistence_authentication_method   = optional(string) #TODO: research the managed identity vs. SAS key and determine level of effort required to default to ManagedIdentity as the more secure option, and review what happens if data persistence is not enabled.\n    rdb_backup_enabled                       = optional(bool)   #TODO: Research if we want backups to be true. Given this is cache, probably not required.\n    rdb_backup_frequency                     = optional(number)\n    rdb_backup_max_snapshot_count            = optional(number)\n    rdb_storage_connection_string            = optional(string)\n    storage_account_subscription_resource_id = optional(string)\n    notify_keyspace_events                   = optional(string)\n  })",
+        "required": false
+      },
+      {
+        "name": "replicas_per_master",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "location",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "diagnostic_settings",
+        "type": "map(object({\n    name                                     = optional(string, null)\n    log_categories                           = optional(set(string), [])\n    log_groups                               = optional(set(string), [\"allLogs\"])\n    metric_categories                        = optional(set(string), [\"AllMetrics\"])\n    log_analytics_destination_type           = optional(string, \"Dedicated\")\n    workspace_resource_id                    = optional(string, null)\n    storage_account_resource_id              = optional(string, null)\n    event_hub_authorization_rule_resource_id = optional(string, null)\n    event_hub_name                           = optional(string, null)\n    marketplace_partner_resource_id          = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "private_endpoints_manage_dns_zone_group",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "zones",
+        "type": "list(string)",
+        "required": false
+      },
+      {
+        "name": "cache_access_policy_assignments",
+        "type": "map(object({\n    name               = string\n    access_policy_name = string\n    object_id          = string\n    object_id_alias    = string\n  }))",
+        "required": false
+      },
+      {
+        "name": "replicas_per_primary",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "shard_count",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "private_endpoints",
+        "type": "map(object({\n    name = optional(string, null)\n    role_assignments = optional(map(object({\n      role_definition_id_or_name             = string\n      principal_id                           = string\n      description                            = optional(string, null)\n      skip_service_principal_aad_check       = optional(bool, false)\n      condition                              = optional(string, null)\n      condition_version                      = optional(string, null)\n      delegated_managed_identity_resource_id = optional(string, null)\n      principal_type                         = optional(string, null)\n    })), {})\n    lock = optional(object({\n      kind = string\n      name = optional(string, null)\n    }), null)\n    tags                                    = optional(map(string), null)\n    subnet_resource_id                      = string\n    private_dns_zone_group_name             = optional(string, \"default\")\n    private_dns_zone_resource_ids           = optional(set(string), [])\n    application_security_group_associations = optional(map(string), {})\n    private_service_connection_name         = optional(string, null)\n    network_interface_name                  = optional(string, null)\n    location                                = optional(string, null)\n    resource_group_name                     = optional(string, null)\n    ip_configurations = optional(map(object({\n      name               = string\n      private_ip_address = string\n    })), {})\n  }))",
+        "required": false
+      },
+      {
+        "name": "access_keys_authentication_enabled",
+        "type": "bool",
+        "required": false
+      }
+    ],
+    "outputs": [
+      {
+        "name": "name",
+        "description": "The name of the redis resource",
+        "sensitive": false
+      },
+      {
+        "name": "private_endpoints",
+        "description": "A map of private endpoints. The map key is the supplied input to var.private_endpoints. The map value is the entire azurerm_private_endpoint resource.",
+        "sensitive": false
+      },
+      {
+        "name": "resource",
+        "description": "This is the full output for the resource.",
+        "sensitive": false
+      },
+      {
+        "name": "resource_id",
+        "description": "The resource id of the redis cache resource.",
+        "sensitive": false
+      },
+      {
+        "name": "system_assigned_mi_principal_id",
+        "description": "The resource id for the system managed identity principal id.",
+        "sensitive": false
+      }
+    ]
+  }
+}

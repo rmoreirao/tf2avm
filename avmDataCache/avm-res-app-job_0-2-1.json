@@ -1,0 +1,109 @@
+{
+  "module": {
+    "name": "avm-res-app-job",
+    "display_name": "Azure/avm-res-app-job",
+    "version": "0.2.1",
+    "description": "Terraform Azure Verified Resource Module for App Job",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-app-job/azurerm",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-app-job",
+    "requirements": [
+      "azurerm ~> 4.0",
+      "modtm ~> 0.3",
+      "random ~> 3.5"
+    ],
+    "resources": [
+      "modtm_telemetry",
+      "azurerm_container_app_job",
+      "random_uuid"
+    ],
+    "inputs": [
+      {
+        "name": "template",
+        "type": "object({\n    max_replicas = optional(number)\n    min_replicas = optional(number)\n    container = object({\n      name    = string\n      image   = string\n      cpu     = number\n      memory  = string\n      command = optional(list(string))\n      args    = optional(list(string))\n      env = optional(list(object({\n        name        = string\n        secret_name = optional(string)\n        value       = optional(string)\n      })))\n      liveness_probe = optional(list(object({\n        port                    = number\n        transport               = string\n        failure_count_threshold = number\n        period                  = number\n        header = optional(list(object({\n          name  = string\n          value = string\n        })))\n        host             = optional(string)\n        initial_delay    = optional(number)\n        interval_seconds = optional(number)\n        path             = optional(string)\n        timeout          = optional(number)\n      })))\n      readiness_probe = optional(list(object({\n        port                    = number\n        transport               = string\n        failure_count_threshold = number\n        header = optional(list(object({\n          name  = string\n          value = string\n        })))\n        host                    = optional(string)\n        interval_seconds        = optional(number)\n        path                    = optional(string)\n        success_count_threshold = optional(number)\n        timeout                 = optional(number)\n      })))\n      startup_probe = optional(list(object({\n        port                    = number\n        transport               = string\n        failure_count_threshold = number\n        header = optional(list(object({\n          name  = string\n          value = string\n        })))\n        host             = optional(string)\n        interval_seconds = optional(number)\n        path             = optional(string)\n        timeout          = optional(number)\n      })))\n      volume_mounts = optional(list(object({\n        name = string\n        path = string\n      })))\n    })\n    init_container = optional(list(object({\n      name    = string\n      image   = string\n      cpu     = number\n      memory  = string\n      command = list(string)\n      args    = list(string)\n      env = optional(list(object({\n        name        = string\n        secret_name = optional(string)\n        value       = optional(string)\n      })))\n      volume_mounts = optional(list(object({\n        name = string\n        path = string\n      })))\n    })))\n    volume = optional(list(object({\n      name         = optional(string)\n      storage_type = optional(string)\n      storage_name = optional(string)\n    })))\n  })",
+        "required": true
+      },
+      {
+        "name": "replica_timeout_in_seconds",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "trigger_config",
+        "type": "object({\n    manual_trigger_config = optional(object({\n      parallelism              = optional(number)\n      replica_completion_count = optional(number)\n    }))\n    event_trigger_config = optional(object({\n      parallelism              = optional(number)\n      replica_completion_count = optional(number)\n      scale = optional(object({\n        max_executions              = optional(number)\n        min_executions              = optional(number)\n        polling_interval_in_seconds = optional(number)\n        rules = optional(list(object({\n          name             = optional(string)\n          custom_rule_type = optional(string)\n          metadata         = optional(map(string))\n          authentication = optional(list(object({\n            secret_name       = optional(string)\n            trigger_parameter = optional(string)\n          })))\n        })))\n      }))\n    }))\n    schedule_trigger_config = optional(object({\n      cron_expression          = optional(string)\n      parallelism              = optional(number)\n      replica_completion_count = optional(number)\n    }))\n  })",
+        "required": false
+      },
+      {
+        "name": "location",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "managed_identities",
+        "type": "object({\n    system_assigned            = optional(bool, false)\n    user_assigned_resource_ids = optional(set(string), [])\n  })",
+        "required": false
+      },
+      {
+        "name": "registries",
+        "type": "list(object({\n    identity             = optional(string)\n    password_secret_name = optional(string)\n    server               = string\n    username             = optional(string)\n  }))",
+        "required": false
+      },
+      {
+        "name": "replica_retry_limit",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "secrets",
+        "type": "list(object({\n    name                = string\n    identity            = optional(string)\n    key_vault_secret_id = optional(string)\n    value               = optional(string)\n  }))",
+        "required": false
+      },
+      {
+        "name": "tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "workload_profile_name",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "container_app_environment_resource_id",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "resource_group_name",
+        "type": "string",
+        "required": true
+      }
+    ],
+    "outputs": [
+      {
+        "name": "container_app_job_name",
+        "description": "The name of the Container App Job.",
+        "sensitive": false
+      },
+      {
+        "name": "managed_identities",
+        "description": "The managed identities for the Container App Job.",
+        "sensitive": false
+      },
+      {
+        "name": "resource_id",
+        "description": "The ID of the Container App Job.",
+        "sensitive": false
+      }
+    ]
+  }
+}

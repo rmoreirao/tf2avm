@@ -1,0 +1,304 @@
+{
+  "module": {
+    "name": "avm-res-avs-privatecloud",
+    "display_name": "Azure/avm-res-avs-privatecloud",
+    "version": "0.9.0",
+    "description": "Terraform Azure Verified Resource Module for AVS Private Cloud",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-avs-privatecloud/azurerm",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-avs-privatecloud",
+    "requirements": [
+      "azapi ~> 2.4",
+      "azurerm >= 3.115, < 5.0",
+      "modtm ~> 0.3",
+      "random ~> 3.6",
+      "time ~> 0.11"
+    ],
+    "resources": [
+      "azapi_resource",
+      "azurerm_management_lock",
+      "azapi_resource_action",
+      "modtm_telemetry",
+      "time_sleep",
+      "random_password",
+      "azapi_resource",
+      "azurerm_vmware_express_route_authorization",
+      "azapi_resource",
+      "azurerm_express_route_connection",
+      "azurerm_express_route_connection",
+      "azurerm_monitor_diagnostic_setting",
+      "azapi_resource",
+      "azapi_resource",
+      "azapi_resource",
+      "azapi_resource",
+      "azapi_resource",
+      "azapi_resource",
+      "azapi_resource",
+      "azapi_resource",
+      "random_uuid",
+      "azapi_resource",
+      "azurerm_role_assignment",
+      "azapi_resource",
+      "time_sleep",
+      "azapi_resource",
+      "azapi_resource",
+      "azapi_resource",
+      "azapi_resource",
+      "azapi_resource",
+      "azapi_resource",
+      "azapi_resource",
+      "terraform_data",
+      "random_password",
+      "azapi_update_resource",
+      "azapi_resource_action"
+    ],
+    "inputs": [
+      {
+        "name": "vcenter_identity_sources",
+        "type": "map(object({\n    alias            = string\n    base_group_dn    = string\n    base_user_dn     = string\n    domain           = string\n    group_name       = optional(string, null)\n    name             = string\n    primary_server   = string\n    secondary_server = optional(string, null)\n    ssl              = optional(string, \"Enabled\")\n    timeout          = optional(string, \"10m\")\n  }))",
+        "required": false
+      },
+      {
+        "name": "virtual_network_resource_id",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "lock",
+        "type": "object({\n    kind = string\n    name = optional(string, null)\n  })",
+        "required": false
+      },
+      {
+        "name": "managed_identities",
+        "type": "object({\n    system_assigned            = optional(bool, false)\n    user_assigned_resource_ids = optional(set(string), [])\n  })",
+        "required": false
+      },
+      {
+        "name": "netapp_files_datastores",
+        "type": "map(object({\n    netapp_volume_resource_id = string\n    cluster_names             = set(string)\n  }))",
+        "required": false
+      },
+      {
+        "name": "location",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "enable_stretch_cluster",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "secondary_zone",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "clusters",
+        "type": "map(object({\n    cluster_node_count = number\n    sku_name           = string\n  }))",
+        "required": false
+      },
+      {
+        "name": "dns_zone_type",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "nsxt_password",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "customer_managed_key",
+        "type": "object({\n    key_vault_resource_id = string\n    key_name              = string\n    key_version           = optional(string, null)\n    user_assigned_identity = optional(object({\n      resource_id = string\n    }), null)\n  })",
+        "required": false
+      },
+      {
+        "name": "diagnostic_settings",
+        "type": "map(object({\n    name                                     = optional(string, null)\n    log_categories                           = optional(set(string), [])\n    log_groups                               = optional(set(string), [\"allLogs\"])\n    metric_categories                        = optional(set(string), [\"AllMetrics\"])\n    log_analytics_destination_type           = optional(string, \"Dedicated\")\n    workspace_resource_id                    = optional(string, null)\n    storage_account_resource_id              = optional(string, null)\n    event_hub_authorization_rule_resource_id = optional(string, null)\n    event_hub_name                           = optional(string, null)\n    marketplace_partner_resource_id          = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "vcenter_identity_sources_credentials",
+        "type": "map(object({\n    ldap_user          = string\n    ldap_user_password = string\n  }))",
+        "required": false
+      },
+      {
+        "name": "avs_network_cidr",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "resource_group_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "addons",
+        "type": "map(object({\n    arc_vcenter            = optional(string)\n    hcx_key_names          = optional(list(string), [])\n    hcx_license_type       = optional(string, \"Enterprise\")\n    hcx_management_network = optional(string, null)\n    hcx_uplink_network     = optional(string, null)\n    srm_license_key        = optional(string)\n    vr_vrs_count           = optional(number, 0)\n  }))",
+        "required": false
+      },
+      {
+        "name": "internet_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "role_assignments",
+        "type": "map(object({\n    role_definition_id_or_name             = string\n    principal_id                           = string\n    description                            = optional(string, null)\n    skip_service_principal_aad_check       = optional(bool, false)\n    condition                              = optional(string, null)\n    condition_version                      = optional(string, null)\n    delegated_managed_identity_resource_id = optional(string, null)\n    principal_type                         = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "resource_group_resource_id",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "sku_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "elastic_san_datastores",
+        "type": "map(object({\n    cluster_names           = set(string)\n    esan_volume_resource_id = string\n  }))",
+        "required": false
+      },
+      {
+        "name": "expressroute_connections",
+        "type": "map(object({\n    name                               = string\n    expressroute_gateway_resource_id   = string\n    deployment_order                   = optional(number, 1)\n    vwan_hub_connection                = optional(bool, false)\n    authorization_key_name             = optional(string, null)\n    fast_path_enabled                  = optional(bool, false)\n    private_link_fast_path_enabled     = optional(bool, false)\n    routing_weight                     = optional(number, 0)\n    enable_internet_security           = optional(bool, false)\n    tags                               = optional(map(string), {})\n    network_resource_group_resource_id = optional(string, null)\n    network_resource_group_location    = optional(string, null)\n    routing = optional(map(object({\n      associated_route_table_resource_id = optional(string, null)\n      inbound_route_map_resource_id      = optional(string, null)\n      outbound_route_map_resource_id     = optional(string, null)\n      propagated_route_table = optional(object({\n        labels = optional(list(string), [])\n        ids    = optional(list(string), [])\n      }), {})\n    })), {})\n  }))",
+        "required": false
+      },
+      {
+        "name": "external_storage_address_block",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "global_reach_connections",
+        "type": "map(object({\n    authorization_key                     = string\n    peer_expressroute_circuit_resource_id = string\n  }))",
+        "required": false
+      },
+      {
+        "name": "segments",
+        "type": "map(object({\n    display_name      = string\n    gateway_address   = string\n    dhcp_ranges       = optional(list(string), [])\n    connected_gateway = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "dhcp_configuration",
+        "type": "map(object({\n    display_name           = string\n    dhcp_type              = string\n    relay_server_addresses = optional(list(string), [])\n    server_lease_time      = optional(number, 86400)\n    server_address         = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "internet_inbound_public_ips",
+        "type": "map(object({\n    number_of_ip_addresses = number\n  }))",
+        "required": false
+      },
+      {
+        "name": "primary_zone",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "vcenter_password",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "avs_interconnect_connections",
+        "type": "map(object({\n    linked_private_cloud_resource_id = string\n  }))",
+        "required": false
+      },
+      {
+        "name": "dns_forwarder_zones",
+        "type": "map(object({\n    display_name               = string\n    dns_server_ips             = list(string)\n    domain_names               = list(string)\n    source_ip                  = optional(string, \"\")\n    add_to_default_dns_service = optional(bool, false)\n  }))",
+        "required": false
+      },
+      {
+        "name": "extended_network_blocks",
+        "type": "list(string)",
+        "required": false
+      },
+      {
+        "name": "management_cluster_size",
+        "type": "number",
+        "required": false
+      }
+    ],
+    "outputs": [
+      {
+        "name": "credentials",
+        "description": "This value returns the vcenter and nsxt cloudadmin credential values.",
+        "sensitive": false
+      },
+      {
+        "name": "hcx_cloud_manager_endpoint_hostname",
+        "description": "The hcx cloud manager's hostname",
+        "sensitive": false
+      },
+      {
+        "name": "hcx_cloud_manager_endpoint_https",
+        "description": "The full https endpoint for hcx cloud manager",
+        "sensitive": false
+      },
+      {
+        "name": "nsxt_manager_endpoint_https",
+        "description": "The full https endpoint for nsxt manager.",
+        "sensitive": false
+      },
+      {
+        "name": "public_ip",
+        "description": "The public IP prefixes when a public ip config is configured for the private cloud.",
+        "sensitive": false
+      },
+      {
+        "name": "resource",
+        "description": "This output returns the full private cloud resource object properties.",
+        "sensitive": false
+      },
+      {
+        "name": "vcsa_endpoint_hostname",
+        "description": "The vcsa endpoint's hostname",
+        "sensitive": false
+      },
+      {
+        "name": "vcsa_endpoint_https",
+        "description": "The full https endpoint for vcsa.",
+        "sensitive": false
+      },
+      {
+        "name": "identity",
+        "description": "This output returns the managed identity values if the managed identity has been enabled on the module.",
+        "sensitive": false
+      },
+      {
+        "name": "nsxt_manager_endpoint_hostname",
+        "description": "The nsxt endpoint's hostname",
+        "sensitive": false
+      },
+      {
+        "name": "resource_id",
+        "description": "The azure resource if of the private cloud.",
+        "sensitive": false
+      },
+      {
+        "name": "system_assigned_mi_principal_id",
+        "description": "The principal id of the system managed identity assigned to the virtual machine",
+        "sensitive": false
+      }
+    ]
+  }
+}

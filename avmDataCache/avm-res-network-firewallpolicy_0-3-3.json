@@ -1,0 +1,147 @@
+{
+  "module": {
+    "name": "avm-res-network-firewallpolicy",
+    "display_name": "Azure/avm-res-network-firewallpolicy",
+    "version": "0.3.3",
+    "description": "Azure Firewall Policy AVM Module",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-network-firewallpolicy/azurerm",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-network-firewallpolicy",
+    "requirements": [
+      "azurerm >= 3.71, < 5.0.0",
+      "modtm ~> 0.3",
+      "random ~> 3.5"
+    ],
+    "resources": [
+      "random_uuid",
+      "modtm_telemetry",
+      "azurerm_firewall_policy",
+      "azurerm_role_assignment",
+      "azurerm_monitor_diagnostic_setting",
+      "azurerm_management_lock"
+    ],
+    "inputs": [
+      {
+        "name": "firewall_policy_sku",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "firewall_policy_threat_intelligence_allowlist",
+        "type": "object({\n    fqdns        = optional(set(string))\n    ip_addresses = optional(set(string))\n  })",
+        "required": false
+      },
+      {
+        "name": "lock",
+        "type": "object({\n    kind = string\n    name = optional(string, null)\n  })",
+        "required": false
+      },
+      {
+        "name": "firewall_policy_dns",
+        "type": "object({\n    proxy_enabled = optional(bool)\n    servers       = optional(list(string))\n  })",
+        "required": false
+      },
+      {
+        "name": "firewall_policy_explicit_proxy",
+        "type": "object({\n    enable_pac_file = optional(bool)\n    enabled         = optional(bool)\n    http_port       = optional(number)\n    https_port      = optional(number)\n    pac_file        = optional(string)\n    pac_file_port   = optional(number)\n  })",
+        "required": false
+      },
+      {
+        "name": "firewall_policy_identity",
+        "type": "object({\n    identity_ids = optional(set(string))\n    type         = string\n  })",
+        "required": false
+      },
+      {
+        "name": "firewall_policy_insights",
+        "type": "object({\n    default_log_analytics_workspace_id = string\n    enabled                            = bool\n    retention_in_days                  = optional(number)\n    log_analytics_workspace = optional(list(object({\n      firewall_location = string\n      id                = string\n    })))\n  })",
+        "required": false
+      },
+      {
+        "name": "firewall_policy_timeouts",
+        "type": "object({\n    create = optional(string)\n    delete = optional(string)\n    read   = optional(string)\n    update = optional(string)\n  })",
+        "required": false
+      },
+      {
+        "name": "tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "firewall_policy_sql_redirect_allowed",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "firewall_policy_threat_intelligence_mode",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "firewall_policy_tls_certificate",
+        "type": "object({\n    key_vault_secret_id = string\n    name                = string\n  })",
+        "required": false
+      },
+      {
+        "name": "role_assignments",
+        "type": "map(object({\n    role_definition_id_or_name             = string\n    principal_id                           = string\n    description                            = optional(string, null)\n    skip_service_principal_aad_check       = optional(bool, false)\n    condition                              = optional(string, null)\n    condition_version                      = optional(string, null)\n    delegated_managed_identity_resource_id = optional(string, null)\n    principal_type                         = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "location",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "resource_group_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "diagnostic_settings",
+        "type": "map(object({\n    name                                     = optional(string, null)\n    log_categories                           = optional(set(string), [])\n    log_groups                               = optional(set(string), [\"allLogs\"])\n    metric_categories                        = optional(set(string), [\"AllMetrics\"])\n    log_analytics_destination_type           = optional(string, \"Dedicated\")\n    workspace_resource_id                    = optional(string, null)\n    storage_account_resource_id              = optional(string, null)\n    event_hub_authorization_rule_resource_id = optional(string, null)\n    event_hub_name                           = optional(string, null)\n    marketplace_partner_resource_id          = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "firewall_policy_auto_learn_private_ranges_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "firewall_policy_base_policy_id",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "firewall_policy_intrusion_detection",
+        "type": "object({\n    mode           = optional(string)\n    private_ranges = optional(list(string))\n    signature_overrides = optional(list(object({\n      id    = optional(string)\n      state = optional(string)\n    })))\n    traffic_bypass = optional(list(object({\n      description           = optional(string)\n      destination_addresses = optional(set(string))\n      destination_ip_groups = optional(set(string))\n      destination_ports     = optional(set(string))\n      name                  = string\n      protocol              = string\n      source_addresses      = optional(set(string))\n      source_ip_groups      = optional(set(string))\n    })))\n  })",
+        "required": false
+      },
+      {
+        "name": "firewall_policy_private_ip_ranges",
+        "type": "list(string)",
+        "required": false
+      }
+    ],
+    "outputs": [
+      {
+        "name": "resource",
+        "description": "\"This is the full output for Firewall Policy resource. This is the default output for the module following AVM standards. Review the examples below for the correct output to use in your module.\"\nExamples: \n- module.firewall_policy.resource.id\n- module.firewall_policy.resource.firewalls\n- module.firewall_policy.resource.child_policies\n- module.firewall_policy.resource.rule_collection_groups\n",
+        "sensitive": false
+      },
+      {
+        "name": "resource_id",
+        "description": "the resource id of the firewall policy",
+        "sensitive": false
+      }
+    ]
+  }
+}

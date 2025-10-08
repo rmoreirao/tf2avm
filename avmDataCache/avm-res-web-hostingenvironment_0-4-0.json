@@ -1,0 +1,122 @@
+{
+  "module": {
+    "name": "avm-res-web-hostingenvironment",
+    "display_name": "Azure/avm-res-web-hostingenvironment",
+    "version": "0.4.0",
+    "description": "",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-web-hostingenvironment/azurerm",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-web-hostingenvironment",
+    "requirements": [
+      "azurerm >= 4.0.0, < 5.0.0",
+      "modtm ~> 0.3",
+      "random ~> 3.5"
+    ],
+    "resources": [
+      "modtm_telemetry",
+      "azurerm_app_service_environment_v3",
+      "azurerm_management_lock",
+      "azurerm_role_assignment",
+      "azurerm_monitor_diagnostic_setting",
+      "random_uuid"
+    ],
+    "inputs": [
+      {
+        "name": "managed_identities",
+        "type": "object({\r\n    system_assigned            = optional(bool, false)\r\n    user_assigned_resource_ids = optional(set(string), [])\r\n  })",
+        "required": false
+      },
+      {
+        "name": "subnet_id",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "allow_new_private_endpoint_connections",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "cluster_setting",
+        "type": "map(object({\r\n    name  = optional(string, null)\r\n    value = optional(string, null)\r\n  }))",
+        "required": false
+      },
+      {
+        "name": "customer_managed_key",
+        "type": "object({\r\n    key_vault_resource_id = string\r\n    key_name              = string\r\n    key_version           = optional(string, null)\r\n    user_assigned_identity = optional(object({\r\n      resource_id = string\r\n    }), null)\r\n  })",
+        "required": false
+      },
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "role_assignments",
+        "type": "map(object({\r\n    role_definition_id_or_name             = string\r\n    principal_id                           = string\r\n    description                            = optional(string, null)\r\n    skip_service_principal_aad_check       = optional(bool, false)\r\n    condition                              = optional(string, null)\r\n    condition_version                      = optional(string, null)\r\n    delegated_managed_identity_resource_id = optional(string, null)\r\n    principal_type                         = optional(string, null)\r\n  }))",
+        "required": false
+      },
+      {
+        "name": "remote_debugging_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "zone_redundant",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "dedicated_host_count",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "diagnostic_settings",
+        "type": "map(object({\r\n    name                                     = optional(string, null)\r\n    log_categories                           = optional(set(string), [])\r\n    log_groups                               = optional(set(string), [\"allLogs\"])\r\n    metric_categories                        = optional(set(string), [\"AllMetrics\"])\r\n    log_analytics_destination_type           = optional(string, \"Dedicated\")\r\n    workspace_resource_id                    = optional(string, null)\r\n    storage_account_resource_id              = optional(string, null)\r\n    event_hub_authorization_rule_resource_id = optional(string, null)\r\n    event_hub_name                           = optional(string, null)\r\n    marketplace_partner_resource_id          = optional(string, null)\r\n  }))",
+        "required": false
+      },
+      {
+        "name": "internal_load_balancing_mode",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "resource_group_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "lock",
+        "type": "object({\r\n    kind = string\r\n    name = optional(string, null)\r\n  })",
+        "required": false
+      }
+    ],
+    "outputs": [
+      {
+        "name": "name",
+        "description": "The name of the resource.",
+        "sensitive": false
+      },
+      {
+        "name": "resource",
+        "description": "The full resource object",
+        "sensitive": false
+      },
+      {
+        "name": "resource_id",
+        "description": "This is the full output for the resource.",
+        "sensitive": false
+      }
+    ]
+  }
+}

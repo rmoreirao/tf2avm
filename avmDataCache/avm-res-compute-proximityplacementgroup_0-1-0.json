@@ -1,0 +1,85 @@
+{
+  "module": {
+    "name": "avm-res-compute-proximityplacementgroup",
+    "display_name": "Azure/avm-res-compute-proximityplacementgroup",
+    "version": "0.1.0",
+    "description": "",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-compute-proximityplacementgroup/azurerm",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-compute-proximityplacementgroup",
+    "requirements": [
+      "azurerm >= 3.116.0, < 5.0.0",
+      "modtm 0.3.2",
+      "random ~> 3.5"
+    ],
+    "resources": [
+      "random_uuid",
+      "modtm_telemetry",
+      "azurerm_management_lock",
+      "azurerm_proximity_placement_group"
+    ],
+    "inputs": [
+      {
+        "name": "resource_group_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "allowed_vm_sizes",
+        "type": "list(string)",
+        "required": false
+      },
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "lock",
+        "type": "object({\n    kind = string\n    name = optional(string, null)\n  })",
+        "required": false
+      },
+      {
+        "name": "tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "zone",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "location",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "required": true
+      }
+    ],
+    "outputs": [
+      {
+        "name": "location",
+        "description": "The Azure deployment region.",
+        "sensitive": false
+      },
+      {
+        "name": "resource",
+        "description": "This is the full output for the resource.",
+        "sensitive": false
+      },
+      {
+        "name": "resource_group_name",
+        "description": "The name of the resource group.",
+        "sensitive": false
+      },
+      {
+        "name": "resource_id",
+        "description": "This id of the resource.",
+        "sensitive": false
+      }
+    ]
+  }
+}

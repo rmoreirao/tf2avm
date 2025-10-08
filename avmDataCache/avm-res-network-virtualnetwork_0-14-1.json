@@ -1,0 +1,163 @@
+{
+  "module": {
+    "name": "avm-res-network-virtualnetwork",
+    "display_name": "Azure/avm-res-network-virtualnetwork",
+    "version": "0.14.1",
+    "description": "Terraform Azure Verified Resource Module for Virtual Network",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-network-virtualnetwork/azurerm",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-network-virtualnetwork",
+    "requirements": [
+      "azapi ~> 2.4",
+      "azurerm ~> 4.0",
+      "modtm ~> 0.3",
+      "random ~> 3.5"
+    ],
+    "resources": [
+      "azurerm_management_lock",
+      "azurerm_role_assignment",
+      "azurerm_monitor_diagnostic_setting",
+      "random_uuid",
+      "modtm_telemetry",
+      "azapi_resource"
+    ],
+    "inputs": [
+      {
+        "name": "lock",
+        "type": "object({\n    kind = string\n    name = optional(string, null)\n  })",
+        "required": false
+      },
+      {
+        "name": "parent_id",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "address_space",
+        "type": "set(string)",
+        "required": false
+      },
+      {
+        "name": "bgp_community",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "dns_servers",
+        "type": "object({\n    dns_servers = list(string)\n  })",
+        "required": false
+      },
+      {
+        "name": "tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "enable_vm_protection",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "encryption",
+        "type": "object({\n    enabled     = bool\n    enforcement = string\n  })",
+        "required": false
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "subnets",
+        "type": "map(object({\n    address_prefix   = optional(string)\n    address_prefixes = optional(list(string))\n    name             = string\n    ipam_pools = optional(list(object({\n      pool_id         = string\n      prefix_length   = optional(number)\n      allocation_type = optional(string, \"Static\")\n    })))\n    nat_gateway = optional(object({\n      id = string\n    }))\n    network_security_group = optional(object({\n      id = string\n    }))\n    private_endpoint_network_policies             = optional(string, \"Enabled\")\n    private_link_service_network_policies_enabled = optional(bool, true)\n    route_table = optional(object({\n      id = string\n    }))\n    service_endpoint_policies = optional(map(object({\n      id = string\n    })))\n    service_endpoints = optional(list(string))\n    service_endpoints_with_location = optional(list(object({\n      service   = string\n      locations = optional(list(string), [\"*\"])\n    })))\n    default_outbound_access_enabled = optional(bool, false)\n    sharing_scope                   = optional(string, null)\n    delegations = optional(list(object({\n      name = string\n      service_delegation = object({\n        name = string\n      })\n    })))\n    timeouts = optional(object({\n      create = optional(string, \"30m\")\n      read   = optional(string, \"5m\")\n      update = optional(string, \"30m\")\n      delete = optional(string, \"30m\")\n    }), {})\n    retry = optional(object({\n      error_message_regex  = optional(list(string), [\"ReferencedResourceNotProvisioned\"])\n      interval_seconds     = optional(number, 10)\n      max_interval_seconds = optional(number, 180)\n    }), {})\n    role_assignments = optional(map(object({\n      role_definition_id_or_name             = string\n      principal_id                           = string\n      description                            = optional(string, null)\n      skip_service_principal_aad_check       = optional(bool, false)\n      condition                              = optional(string, null)\n      condition_version                      = optional(string, null)\n      delegated_managed_identity_resource_id = optional(string, null)\n      principal_type                         = optional(string, null)\n    })))\n  }))",
+        "required": false
+      },
+      {
+        "name": "location",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "extended_location",
+        "type": "object({\n    name = string\n    type = string\n  })",
+        "required": false
+      },
+      {
+        "name": "peerings",
+        "type": "map(object({\n    name                               = string\n    remote_virtual_network_resource_id = string\n    allow_forwarded_traffic            = optional(bool, false)\n    allow_gateway_transit              = optional(bool, false)\n    allow_virtual_network_access       = optional(bool, true)\n    do_not_verify_remote_gateways      = optional(bool, false)\n    enable_only_ipv6_peering           = optional(bool, false)\n    peer_complete_vnets                = optional(bool, true)\n    local_peered_address_spaces = optional(list(object({\n      address_prefix = string\n    })))\n    remote_peered_address_spaces = optional(list(object({\n      address_prefix = string\n    })))\n    local_peered_subnets = optional(list(object({\n      subnet_name = string\n    })))\n    remote_peered_subnets = optional(list(object({\n      subnet_name = string\n    })))\n    use_remote_gateways                   = optional(bool, false)\n    create_reverse_peering                = optional(bool, false)\n    reverse_name                          = optional(string)\n    reverse_allow_forwarded_traffic       = optional(bool, false)\n    reverse_allow_gateway_transit         = optional(bool, false)\n    reverse_allow_virtual_network_access  = optional(bool, true)\n    reverse_do_not_verify_remote_gateways = optional(bool, false)\n    reverse_enable_only_ipv6_peering      = optional(bool, false)\n    reverse_peer_complete_vnets           = optional(bool, true)\n    reverse_local_peered_address_spaces = optional(list(object({\n      address_prefix = string\n    })))\n    reverse_remote_peered_address_spaces = optional(list(object({\n      address_prefix = string\n    })))\n    reverse_local_peered_subnets = optional(list(object({\n      subnet_name = string\n    })))\n    reverse_remote_peered_subnets = optional(list(object({\n      subnet_name = string\n    })))\n    reverse_use_remote_gateways        = optional(bool, false)\n    sync_remote_address_space_enabled  = optional(bool, false)\n    sync_remote_address_space_triggers = optional(any, null)\n    timeouts = optional(object({\n      create = optional(string, \"30m\")\n      read   = optional(string, \"5m\")\n      update = optional(string, \"30m\")\n      delete = optional(string, \"30m\")\n    }), {})\n    retry = optional(object({\n      error_message_regex  = optional(list(string), [\"ReferencedResourceNotProvisioned\"])\n      interval_seconds     = optional(number, 10)\n      max_interval_seconds = optional(number, 180)\n    }), {})\n  }))",
+        "required": false
+      },
+      {
+        "name": "retry",
+        "type": "object({\n    error_message_regex  = optional(list(string), [\"ReferencedResourceNotProvisioned\"])\n    interval_seconds     = optional(number, 10)\n    max_interval_seconds = optional(number, 180)\n  })",
+        "required": false
+      },
+      {
+        "name": "role_assignments",
+        "type": "map(object({\n    role_definition_id_or_name             = string\n    principal_id                           = string\n    description                            = optional(string, null)\n    skip_service_principal_aad_check       = optional(bool, false)\n    condition                              = optional(string, null)\n    condition_version                      = optional(string, null)\n    delegated_managed_identity_resource_id = optional(string, null)\n    principal_type                         = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "timeouts",
+        "type": "object({\n    create = optional(string, \"30m\")\n    read   = optional(string, \"5m\")\n    update = optional(string, \"30m\")\n    delete = optional(string, \"30m\")\n  })",
+        "required": false
+      },
+      {
+        "name": "ddos_protection_plan",
+        "type": "object({\n    id     = string\n    enable = bool\n  })",
+        "required": false
+      },
+      {
+        "name": "diagnostic_settings",
+        "type": "map(object({\n    name                                     = optional(string, null)\n    log_categories                           = optional(set(string), [])\n    log_groups                               = optional(set(string), [\"allLogs\"])\n    metric_categories                        = optional(set(string), [\"AllMetrics\"])\n    log_analytics_destination_type           = optional(string, \"Dedicated\")\n    workspace_resource_id                    = optional(string, null)\n    storage_account_resource_id              = optional(string, null)\n    event_hub_authorization_rule_resource_id = optional(string, null)\n    event_hub_name                           = optional(string, null)\n    marketplace_partner_resource_id          = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "flow_timeout_in_minutes",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "ipam_pools",
+        "type": "list(object({\n    id            = string\n    prefix_length = number\n  }))",
+        "required": false
+      }
+    ],
+    "outputs": [
+      {
+        "name": "address_spaces",
+        "description": "The address spaces of the virtual network.",
+        "sensitive": false
+      },
+      {
+        "name": "name",
+        "description": "The resource name of the virtual network.",
+        "sensitive": false
+      },
+      {
+        "name": "peerings",
+        "description": "Information about the peerings created in the module.\n\nPlease refer to the peering module documentation for details of the outputs\n",
+        "sensitive": false
+      },
+      {
+        "name": "resource",
+        "description": "The Azure Virtual Network resource.  This will be null if an existing vnet is supplied.",
+        "sensitive": false
+      },
+      {
+        "name": "resource_id",
+        "description": "The resource ID of the virtual network.",
+        "sensitive": false
+      },
+      {
+        "name": "subnets",
+        "description": "Information about the subnets created in the module.\n\nPlease refer to the subnet module documentation for details of the outputs\n",
+        "sensitive": false
+      }
+    ]
+  }
+}

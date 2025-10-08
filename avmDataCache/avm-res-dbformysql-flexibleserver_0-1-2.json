@@ -1,0 +1,214 @@
+{
+  "module": {
+    "name": "avm-res-dbformysql-flexibleserver",
+    "display_name": "Azure/avm-res-dbformysql-flexibleserver",
+    "version": "0.1.2",
+    "description": "Terraform Azure Verified Resource Module for DB for MySQL Flexible Server",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-dbformysql-flexibleserver/azurerm",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-dbformysql-flexibleserver",
+    "requirements": [
+      "azapi ~> 2.4",
+      "azurerm ~> 4.0",
+      "modtm ~> 0.3",
+      "random >= 3.6.0, < 4.0.0"
+    ],
+    "resources": [
+      "azurerm_monitor_diagnostic_setting",
+      "azurerm_mysql_flexible_database",
+      "azurerm_private_endpoint",
+      "azurerm_mysql_flexible_server_configuration",
+      "azurerm_mysql_flexible_server",
+      "azurerm_management_lock",
+      "azurerm_role_assignment",
+      "azurerm_mysql_flexible_server_active_directory_administrator",
+      "azurerm_mysql_flexible_server_firewall_rule",
+      "azurerm_private_endpoint_application_security_group_association",
+      "random_uuid",
+      "modtm_telemetry"
+    ],
+    "inputs": [
+      {
+        "name": "databases",
+        "type": "map(object({\n    charset   = string\n    collation = string\n    name      = string\n    timeouts = optional(object({\n      create = optional(string)\n      delete = optional(string)\n      read   = optional(string)\n    }))\n  }))",
+        "required": false
+      },
+      {
+        "name": "server_configuration",
+        "type": "map(object({\n    name  = string\n    value = string\n  }))",
+        "required": false
+      },
+      {
+        "name": "administrator_password",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "backup_retention_days",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "storage",
+        "type": "object({\n    auto_grow_enabled  = optional(bool)\n    io_scaling_enabled = optional(bool)\n    iops               = optional(number)\n    size_gb            = optional(number)\n  })",
+        "required": false
+      },
+      {
+        "name": "customer_managed_key",
+        "type": "object({\n    key_vault_key_id                     = string\n    geo_backup_key_vault_key_id          = optional(string)\n    geo_backup_user_assigned_identity_id = optional(string)\n    primary_user_assigned_identity_id    = optional(string)\n  })",
+        "required": false
+      },
+      {
+        "name": "diagnostic_settings",
+        "type": "map(object({\n    name                                     = optional(string, null)\n    log_categories                           = optional(set(string), [])\n    log_groups                               = optional(set(string), [\"allLogs\"])\n    metric_categories                        = optional(set(string), [\"AllMetrics\"])\n    log_analytics_destination_type           = optional(string, \"Dedicated\")\n    workspace_resource_id                    = optional(string, null)\n    storage_account_resource_id              = optional(string, null)\n    event_hub_authorization_rule_resource_id = optional(string, null)\n    event_hub_name                           = optional(string, null)\n    marketplace_partner_resource_id          = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "point_in_time_restore_time_in_utc",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "sku_name",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "high_availability",
+        "type": "object({\n    mode                      = string\n    standby_availability_zone = optional(string)\n  })",
+        "required": false
+      },
+      {
+        "name": "tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "firewall_rules",
+        "type": "map(object({\n    end_ip_address   = string\n    start_ip_address = string\n    timeouts = optional(object({\n      create = optional(string)\n      delete = optional(string)\n      read   = optional(string)\n      update = optional(string)\n    }))\n  }))",
+        "required": false
+      },
+      {
+        "name": "location",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "managed_identities",
+        "type": "object({\n    system_assigned            = optional(bool, false)\n    user_assigned_resource_ids = optional(set(string), [])\n  })",
+        "required": false
+      },
+      {
+        "name": "private_endpoints",
+        "type": "map(object({\n    name = optional(string, null)\n    role_assignments = optional(map(object({\n      role_definition_id_or_name             = string\n      principal_id                           = string\n      description                            = optional(string, null)\n      skip_service_principal_aad_check       = optional(bool, false)\n      condition                              = optional(string, null)\n      condition_version                      = optional(string, null)\n      delegated_managed_identity_resource_id = optional(string, null)\n      principal_type                         = optional(string, null)\n    })), {})\n    lock = optional(object({\n      kind = string\n      name = optional(string, null)\n    }), null)\n    tags                                    = optional(map(string), null)\n    subnet_resource_id                      = string\n    subresource_name                        = string # NOTE: `subresource_name` can be excluded if the resource does not support multiple sub resource types (e.g. storage account supports blob, queue, etc)\n    private_dns_zone_group_name             = optional(string, \"default\")\n    private_dns_zone_resource_ids           = optional(set(string), [])\n    application_security_group_associations = optional(map(string), {})\n    private_service_connection_name         = optional(string, null)\n    network_interface_name                  = optional(string, null)\n    location                                = optional(string, null)\n    resource_group_name                     = optional(string, null)\n    ip_configurations = optional(map(object({\n      name               = string\n      private_ip_address = string\n    })), {})\n  }))",
+        "required": false
+      },
+      {
+        "name": "source_server_id",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "active_directory_administrator",
+        "type": "object({\n    identity_id = optional(string)\n    login       = string\n    object_id   = string\n    tenant_id   = string\n    timeouts = optional(object({\n      create = optional(string)\n      read   = optional(string)\n      update = optional(string)\n      delete = optional(string)\n    }))\n  })",
+        "required": false
+      },
+      {
+        "name": "create_mode",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "private_dns_zone_id",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "delegated_subnet_id",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "maintenance_window",
+        "type": "object({\n    day_of_week  = optional(string)\n    start_hour   = optional(number)\n    start_minute = optional(number)\n  })",
+        "required": false
+      },
+      {
+        "name": "resource_group_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "administrator_login",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "lock",
+        "type": "object({\n    kind = string\n    name = optional(string, null)\n  })",
+        "required": false
+      },
+      {
+        "name": "replication_role",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "zone",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "geo_redundant_backup_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "mysql_version",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "role_assignments",
+        "type": "map(object({\n    role_definition_id_or_name             = string\n    principal_id                           = string\n    description                            = optional(string, null)\n    skip_service_principal_aad_check       = optional(bool, false)\n    condition                              = optional(string, null)\n    condition_version                      = optional(string, null)\n    delegated_managed_identity_resource_id = optional(string, null)\n    principal_type                         = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "timeouts",
+        "type": "object({\n    create = optional(string)\n    delete = optional(string)\n    read   = optional(string)\n    update = optional(string)\n  })",
+        "required": false
+      }
+    ],
+    "outputs": [
+      {
+        "name": "private_endpoints",
+        "description": "A map of private endpoints. The map key is the supplied input to var.private_endpoints. The map value is the entire azurerm_private_endpoint resource.",
+        "sensitive": false
+      },
+      {
+        "name": "resouce_name",
+        "description": "The name of the rresource",
+        "sensitive": false
+      },
+      {
+        "name": "resource",
+        "description": "This is the full output for the resource.",
+        "sensitive": false
+      },
+      {
+        "name": "resource_id",
+        "description": "The ID of the resoure",
+        "sensitive": false
+      }
+    ]
+  }
+}

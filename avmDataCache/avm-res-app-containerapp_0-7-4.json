@@ -1,0 +1,202 @@
+{
+  "module": {
+    "name": "avm-res-app-containerapp",
+    "display_name": "Azure/avm-res-app-containerapp",
+    "version": "0.7.4",
+    "description": "Terraform Azure Verified Resource Module for Container App",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-app-containerapp/azurerm",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-app-containerapp",
+    "requirements": [
+      "azapi ~> 2.5",
+      "modtm ~> 0.3",
+      "random ~> 3.0"
+    ],
+    "resources": [
+      "random_uuid",
+      "modtm_telemetry",
+      "azapi_resource",
+      "azapi_resource",
+      "azapi_resource",
+      "azapi_resource"
+    ],
+    "inputs": [
+      {
+        "name": "lock",
+        "type": "object({\n    kind = string\n    name = optional(string, null)\n  })",
+        "required": false
+      },
+      {
+        "name": "resource_group_id",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "revision_mode",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "dapr",
+        "type": "object({\n    app_id                = optional(string)\n    app_port              = optional(number)\n    app_protocol          = optional(string, \"http\")\n    enable_api_logging    = optional(bool, false)\n    enabled               = optional(bool, false)\n    http_max_request_size = optional(number)\n    http_read_buffer_size = optional(number)\n    log_level             = optional(string, \"info\")\n  })",
+        "required": false
+      },
+      {
+        "name": "location",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "runtime",
+        "type": "object({\n    java = optional(object({\n      enable_metrics = optional(bool, false)\n    }))\n  })",
+        "required": false
+      },
+      {
+        "name": "secrets",
+        "type": "map(object({\n    identity            = optional(string)\n    key_vault_secret_id = optional(string)\n    name                = string\n    value               = optional(string)\n  }))",
+        "required": false
+      },
+      {
+        "name": "service",
+        "type": "object({\n    type = string\n  })",
+        "required": false
+      },
+      {
+        "name": "workload_profile_name",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "resource_group_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "template",
+        "type": "object({\n    cooldown_period = optional(number, 300)\n    max_replicas    = optional(number, 10)\n    #TODO:Set `min_replicas` default value to `0` in `v1.0.0`\n    min_replicas     = optional(number)\n    polling_interval = optional(number, 30)\n    revision_suffix  = optional(string)\n    #TODO:Set `termination_grace_period_seconds` default value to `0` in `v1.0.0`\n    termination_grace_period_seconds = optional(number)\n\n    azure_queue_scale_rules = optional(list(object({\n      name         = string\n      queue_length = number\n      queue_name   = string\n      account_name = optional(string)\n      identity     = optional(string)\n      authentication = list(object({\n        secret_name       = string\n        trigger_parameter = string\n      }))\n    })))\n    containers = list(object({\n      args    = optional(list(string))\n      command = optional(list(string))\n      cpu     = number\n      image   = string\n      memory  = string\n      name    = string\n      env = optional(list(object({\n        name        = string\n        secret_name = optional(string)\n        value       = optional(string)\n      })))\n      liveness_probes = optional(list(object({\n        failure_count_threshold          = optional(number, 3)\n        host                             = optional(string)\n        initial_delay                    = optional(number, 1)\n        interval_seconds                 = optional(number, 10)\n        path                             = optional(string)\n        port                             = number\n        termination_grace_period_seconds = optional(number)\n        timeout                          = optional(number, 1)\n        transport                        = string\n        header = optional(list(object({\n          name  = string\n          value = string\n        })))\n      })))\n      readiness_probes = optional(list(object({\n        failure_count_threshold = optional(number, 3)\n        host                    = optional(string)\n        initial_delay           = optional(number, 0)\n        interval_seconds        = optional(number, 10)\n        path                    = optional(string)\n        port                    = number\n        success_count_threshold = optional(number, 3)\n        timeout                 = optional(number, 1)\n        transport               = string\n        header = optional(list(object({\n          name  = string\n          value = string\n        })))\n      })))\n      #TODO:Remove startup_probe in v1.0.0\n      startup_probe = optional(list(object({\n        failure_count_threshold          = optional(number, 3)\n        host                             = optional(string)\n        initial_delay                    = optional(number, 0)\n        interval_seconds                 = optional(number, 10)\n        path                             = optional(string)\n        port                             = number\n        termination_grace_period_seconds = optional(number)\n        timeout                          = optional(number, 1)\n        transport                        = string\n        header = optional(list(object({\n          name  = string\n          value = string\n        })))\n      })))\n      startup_probes = optional(list(object({\n        failure_count_threshold          = optional(number, 3)\n        host                             = optional(string)\n        initial_delay                    = optional(number, 0)\n        interval_seconds                 = optional(number, 10)\n        path                             = optional(string)\n        port                             = number\n        termination_grace_period_seconds = optional(number)\n        timeout                          = optional(number, 1)\n        transport                        = string\n        header = optional(list(object({\n          name  = string\n          value = string\n        })))\n      })))\n      volume_mounts = optional(list(object({\n        name     = string\n        path     = string\n        sub_path = optional(string)\n      })))\n    }))\n    custom_scale_rules = optional(list(object({\n      custom_rule_type = string\n      metadata         = map(string)\n      name             = string\n      identity         = optional(string)\n      authentication = optional(list(object({\n        secret_name       = string\n        trigger_parameter = string\n      })))\n    })))\n    http_scale_rules = optional(list(object({\n      concurrent_requests = string\n      name                = string\n      identity            = optional(string)\n      metadata            = optional(map(string))\n      authentication = optional(list(object({\n        secret_name       = string\n        trigger_parameter = optional(string)\n      })))\n    })))\n    init_containers = optional(list(object({\n      args    = optional(list(string))\n      command = optional(list(string))\n      cpu     = optional(number)\n      image   = string\n      memory  = optional(string)\n      name    = string\n      env = optional(list(object({\n        name        = string\n        secret_name = optional(string)\n        value       = optional(string)\n      })))\n      volume_mounts = optional(list(object({\n        name     = string\n        path     = string\n        sub_path = optional(string)\n      })))\n    })))\n\n    service_binds = optional(list(object({\n      name       = string\n      service_id = string\n    })))\n\n    tcp_scale_rules = optional(list(object({\n      concurrent_requests = string\n      name                = string\n      identity            = optional(string)\n      metadata            = optional(map(string))\n      authentication = optional(list(object({\n        secret_name       = string\n        trigger_parameter = optional(string)\n      })))\n    })))\n    volumes = optional(list(object({\n      mount_options = optional(string)\n      name          = string\n      secrets = optional(list(object({\n        path        = string\n        secret_name = string\n      })))\n      storage_name = optional(string)\n      storage_type = optional(string, \"EmptyDir\")\n    })))\n  })",
+        "required": true
+      },
+      {
+        "name": "auth_configs",
+        "type": "map(object({\n    name = string\n    platform = optional(object({\n      enabled         = optional(bool)\n      runtime_version = optional(string)\n    }))\n    global_validation = optional(object({\n      unauthenticated_client_action = optional(string)\n      redirect_to_provider          = optional(string)\n      exclude_paths                 = optional(list(string))\n    }))\n    identity_providers = optional(object({\n      azure_active_directory = optional(object({\n        enabled = optional(bool)\n        registration = optional(object({\n          open_id_issuer                                     = optional(string)\n          client_id                                          = optional(string)\n          client_secret_setting_name                         = optional(string)\n          client_secret_certificate_issuer                   = optional(string)\n          client_secret_certificate_subject_alternative_name = optional(string)\n          client_secret_certificate_thumbprint               = optional(string)\n        }))\n        login = optional(object({\n          login_parameters         = list(string)\n          disable_www_authenticate = bool\n        }))\n        validation = optional(object({\n          jwt_claim_checks = optional(object({\n            allowed_groups              = optional(list(string))\n            allowed_client_applications = optional(list(string))\n          }))\n          allowed_audiences = optional(list(string))\n          default_authorization_policy = optional(object({\n            allowed_principals = optional(object({\n              groups     = optional(list(string))\n              identities = optional(list(string))\n            }))\n            allowed_applications = optional(list(string))\n          }))\n        }))\n        is_auto_provisioned = optional(bool)\n      }))\n      facebook = optional(object({\n        enabled = optional(bool)\n        registration = optional(object({\n          app_id                  = optional(string)\n          app_secret_setting_name = optional(string)\n        }))\n        graph_api_version = optional(string)\n        login = optional(object({\n          scopes = list(string)\n        }))\n      }))\n      github = optional(object({\n        enabled = optional(bool)\n        registration = optional(object({\n          client_id                  = optional(string)\n          client_secret_setting_name = optional(string)\n        }))\n        login = optional(object({\n          scopes = list(string)\n        }))\n      }))\n      google = optional(object({\n        enabled = optional(bool)\n        registration = optional(object({\n          client_id                  = optional(string)\n          client_secret_setting_name = optional(string)\n        }))\n        login = optional(object({\n          scopes = list(string)\n        }))\n        validation = optional(object({\n          allowed_audiences = list(string)\n        }))\n      }))\n      twitter = optional(object({\n        enabled = optional(bool)\n        registration = optional(object({\n          consumer_key                 = string\n          consumer_secret_setting_name = optional(string)\n        }))\n      }))\n      apple = optional(object({\n        enabled = optional(bool)\n        registration = optional(object({\n          client_id                  = string\n          client_secret_setting_name = optional(string)\n        }))\n        login = optional(object({\n          scopes = list(string)\n        }))\n      }))\n      azure_static_web_apps = optional(object({\n        enabled = optional(bool)\n        registration = optional(object({\n          client_id = string\n        }))\n      }))\n      custom_open_id_connect_providers = optional(map(object({\n        enabled = optional(bool)\n        registration = optional(object({\n          client_id = optional(string)\n          client_credential = optional(object({\n            method                     = string\n            client_secret_setting_name = string\n          }))\n          open_id_connect_configuration = optional(object({\n            authorization_endpoint           = string\n            token_endpoint                   = string\n            issuer                           = string\n            certification_uri                = string\n            well_known_open_id_configuration = optional(string)\n          }))\n        }))\n        login = optional(object({\n          name_claim_type = string\n          scopes          = list(string)\n        }))\n      })), {})\n    }))\n    login = optional(object({\n      routes = optional(object({\n        logout_endpoint = string\n      }))\n      token_store = optional(object({\n        enabled                       = bool\n        token_refresh_extension_hours = number\n        azure_blob_storage = optional(object({\n          sas_url_setting_name = string\n        }))\n      }))\n      preserve_url_fragments_for_logins = optional(bool)\n      allowed_external_redirect_urls    = optional(list(string))\n      cookie_expiration = optional(object({\n        convention         = optional(string)\n        time_to_expiration = optional(string)\n      }))\n      nonce = optional(object({\n        validate_nonce            = bool\n        nonce_expiration_interval = string\n      }))\n    }))\n    http_settings = optional(object({\n      require_https = optional(bool)\n      forward_proxy = optional(object({\n        convention               = optional(string)\n        custom_host_header_name  = optional(string)\n        custom_proto_header_name = optional(string)\n      }))\n      routes = optional(object({\n        api_prefix = string\n      }))\n    }))\n    encryption_settings = optional(object({\n      container_app_auth_encryption_secret_name = optional(string)\n      container_app_auth_signing_secret_name    = optional(string)\n    }))\n  }))",
+        "required": false
+      },
+      {
+        "name": "managed_identities",
+        "type": "object({\n    system_assigned            = optional(bool, false)\n    user_assigned_resource_ids = optional(set(string), [])\n  })",
+        "required": false
+      },
+      {
+        "name": "identity_settings",
+        "type": "list(object({\n    identity  = string\n    lifecycle = optional(string, \"All\")\n  }))",
+        "required": false
+      },
+      {
+        "name": "ingress",
+        "type": "object({\n    allow_insecure_connections = optional(bool, false)\n    client_certificate_mode    = optional(string)\n    exposed_port               = optional(number, 0)\n    external_enabled           = optional(bool, false)\n    target_port                = optional(number)\n    transport                  = optional(string, \"auto\")\n\n    traffic_weight = list(object({\n      label           = optional(string)\n      latest_revision = optional(bool, false)\n      revision_suffix = optional(string)\n      percentage      = number\n    }))\n\n    additional_port_mappings = optional(list(object({\n      exposed_port = number\n      external     = bool\n      target_port  = number\n    })))\n\n    cors_policy = optional(object({\n      allow_credentials = optional(bool, false)\n      allowed_headers   = optional(list(string))\n      allowed_methods   = optional(list(string))\n      allowed_origins   = optional(list(string))\n      expose_headers    = optional(list(string))\n      max_age           = optional(number)\n    }), null)\n\n    # TODO: Remove custom_domain in v1.0.0 - replaced by custom_domains list\n    custom_domain = optional(object({\n      certificate_binding_type = optional(string)\n      certificate_id           = optional(string)\n      name                     = optional(string)\n    }))\n\n    custom_domains = optional(list(object({\n      certificate_binding_type = optional(string)\n      certificate_id           = optional(string)\n      name                     = string\n    })), [])\n\n    ip_restrictions = optional(list(object({\n      action      = optional(string)\n      description = optional(string)\n      ip_range    = optional(string)\n      name        = optional(string)\n    })))\n\n    sticky_sessions = optional(object({\n      affinity = optional(string, \"none\")\n    }))\n  })",
+        "required": false
+      },
+      {
+        "name": "max_inactive_revisions",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "registries",
+        "type": "list(object({\n    identity             = optional(string)\n    password_secret_name = optional(string)\n    server               = optional(string)\n    username             = optional(string)\n  }))",
+        "required": false
+      },
+      {
+        "name": "role_assignments",
+        "type": "map(object({\n    role_definition_id_or_name             = string\n    principal_id                           = string\n    description                            = optional(string, null)\n    skip_service_principal_aad_check       = optional(bool, false)\n    condition                              = optional(string, null)\n    condition_version                      = optional(string, null)\n    delegated_managed_identity_resource_id = optional(string, null)\n    principal_type                         = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "timeouts",
+        "type": "object({\n    create = optional(string, \"30m\")\n    delete = optional(string, \"30m\")\n    read   = optional(string, \"5m\")\n    update = optional(string, \"30m\")\n  })",
+        "required": false
+      },
+      {
+        "name": "container_app_environment_resource_id",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      }
+    ],
+    "outputs": [
+      {
+        "name": "latest_revision_fqdn",
+        "description": "The FQDN of the latest revision of the Container App.",
+        "sensitive": false
+      },
+      {
+        "name": "latest_revision_name",
+        "description": "The name of the latest revision of the Container App.",
+        "sensitive": false
+      },
+      {
+        "name": "name",
+        "description": "The name of the Container App.",
+        "sensitive": false
+      },
+      {
+        "name": "custom_domain_verification_id",
+        "description": "The custom domain verification ID for the Container App.",
+        "sensitive": false
+      },
+      {
+        "name": "fqdn_url",
+        "description": "https url that contains ingress's fqdn, could be used to access the deployed app.",
+        "sensitive": false
+      },
+      {
+        "name": "latest_ready_revision_name",
+        "description": "The name of the latest ready revision of the Container App.",
+        "sensitive": false
+      },
+      {
+        "name": "location",
+        "description": "The Azure Region where the Container App is located.",
+        "sensitive": false
+      },
+      {
+        "name": "outbound_ip_addresses",
+        "description": "The outbound IP addresses of the Container App.",
+        "sensitive": false
+      },
+      {
+        "name": "resource_id",
+        "description": "Resource ID of container app resource created by this module.",
+        "sensitive": false
+      },
+      {
+        "name": "custom_domains",
+        "description": "The custom domains configured for the Container App.",
+        "sensitive": false
+      },
+      {
+        "name": "environment_id",
+        "description": "The ID of the Container App Environment.",
+        "sensitive": false
+      },
+      {
+        "name": "identity",
+        "description": "The identities assigned to the Container App.",
+        "sensitive": false
+      }
+    ]
+  }
+}

@@ -1,0 +1,69 @@
+{
+  "module": {
+    "name": "avm-res-portal-dashboard",
+    "display_name": "Azure/avm-res-portal-dashboard",
+    "version": "0.1.0",
+    "description": "AVM Terraform module for Azure portal dashboard.",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-portal-dashboard/azurerm",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-portal-dashboard",
+    "requirements": [
+      "azurerm ~> 3.110",
+      "modtm ~> 0.3",
+      "random ~> 3.5"
+    ],
+    "resources": [
+      "random_uuid",
+      "modtm_telemetry",
+      "azurerm_portal_dashboard"
+    ],
+    "inputs": [
+      {
+        "name": "name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "resource_group_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "template_file_path",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "template_file_variables",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "location",
+        "type": "string",
+        "required": true
+      }
+    ],
+    "outputs": [
+      {
+        "name": "resource_id",
+        "description": "The ID of the Azure portal dashboard resource.",
+        "sensitive": false
+      },
+      {
+        "name": "dashboard",
+        "description": "This is the full output for the resource.",
+        "sensitive": false
+      }
+    ]
+  }
+}

@@ -84,7 +84,7 @@ Only output the JSON mapping format. Output the full list and never truncate it.
         """
         
         terraform_plugin = TerraformPlugin()
-        raw_avm_module_details_json = await terraform_plugin.get_avm_module_details(module_name=module_name, module_version=module_version)
+        raw_avm_module_details_json = await terraform_plugin.get_avm_module_details_json(module_name=module_name, module_version=module_version)
 
         message = f"Parse the AVM module details. module_name is {module_name}, module_version is {module_version}. Here is the raw JSON data for the AVM module: {raw_avm_module_details_json}"
         response = await self.agent.get_response(message)

@@ -1,0 +1,117 @@
+{
+  "module": {
+    "name": "avm-res-edge-site",
+    "display_name": "Azure/avm-res-edge-site",
+    "version": "3.0.0",
+    "description": "Terraform Azure Verified Resource Module for Azure Arc Site manager",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-edge-site/azurerm",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-edge-site",
+    "requirements": [
+      "azapi ~> 2.0",
+      "azurerm ~>4.0",
+      "modtm ~> 0.3",
+      "random ~>3.0"
+    ],
+    "resources": [
+      "random_uuid",
+      "modtm_telemetry",
+      "azapi_resource",
+      "azurerm_management_lock",
+      "azurerm_role_assignment"
+    ],
+    "inputs": [
+      {
+        "name": "role_assignments",
+        "type": "map(object({\n    role_definition_id_or_name             = string\n    principal_id                           = string\n    description                            = optional(string, null)\n    skip_service_principal_aad_check       = optional(bool, false)\n    condition                              = optional(string, null)\n    condition_version                      = optional(string, null)\n    delegated_managed_identity_resource_id = optional(string, null)\n    principal_type                         = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "street_address_2",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "country",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "resource_group_id",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "site_description",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "site_labels",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "postal_code",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "street_address_1",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "site_display_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "site_resource_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "lock",
+        "type": "object({\n    kind = string\n    name = optional(string, null)\n  })",
+        "required": false
+      },
+      {
+        "name": "state_or_province",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "city",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "customer_managed_key",
+        "type": "object({\n    key_vault_resource_id = string\n    key_name              = string\n    key_version           = optional(string, null)\n    user_assigned_identity = optional(object({\n      resource_id = string\n    }), null)\n  })",
+        "required": false
+      }
+    ],
+    "outputs": [
+      {
+        "name": "resource",
+        "description": "This is the full output for the resource.",
+        "sensitive": false
+      },
+      {
+        "name": "resource_id",
+        "description": "This is the resource id for the site resource.",
+        "sensitive": false
+      }
+    ]
+  }
+}

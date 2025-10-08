@@ -1,0 +1,296 @@
+{
+  "module": {
+    "name": "avm-res-cognitiveservices-account",
+    "display_name": "Azure/avm-res-cognitiveservices-account",
+    "version": "0.10.1",
+    "description": "Terraform Azure Verified Resource Module for Cognitive Service",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-cognitiveservices-account/azurerm",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-cognitiveservices-account",
+    "requirements": [
+      "azapi ~> 2.5",
+      "azurerm >= 4.17.0, < 5.0",
+      "modtm ~> 0.3",
+      "random >= 3.5.0, < 4.0",
+      "time ~> 0.10"
+    ],
+    "resources": [
+      "azurerm_private_endpoint",
+      "random_uuid",
+      "time_sleep",
+      "azurerm_cognitive_account_customer_managed_key",
+      "azapi_update_resource",
+      "modtm_telemetry",
+      "azapi_resource",
+      "azurerm_private_endpoint_application_security_group_association",
+      "random_string",
+      "azapi_resource",
+      "azurerm_management_lock",
+      "azapi_resource",
+      "time_sleep",
+      "azapi_resource",
+      "azurerm_role_assignment",
+      "azurerm_monitor_diagnostic_setting",
+      "terraform_data",
+      "azurerm_private_endpoint"
+    ],
+    "inputs": [
+      {
+        "name": "allow_project_management",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "custom_question_answering_search_service_id",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "default_project",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "local_auth_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "metrics_advisor_aad_client_id",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "metrics_advisor_aad_tenant_id",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "metrics_advisor_website_name",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "private_endpoints",
+        "type": "map(object({\n    name = optional(string, null)\n    role_assignments = optional(map(object({\n      role_definition_id_or_name             = string\n      principal_id                           = string\n      description                            = optional(string, null)\n      skip_service_principal_aad_check       = optional(bool, false)\n      condition                              = optional(string, null)\n      condition_version                      = optional(string, null)\n      delegated_managed_identity_resource_id = optional(string, null)\n      principal_type                         = optional(string, null)\n    })), {})\n    lock = optional(object({\n      kind = string\n      name = optional(string, null)\n    }), null)\n    tags                                    = optional(map(string), null)\n    subnet_resource_id                      = string\n    private_dns_zone_group_name             = optional(string, \"default\")\n    private_dns_zone_resource_ids           = optional(set(string), [])\n    application_security_group_associations = optional(map(string), {})\n    private_service_connection_name         = optional(string, null)\n    network_interface_name                  = optional(string, null)\n    location                                = optional(string, null)\n    resource_group_name                     = optional(string, null)\n    ip_configurations = optional(map(object({\n      name               = string\n      private_ip_address = string\n    })), {})\n  }))",
+        "required": false
+      },
+      {
+        "name": "kind",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "location",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "custom_question_answering_search_service_key",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "network_injections",
+        "type": "object({\n    subnet_id                         = string\n    scenario                          = string\n    microsoft_managed_network_enabled = optional(bool, false)\n  })",
+        "required": false
+      },
+      {
+        "name": "public_network_access_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "rai_monitor_config",
+        "type": "object({\n    adx_storage_resource_id = string\n    identity_client_id      = optional(string, null)\n  })",
+        "required": false
+      },
+      {
+        "name": "role_assignments",
+        "type": "map(object({\n    role_definition_id_or_name             = string\n    principal_id                           = string\n    description                            = optional(string, null)\n    skip_service_principal_aad_check       = optional(bool, false)\n    condition                              = optional(string, null)\n    condition_version                      = optional(string, null)\n    delegated_managed_identity_resource_id = optional(string, null)\n    principal_type                         = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "sku_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "aml_workspace",
+        "type": "object({\n    resource_id        = string\n    identity_client_id = optional(string, null)\n  })",
+        "required": false
+      },
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "rai_policies",
+        "type": "map(object({\n    name             = string\n    base_policy_name = string\n    mode             = string\n    content_filters = optional(list(object({\n      blocking           = bool\n      enabled            = bool\n      name               = string\n      severity_threshold = string\n      source             = string\n    })))\n    custom_block_lists = optional(list(object({\n      source          = string\n      block_list_name = string\n      blocking        = bool\n    })))\n  }))",
+        "required": false
+      },
+      {
+        "name": "storage",
+        "type": "list(object({\n    identity_client_id = optional(string)\n    storage_account_id = string\n  }))",
+        "required": false
+      },
+      {
+        "name": "is_hsm_key",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "managed_identities",
+        "type": "object({\n    system_assigned            = optional(bool, false)\n    user_assigned_resource_ids = optional(set(string), [])\n  })",
+        "required": false
+      },
+      {
+        "name": "metrics_advisor_super_user_name",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "private_endpoints_manage_dns_zone_group",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "custom_subdomain_name",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "outbound_network_access_restricted",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "timeouts",
+        "type": "object({\n    create = optional(string)\n    delete = optional(string)\n    read   = optional(string)\n    update = optional(string)\n  })",
+        "required": false
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "resource_group_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "associated_projects",
+        "type": "list(string)",
+        "required": false
+      },
+      {
+        "name": "cognitive_deployments",
+        "type": "map(object({\n    name                       = string\n    rai_policy_name            = optional(string)\n    version_upgrade_option     = optional(string, \"OnceNewDefaultVersionAvailable\")\n    dynamic_throttling_enabled = optional(bool, false)\n    model = object({\n      format  = string\n      name    = string\n      version = optional(string)\n    })\n    scale = object({\n      capacity = optional(number, 1)\n      family   = optional(string)\n      size     = optional(string)\n      tier     = optional(string)\n      type     = string\n    })\n    retry = optional(object({\n      error_message_regex  = list(string)\n      interval_seconds     = optional(number, 30)\n      max_interval_seconds = optional(number, 300)\n      multiplier           = optional(number, 1.5)\n      randomization_factor = optional(number, 0.3)\n    }))\n    timeouts = optional(object({\n      create = optional(string)\n      delete = optional(string)\n      read   = optional(string)\n      update = optional(string)\n    }))\n  }))",
+        "required": false
+      },
+      {
+        "name": "diagnostic_settings",
+        "type": "map(object({\n    name                                     = optional(string, null)\n    log_categories                           = optional(set(string), [])\n    log_groups                               = optional(set(string), [\"allLogs\"])\n    metric_categories                        = optional(set(string), [\"AllMetrics\"])\n    log_analytics_destination_type           = optional(string, \"Dedicated\")\n    workspace_resource_id                    = optional(string, null)\n    storage_account_resource_id              = optional(string, null)\n    event_hub_authorization_rule_resource_id = optional(string, null)\n    event_hub_name                           = optional(string, null)\n    marketplace_partner_resource_id          = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "dynamic_throttling_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "qna_runtime_endpoint",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "lock",
+        "type": "object({\n    kind = string\n    name = optional(string, null)\n  })",
+        "required": false
+      },
+      {
+        "name": "network_acls",
+        "type": "object({\n    default_action = string\n    ip_rules       = optional(set(string))\n    virtual_network_rules = optional(set(object({\n      ignore_missing_vnet_service_endpoint = optional(bool)\n      subnet_id                            = string\n    })))\n    bypass = optional(string)\n  })",
+        "required": false
+      },
+      {
+        "name": "tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "customer_managed_key",
+        "type": "object({\n    key_vault_resource_id = string\n    key_name              = string\n    key_version           = optional(string, null)\n    user_assigned_identity = optional(object({\n      resource_id = string\n    }), null)\n  })",
+        "required": false
+      },
+      {
+        "name": "deployment_serialization_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "fqdns",
+        "type": "list(string)",
+        "required": false
+      }
+    ],
+    "outputs": [
+      {
+        "name": "endpoint",
+        "description": "The endpoint used to connect to the Cognitive Service Account.",
+        "sensitive": false
+      },
+      {
+        "name": "name",
+        "description": "The name of cognitive account created.",
+        "sensitive": false
+      },
+      {
+        "name": "resource_cognitive_deployment",
+        "description": "The map of cognitive deployments created in AzureRM schema.",
+        "sensitive": false
+      },
+      {
+        "name": "resource_id",
+        "description": "The resource ID of cognitive account created.",
+        "sensitive": false
+      },
+      {
+        "name": "resource_sensitive",
+        "description": "The cognitive account resource created, sensitive data only.",
+        "sensitive": false
+      },
+      {
+        "name": "primary_access_key",
+        "description": "A primary access key which can be used to connect to the Cognitive Service Account. This will be null when `var.local_auth_enabled` is set to false.",
+        "sensitive": false
+      },
+      {
+        "name": "private_endpoints",
+        "description": "  A map of the private endpoints created.\n",
+        "sensitive": false
+      },
+      {
+        "name": "rai_policy_id",
+        "description": "The ID of the RAI policy created.",
+        "sensitive": false
+      },
+      {
+        "name": "resource",
+        "description": "The cognitive account resource created in AzureRM schema.",
+        "sensitive": false
+      },
+      {
+        "name": "secondary_access_key",
+        "description": "A secondary access key which can be used to connect to the Cognitive Service Account. This will be null when local_auth_enabled is set to false.",
+        "sensitive": false
+      },
+      {
+        "name": "system_assigned_mi_principal_id",
+        "description": "The principal ID of system assigned managed identity on the Cognitive/AI Service account created, when `var.managed_identities` is `null` or `var.managed_identities.system_assigned` is `false` this output is `null`.",
+        "sensitive": false
+      }
+    ]
+  }
+}

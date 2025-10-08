@@ -1,0 +1,102 @@
+{
+  "module": {
+    "name": "avm-res-maintenance-maintenanceconfiguration",
+    "display_name": "Azure/avm-res-maintenance-maintenanceconfiguration",
+    "version": "0.1.0",
+    "description": "Terraform Azure Verified Resource Module for Maintenance Configuration",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-maintenance-maintenanceconfiguration/azurerm",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-maintenance-maintenanceconfiguration",
+    "requirements": [
+      "azapi >= 1.13, < 3",
+      "azurerm ~> 4.0",
+      "modtm ~> 0.3",
+      "random ~> 3.5"
+    ],
+    "resources": [
+      "random_uuid",
+      "modtm_telemetry",
+      "azapi_resource",
+      "azurerm_management_lock",
+      "azurerm_role_assignment"
+    ],
+    "inputs": [
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "install_patches",
+        "type": "object({\n    linux = optional(object({\n      classifications_to_include    = optional(list(string), [\"Critical\", \"Security\"])\n      package_name_masks_to_exclude = optional(list(string), [])\n      package_name_masks_to_include = optional(list(string), [])\n    }))\n    reboot_setting = optional(string)\n    windows = optional(object({\n      classifications_to_include   = optional(list(string), [\"Critical\", \"Security\"])\n      exclude_kbs_requiring_reboot = optional(bool)\n      kb_numbers_to_exclude        = optional(list(string), [])\n      kb_numbers_to_include        = optional(list(string), [])\n    }))\n  })",
+        "required": false
+      },
+      {
+        "name": "role_assignments",
+        "type": "map(object({\n    role_definition_id_or_name             = string\n    principal_id                           = string\n    description                            = optional(string, null)\n    skip_service_principal_aad_check       = optional(bool, false)\n    condition                              = optional(string, null)\n    condition_version                      = optional(string, null)\n    delegated_managed_identity_resource_id = optional(string, null)\n    principal_type                         = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "subscription_id",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "visibility",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "window",
+        "type": "object({\n    duration             = optional(string, \"01:30\")\n    expiration_date_time = optional(string)\n    recur_every          = string\n    start_date_time      = string\n    time_zone            = string\n  })",
+        "required": false
+      },
+      {
+        "name": "location",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "scope",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "extension_properties",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "lock",
+        "type": "object({\n    kind = string\n    name = optional(string, null)\n  })",
+        "required": false
+      },
+      {
+        "name": "tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "resource_group_name",
+        "type": "string",
+        "required": true
+      }
+    ],
+    "outputs": [
+      {
+        "name": "name",
+        "description": "The name of the Maintenance Configuration resource.",
+        "sensitive": false
+      },
+      {
+        "name": "resource_id",
+        "description": "The ID of the Maintenance Configuration resource.",
+        "sensitive": false
+      }
+    ]
+  }
+}

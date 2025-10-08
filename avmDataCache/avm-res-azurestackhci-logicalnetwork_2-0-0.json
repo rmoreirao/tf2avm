@@ -1,0 +1,127 @@
+{
+  "module": {
+    "name": "avm-res-azurestackhci-logicalnetwork",
+    "display_name": "Azure/avm-res-azurestackhci-logicalnetwork",
+    "version": "2.0.0",
+    "description": "",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-azurestackhci-logicalnetwork/azurerm",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-azurestackhci-logicalnetwork",
+    "requirements": [
+      "azapi ~> 2.0",
+      "azurerm ~> 4.0",
+      "modtm ~> 0.3",
+      "random ~> 3.5"
+    ],
+    "resources": [
+      "random_uuid",
+      "modtm_telemetry",
+      "azurerm_management_lock",
+      "azurerm_role_assignment",
+      "azapi_resource"
+    ],
+    "inputs": [
+      {
+        "name": "ip_allocation_method",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "ip_configuration_references",
+        "type": "list(object({\n    ID = string\n  }))",
+        "required": false
+      },
+      {
+        "name": "route_name",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "subnet_0_name",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "vm_switch_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "default_gateway",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "ending_address",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "vlan_id",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "dns_servers",
+        "type": "list(string)",
+        "required": false
+      },
+      {
+        "name": "logical_network_tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "role_assignments",
+        "type": "map(object({\n    role_definition_id_or_name             = string\n    principal_id                           = string\n    description                            = optional(string, null)\n    skip_service_principal_aad_check       = optional(bool, false)\n    condition                              = optional(string, null)\n    condition_version                      = optional(string, null)\n    delegated_managed_identity_resource_id = optional(string, null)\n    principal_type                         = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "starting_address",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "custom_location_id",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "resource_group_id",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "address_prefix",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "location",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "lock",
+        "type": "object({\n    kind = string\n    name = optional(string, null)\n  })",
+        "required": false
+      }
+    ],
+    "outputs": [
+      {
+        "name": "resource_id",
+        "description": "This is the full output for the resource.",
+        "sensitive": false
+      }
+    ]
+  }
+}

@@ -1,0 +1,106 @@
+{
+  "module": {
+    "name": "avm-res-compute-diskencryptionset",
+    "display_name": "Azure/avm-res-compute-diskencryptionset",
+    "version": "0.1.0",
+    "description": "AVM Terraform module for Disk Encryption Set",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-compute-diskencryptionset/azurerm",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-compute-diskencryptionset",
+    "requirements": [
+      "azurerm ~> 3.71",
+      "modtm ~> 0.3",
+      "random ~> 3.5"
+    ],
+    "resources": [
+      "random_uuid",
+      "modtm_telemetry",
+      "azurerm_management_lock",
+      "azurerm_disk_encryption_set",
+      "azurerm_role_assignment"
+    ],
+    "inputs": [
+      {
+        "name": "location",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "auto_key_rotation_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "federated_client_id",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "managed_hsm_key_id",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "key_vault_key_id",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "key_vault_resource_id",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "resource_group_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "encryption_type",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "lock",
+        "type": "object({\n    kind = string\n    name = optional(string, null)\n  })",
+        "required": false
+      },
+      {
+        "name": "managed_identities",
+        "type": "object({\n    system_assigned            = optional(bool, false)\n    user_assigned_resource_ids = optional(set(string), [])\n  })",
+        "required": false
+      }
+    ],
+    "outputs": [
+      {
+        "name": "key_vault_key_url",
+        "description": "The ID of the disk encryption set.",
+        "sensitive": false
+      },
+      {
+        "name": "resource",
+        "description": "This is the full output for the resource.",
+        "sensitive": false
+      },
+      {
+        "name": "resource_id",
+        "description": "The ID of the disk encryption set.",
+        "sensitive": false
+      }
+    ]
+  }
+}

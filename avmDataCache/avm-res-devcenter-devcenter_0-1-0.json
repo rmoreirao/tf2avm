@@ -1,0 +1,92 @@
+{
+  "module": {
+    "name": "avm-res-devcenter-devcenter",
+    "display_name": "Azure/avm-res-devcenter-devcenter",
+    "version": "0.1.0",
+    "description": "Azure Verified Modules DevCenter Terraform Module",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-devcenter-devcenter/azurerm",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-devcenter-devcenter",
+    "requirements": [
+      "azurerm >= 3.71, < 5.0.0",
+      "modtm ~> 0.3",
+      "random ~> 3.5"
+    ],
+    "resources": [
+      "modtm_telemetry",
+      "azurerm_management_lock",
+      "azurerm_role_assignment",
+      "azurerm_dev_center",
+      "azurerm_monitor_diagnostic_setting",
+      "random_uuid"
+    ],
+    "inputs": [
+      {
+        "name": "tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "location",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "resource_group_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "dev_center_identity",
+        "type": "object({\n    identity_ids = optional(set(string))\n    type         = string\n  })",
+        "required": false
+      },
+      {
+        "name": "dev_center_timeouts",
+        "type": "object({\n    create = optional(string)\n    delete = optional(string)\n    read   = optional(string)\n    update = optional(string)\n  })",
+        "required": false
+      },
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "role_assignments",
+        "type": "map(object({\n    role_definition_id_or_name             = string\n    principal_id                           = string\n    description                            = optional(string, null)\n    skip_service_principal_aad_check       = optional(bool, false)\n    condition                              = optional(string, null)\n    condition_version                      = optional(string, null)\n    delegated_managed_identity_resource_id = optional(string, null)\n    principal_type                         = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "dev_center_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "diagnostic_settings",
+        "type": "map(object({\n    name                                     = optional(string, null)\n    log_categories                           = optional(set(string), [])\n    log_groups                               = optional(set(string), [\"allLogs\"])\n    metric_categories                        = optional(set(string), [\"AllMetrics\"])\n    log_analytics_destination_type           = optional(string, \"Dedicated\")\n    workspace_resource_id                    = optional(string, null)\n    storage_account_resource_id              = optional(string, null)\n    event_hub_authorization_rule_resource_id = optional(string, null)\n    event_hub_name                           = optional(string, null)\n    marketplace_partner_resource_id          = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "lock",
+        "type": "object({\n    kind = string\n    name = optional(string, null)\n  })",
+        "required": false
+      }
+    ],
+    "outputs": [
+      {
+        "name": "resource_id",
+        "description": "value of the resource id",
+        "sensitive": false
+      },
+      {
+        "name": "dev_center_uri",
+        "description": "The URI of the Dev Center.",
+        "sensitive": false
+      },
+      {
+        "name": "resource",
+        "description": "This is the full output for the resource.",
+        "sensitive": false
+      }
+    ]
+  }
+}

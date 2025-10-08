@@ -1,0 +1,273 @@
+{
+  "module": {
+    "name": "avm-res-automation-automationaccount",
+    "display_name": "Azure/avm-res-automation-automationaccount",
+    "version": "0.2.0",
+    "description": "",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-automation-automationaccount/azurerm",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-automation-automationaccount",
+    "requirements": [
+      "azurerm >= 3.71.0",
+      "modtm ~> 0.3",
+      "random >= 3.5.0"
+    ],
+    "resources": [
+      "azurerm_automation_account",
+      "azurerm_automation_connection_certificate",
+      "azurerm_automation_connection_service_principal",
+      "azurerm_automation_connection_classic_certificate",
+      "azurerm_management_lock",
+      "azurerm_automation_variable_bool",
+      "azurerm_automation_connection",
+      "azurerm_automation_python3_package",
+      "azurerm_automation_source_control",
+      "azurerm_automation_variable_datetime",
+      "azurerm_automation_hybrid_runbook_worker",
+      "azurerm_automation_variable_object",
+      "azurerm_automation_hybrid_runbook_worker_group",
+      "azurerm_automation_powershell72_module",
+      "azurerm_automation_runbook",
+      "azurerm_automation_watcher",
+      "azurerm_role_assignment",
+      "azurerm_automation_credential",
+      "azurerm_automation_job_schedule",
+      "azurerm_automation_webhook",
+      "azurerm_private_endpoint",
+      "azurerm_private_endpoint_application_security_group_association",
+      "azurerm_monitor_diagnostic_setting",
+      "random_uuid",
+      "azurerm_automation_module",
+      "azurerm_automation_schedule",
+      "random_uuid",
+      "azurerm_automation_certificate",
+      "azurerm_private_endpoint",
+      "modtm_telemetry",
+      "azurerm_automation_variable_int",
+      "azurerm_automation_variable_string"
+    ],
+    "inputs": [
+      {
+        "name": "role_assignments",
+        "type": "map(object({\n    role_definition_id_or_name             = string\n    principal_id                           = string\n    description                            = optional(string, null)\n    skip_service_principal_aad_check       = optional(bool, false)\n    condition                              = optional(string, null)\n    condition_version                      = optional(string, null)\n    delegated_managed_identity_resource_id = optional(string, null)\n    principal_type                         = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "automation_connections",
+        "type": "map(object({\n    name        = string\n    type        = string\n    values      = map(string)\n    description = optional(string)\n    timeouts = optional(object({\n      create = optional(string)\n      delete = optional(string)\n      read   = optional(string)\n      update = optional(string)\n    }))\n  }))",
+        "required": false
+      },
+      {
+        "name": "automation_variable_datetimes",
+        "type": "map(object({\n    name        = string\n    value       = optional(string)\n    description = optional(string)\n    encrypted   = optional(bool, false)\n    timeouts = optional(object({\n      create = optional(string)\n      delete = optional(string)\n      read   = optional(string)\n      update = optional(string)\n    }))\n  }))",
+        "required": false
+      },
+      {
+        "name": "automation_webhooks",
+        "type": "map(object({\n    name                = string\n    expiry_time         = string\n    enabled             = optional(bool, true)\n    runbook_key         = string\n    run_on_worker_group = optional(string)\n    parameters          = optional(map(string))\n    uri                 = optional(string, null)\n    timeouts = optional(object({\n      create = optional(string)\n      delete = optional(string)\n      read   = optional(string)\n      update = optional(string)\n    }))\n  }))",
+        "required": false
+      },
+      {
+        "name": "private_endpoints_manage_dns_zone_group",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "automation_powershell72_modules",
+        "type": "map(object({\n    name = string\n    module_link = object({\n      uri = string\n      hash = optional(object({\n        algorithm = string\n        value     = string\n      }))\n    })\n    timeouts = optional(object({\n      create = optional(string)\n      delete = optional(string)\n      read   = optional(string)\n      update = optional(string)\n    }))\n  }))",
+        "required": false
+      },
+      {
+        "name": "automation_python3_packages",
+        "type": "map(object({\n    name            = string\n    content_uri     = string\n    content_version = optional(string) # format should be like 1.1.1\n    hash_algorithm  = optional(string)\n    hash_value      = optional(string)\n    tags            = optional(map(string))\n    timeouts = optional(object({\n      create = optional(string)\n      delete = optional(string)\n      read   = optional(string)\n      update = optional(string)\n    }))\n  }))",
+        "required": false
+      },
+      {
+        "name": "automation_variable_ints",
+        "type": "map(object({\n    name        = string\n    value       = optional(number)\n    description = optional(string)\n    encrypted   = optional(bool, false)\n    timeouts = optional(object({\n      create = optional(string)\n      delete = optional(string)\n      read   = optional(string)\n      update = optional(string)\n    }))\n  }))",
+        "required": false
+      },
+      {
+        "name": "tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "sku",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "automation_connection_classic_certificates",
+        "type": "map(object({\n    connection_key         = string\n    subscription_id        = string\n    subscription_name      = string\n    certificate_asset_name = string\n  }))",
+        "required": false
+      },
+      {
+        "name": "automation_variable_objects",
+        "type": "map(object({\n    name        = string\n    value       = optional(string)\n    description = optional(string)\n    encrypted   = optional(bool, false)\n    timeouts = optional(object({\n      create = optional(string)\n      delete = optional(string)\n      read   = optional(string)\n      update = optional(string)\n    }))\n  }))",
+        "required": false
+      },
+      {
+        "name": "automation_variable_strings",
+        "type": "map(object({\n    name        = string\n    value       = optional(string)\n    description = optional(string)\n    encrypted   = optional(bool, false)\n    timeouts = optional(object({\n      create = optional(string)\n      delete = optional(string)\n      read   = optional(string)\n      update = optional(string)\n    }))\n  }))",
+        "required": false
+      },
+      {
+        "name": "automation_watchers",
+        "type": "map(object({\n    name                           = string\n    runbook_key                    = string\n    hybrid_worker_group_key        = string\n    execution_frequency_in_seconds = number\n    etag                           = optional(string)\n    script_parameters              = optional(map(string))\n    tags                           = optional(map(string))\n    description                    = optional(string)\n    timeouts = optional(object({\n      create = optional(string)\n      delete = optional(string)\n      read   = optional(string)\n      update = optional(string)\n    }))\n  }))",
+        "required": false
+      },
+      {
+        "name": "local_authentication_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "timeouts",
+        "type": "object({\n    create = optional(string, \"30m\")\n    delete = optional(string, \"30m\")\n    read   = optional(string, \"5m\")\n    update = optional(string, \"30m\")\n  })",
+        "required": false
+      },
+      {
+        "name": "location",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "resource_group_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "automation_connection_service_principals",
+        "type": "map(object({\n    connection_key         = string\n    tenant_id              = string\n    application_id         = string\n    certificate_thumbprint = string\n    subscription_id        = string\n  }))",
+        "required": false
+      },
+      {
+        "name": "automation_variable_bools",
+        "type": "map(object({\n    name        = string\n    value       = optional(bool, true)\n    description = optional(string)\n    encrypted   = optional(bool, false)\n    timeouts = optional(object({\n      create = optional(string)\n      delete = optional(string)\n      read   = optional(string)\n      update = optional(string)\n    }))\n  }))",
+        "required": false
+      },
+      {
+        "name": "encryption",
+        "type": "list(object({\n    #key_source                = optional(string) #This is deprecated\n    key_vault_key_id          = string\n    user_assigned_identity_id = optional(string)\n  }))",
+        "required": false
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "automation_hybrid_runbook_worker_groups",
+        "type": "map(object({\n    name            = string\n    credential_name = optional(string, null)\n    timeouts = optional(object({\n      create = optional(string)\n      delete = optional(string)\n      read   = optional(string)\n      update = optional(string)\n    }))\n  }))",
+        "required": false
+      },
+      {
+        "name": "automation_source_controls",
+        "type": "map(object({\n    name                    = string\n    folder_path             = string\n    repository_url          = string\n    source_control_type     = string # GitHub, VsoGit and VsoTfvc\n    automatic_sync          = optional(bool, false)\n    branch                  = optional(string) # Empty value is valid only for VsoTfvc.\n    description             = optional(string)\n    publish_runbook_enabled = optional(bool, true)\n    security = object({\n      token         = string\n      token_type    = string # Personal Access Token or oauth\n      refresh_token = optional(string)\n    })\n    timeouts = optional(object({\n      create = optional(string)\n      delete = optional(string)\n      read   = optional(string)\n      update = optional(string)\n    }))\n  }))",
+        "required": false
+      },
+      {
+        "name": "diagnostic_settings",
+        "type": "map(object({\n    name                                     = optional(string, null)\n    log_categories                           = optional(set(string), [])\n    log_groups                               = optional(set(string), [\"allLogs\"])\n    metric_categories                        = optional(set(string), [\"AllMetrics\"])\n    log_analytics_destination_type           = optional(string, \"Dedicated\")\n    workspace_resource_id                    = optional(string, null)\n    storage_account_resource_id              = optional(string, null)\n    event_hub_authorization_rule_resource_id = optional(string, null)\n    event_hub_name                           = optional(string, null)\n    marketplace_partner_resource_id          = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "automation_hybrid_runbook_workers",
+        "type": "map(object({\n    hybrid_worker_group_key = string\n    vm_resource_id          = string\n    timeouts = optional(object({\n      create = optional(string)\n      delete = optional(string)\n      read   = optional(string)\n      update = optional(string)\n    }))\n  }))",
+        "required": false
+      },
+      {
+        "name": "automation_job_schedules",
+        "type": "map(object({\n    runbook_key  = string\n    schedule_key = string\n    parameters   = optional(map(string)) # must be in lowercase\n    run_on       = optional(string)\n    timeouts = optional(object({\n      create = optional(string)\n      delete = optional(string)\n      read   = optional(string)\n    }))\n  }))",
+        "required": false
+      },
+      {
+        "name": "automation_modules",
+        "type": "map(object({\n    name = string\n    module_link = object({\n      uri = string\n      hash = optional(object({\n        algorithm = string\n        value     = string\n      }))\n    })\n    timeouts = optional(object({\n      create = optional(string)\n      delete = optional(string)\n      read   = optional(string)\n      update = optional(string)\n    }))\n  }))",
+        "required": false
+      },
+      {
+        "name": "lock",
+        "type": "object({\n    kind = string\n    name = optional(string, null)\n  })",
+        "required": false
+      },
+      {
+        "name": "managed_identities",
+        "type": "object({\n    system_assigned            = optional(bool, false)\n    user_assigned_resource_ids = optional(set(string), [])\n  })",
+        "required": false
+      },
+      {
+        "name": "private_endpoints",
+        "type": "map(object({\n    name = optional(string, null)\n    role_assignments = optional(map(object({\n      role_definition_id_or_name             = string\n      principal_id                           = string\n      description                            = optional(string, null)\n      skip_service_principal_aad_check       = optional(bool, false)\n      condition                              = optional(string, null)\n      condition_version                      = optional(string, null)\n      delegated_managed_identity_resource_id = optional(string, null)\n      principal_type                         = optional(string, null)\n    })), {})\n    lock = optional(object({\n      kind = string\n      name = optional(string, null)\n    }), null)\n    tags                                    = optional(map(string), null)\n    subnet_resource_id                      = string\n    subresource_name                        = string # NOTE: `subresource_name` can be excluded if the resource does not support multiple sub resource types (e.g. storage account supports blob, queue, etc)\n    private_dns_zone_group_name             = optional(string, \"default\")\n    private_dns_zone_resource_ids           = optional(set(string), [])\n    application_security_group_associations = optional(map(string), {})\n    private_service_connection_name         = optional(string, null)\n    network_interface_name                  = optional(string, null)\n    location                                = optional(string, null)\n    resource_group_name                     = optional(string, null)\n    ip_configurations = optional(map(object({\n      name               = string\n      private_ip_address = string\n    })), {})\n  }))",
+        "required": false
+      },
+      {
+        "name": "automation_connection_certificates",
+        "type": "map(object({\n    connection_key              = string\n    subscription_id             = string\n    automation_certificate_name = string\n  }))",
+        "required": false
+      },
+      {
+        "name": "automation_runbooks",
+        "type": "map(object({\n    name                     = string\n    runbook_type             = string\n    log_progress             = bool\n    log_verbose              = bool\n    description              = optional(string, \"test\")\n    content                  = optional(string, null)\n    tags                     = optional(map(string))\n    log_activity_trace_level = optional(number, null)\n    publish_content_link = optional(object({\n      uri     = string\n      version = optional(string)\n      hash = optional(object({\n        algorithm = string\n        value     = string\n      }))\n    }))\n    draft = optional(object({\n      edit_mode_enabled = optional(bool)\n      output_types      = optional(list(string))\n      content_link = optional(object({\n        uri     = string\n        version = optional(string)\n        hash = optional(object({\n          algorithm = string\n          value     = string\n        }))\n      }))\n      parameters = optional(list(object({\n        default_value = optional(string)\n        key           = string\n        mandatory     = optional(bool)\n        position      = optional(number)\n        type          = string\n      })))\n    }))\n    job_schedule = optional(list(object({\n      parameters   = optional(map(string))\n      run_on       = optional(string)\n      schedule_key = string # Must match a key in `automation_schedules`.\n    })))\n    timeouts = optional(object({\n      create = optional(string)\n      delete = optional(string)\n      read   = optional(string)\n      update = optional(string)\n    }))\n  }))",
+        "required": false
+      },
+      {
+        "name": "automation_schedules",
+        "type": "map(object({\n    name        = string\n    frequency   = string\n    description = optional(string, null)\n    interval    = optional(number, 1)\n    start_time  = optional(string)\n    expiry_time = optional(string)\n    timezone    = optional(string, \"Etc/UTC\")\n    week_days   = optional(set(string))\n    month_days  = optional(set(number))\n    monthly_occurrence = optional(object({\n      day        = string\n      occurrence = number\n    }))\n    timeouts = optional(object({\n      create = optional(string)\n      delete = optional(string)\n      read   = optional(string)\n      update = optional(string)\n    }))\n  }))",
+        "required": false
+      },
+      {
+        "name": "automation_certificates",
+        "type": "map(object({\n    name        = string\n    base64      = string\n    description = optional(string)\n    exportable  = optional(bool, false)\n    timeouts = optional(object({\n      create = optional(string)\n      delete = optional(string)\n      read   = optional(string)\n      update = optional(string)\n    }))\n  }))",
+        "required": false
+      },
+      {
+        "name": "automation_credentials",
+        "type": "map(object({\n    name        = string\n    username    = string\n    password    = string\n    description = optional(string)\n    timeouts = optional(object({\n      create = optional(string)\n      delete = optional(string)\n      read   = optional(string)\n      update = optional(string)\n    }))\n  }))",
+        "required": false
+      },
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "public_network_access_enabled",
+        "type": "bool",
+        "required": false
+      }
+    ],
+    "outputs": [
+      {
+        "name": "automation_account_id",
+        "description": "ID of the automation account",
+        "sensitive": false
+      },
+      {
+        "name": "automation_account_name",
+        "description": "Name of the automation account",
+        "sensitive": false
+      },
+      {
+        "name": "hybrid_service_url",
+        "description": "Hybrid worker group URL for the automation account",
+        "sensitive": false
+      },
+      {
+        "name": "private_endpoints",
+        "description": "  A map of the private endpoints created.\n",
+        "sensitive": false
+      },
+      {
+        "name": "resource_id",
+        "description": "ID of the automation account",
+        "sensitive": false
+      },
+      {
+        "name": "system_assigned_mi_principal_id",
+        "description": "The system assigned managed identity of the automation account",
+        "sensitive": false
+      }
+    ]
+  }
+}

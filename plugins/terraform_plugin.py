@@ -2,6 +2,9 @@ import json
 import aiohttp
 from semantic_kernel.functions import kernel_function
 from semantic_kernel.connectors.mcp import MCPStdioPlugin
+from typing import List, Optional, Dict, Any
+from schemas.models import AVMModuleDetailed, AVMModuleInput, AVMModuleOutput
+
 
 
 class TerraformPlugin:
@@ -99,9 +102,9 @@ class TerraformPlugin:
     # docs : https://developer.hashicorp.com/terraform/registry/api-docs#get-a-specific-module
     @kernel_function(
         description="Retrieve AVM module details in JSON format. Inputs: module_name, module_version",
-        name="get_avm_module_details",
+        name="get_avm_module_details_json",
     )
-    async def get_avm_module_details(self, module_name: str, module_version: str) -> str:
+    async def get_avm_module_details_json(self, module_name: str, module_version: str) -> str:
         # do not use the mcp plugin here
         # fetch the module details from url https://registry.terraform.io/v1/modules/Azure/{module name}/azurerm/{module version}
 
@@ -123,3 +126,90 @@ class TerraformPlugin:
                         continue
                     else:
                         raise ValueError(f"Failed to retrieve module details for {module_name} version {module_version}. URL: {module_details_url}, HTTP Status: {response.status}, Response: {await response.text()}")
+                    
+
+    async def get_avm_module_details_model(self, module_name: str, module_version: str) -> AVMModuleDetailed:
+        """
+        Parse Terraform Registry API response to create AVMModuleDetailed object.
+        
+        Args:
+            json_data: Dictionary containing the JSON response from Terraform Registry API
+            
+        Returns:
+            AVMModuleDetailed: Parsed module details
+        """
+
+        response = await self.get_avm_module_details_json(module_name, module_version)
+
+        if isinstance(response, dict):
+            json_data = response
+        elif isinstance(response, str):
+            json_data = json.loads(response)
+        else:
+            raise ValueError(f"Unexpected response type: {type(response)}")
+        
+        # Extract basic module information
+        name = json_data.get("name", "")
+        description = json_data.get("description", "")
+        version = json_data.get("version", "")
+        source_url = json_data.get("source", "")
+        
+        # Construct display name from namespace and name
+        namespace = json_data.get("namespace", "")
+        display_name = f"{namespace}/{name}" if namespace else name
+        
+        # Construct Terraform Registry URL
+        provider = json_data.get("provider", "")
+        terraform_registry_url = f"https://registry.terraform.io/modules/{namespace}/{name}/{provider}"
+        
+        # Extract requirements from root module
+        requirements = []
+        if "root" in json_data and "provider_dependencies" in json_data["root"]:
+            for provider_dep in json_data["root"]["provider_dependencies"]:
+                provider_name = provider_dep.get("name", "")
+                version_constraint = provider_dep.get("version", "")
+                if provider_name and version_constraint:
+                    requirements.append(f"{provider_name} {version_constraint}")
+        
+        # Extract resources from root module
+        resources = []
+        if "root" in json_data and "resources" in json_data["root"]:
+            for resource in json_data["root"]["resources"]:
+                resource_type = resource.get("type", "")
+                if resource_type:
+                    resources.append(resource_type)
+        
+        # Parse inputs
+        inputs = []
+        if "root" in json_data and "inputs" in json_data["root"]:
+            for input_data in json_data["root"]["inputs"]:
+                input_obj = AVMModuleInput(
+                    name=input_data.get("name", ""),
+                    type=input_data.get("type", ""),
+                    required=input_data.get("required", True)
+                )
+                inputs.append(input_obj)
+        
+        # Parse outputs
+        outputs = []
+        if "root" in json_data and "outputs" in json_data["root"]:
+            for output_data in json_data["root"]["outputs"]:
+                output_obj = AVMModuleOutput(
+                    name=output_data.get("name", ""),
+                    description=output_data.get("description", "")
+                )
+                outputs.append(output_obj)
+        
+        
+        return AVMModuleDetailed(
+            name=name,
+            display_name=display_name,
+            version=version,
+            description=description,
+            terraform_registry_url=terraform_registry_url,
+            source_code_url=source_url,
+            requirements=requirements,
+            resources=resources,
+            inputs=inputs,
+            outputs=outputs
+        )

@@ -1,0 +1,182 @@
+{
+  "module": {
+    "name": "avm-res-sql-server",
+    "display_name": "Azure/avm-res-sql-server",
+    "version": "0.1.6",
+    "description": "Terraform Azure Verified Resource Module for Azure SQL Server",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-sql-server/azurerm",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-sql-server",
+    "requirements": [
+      "azapi ~> 2.4",
+      "azurerm ~> 4.26",
+      "modtm ~> 0.3",
+      "random ~> 3.6"
+    ],
+    "resources": [
+      "modtm_telemetry",
+      "azurerm_mssql_server",
+      "azurerm_management_lock",
+      "azurerm_monitor_diagnostic_setting",
+      "azurerm_mssql_firewall_rule",
+      "azurerm_private_endpoint",
+      "azurerm_private_endpoint",
+      "azurerm_private_endpoint_application_security_group_association",
+      "random_uuid",
+      "azurerm_role_assignment"
+    ],
+    "inputs": [
+      {
+        "name": "primary_user_assigned_identity_id",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "transparent_data_encryption_key_vault_key_id",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "resource_group_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "diagnostic_settings",
+        "type": "map(object({\n    name                                     = optional(string, null)\n    log_categories                           = optional(set(string), [])\n    log_groups                               = optional(set(string), [\"allLogs\"])\n    metric_categories                        = optional(set(string), [\"AllMetrics\"])\n    log_analytics_destination_type           = optional(string, \"Dedicated\")\n    workspace_resource_id                    = optional(string, null)\n    storage_account_resource_id              = optional(string, null)\n    event_hub_authorization_rule_resource_id = optional(string, null)\n    event_hub_name                           = optional(string, null)\n    marketplace_partner_resource_id          = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "managed_identities",
+        "type": "object({\n    system_assigned            = optional(bool, false)\n    user_assigned_resource_ids = optional(set(string), [])\n  })",
+        "required": false
+      },
+      {
+        "name": "private_endpoints",
+        "type": "map(object({\n    name = optional(string, null)\n    role_assignments = optional(map(object({\n      role_definition_id_or_name             = string\n      principal_id                           = string\n      description                            = optional(string, null)\n      skip_service_principal_aad_check       = optional(bool, false)\n      condition                              = optional(string, null)\n      condition_version                      = optional(string, null)\n      delegated_managed_identity_resource_id = optional(string, null)\n      principal_type                         = optional(string, null)\n    })), {})\n    lock = optional(object({\n      kind = string\n      name = optional(string, null)\n    }), null)\n    tags                                    = optional(map(string), null)\n    subnet_resource_id                      = string\n    subresource_name                        = string # NOTE: `subresource_name` can be excluded if the resource does not support multiple sub resource types (e.g. storage account supports blob, queue, etc)\n    private_dns_zone_group_name             = optional(string, \"default\")\n    private_dns_zone_resource_ids           = optional(set(string), [])\n    application_security_group_associations = optional(map(string), {})\n    private_service_connection_name         = optional(string, null)\n    network_interface_name                  = optional(string, null)\n    location                                = optional(string, null)\n    resource_group_name                     = optional(string, null)\n    ip_configurations = optional(map(object({\n      name               = string\n      private_ip_address = string\n    })), {})\n  }))",
+        "required": false
+      },
+      {
+        "name": "administrator_login_password",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "azuread_administrator",
+        "type": "object({\n    azuread_authentication_only = optional(bool)\n    login_username              = string\n    object_id                   = string\n    tenant_id                   = optional(string)\n  })",
+        "required": false
+      },
+      {
+        "name": "location",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "private_endpoints_manage_dns_zone_group",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "databases",
+        "type": "map(object({\n    name                                                       = string\n    auto_pause_delay_in_minutes                                = optional(number)\n    create_mode                                                = optional(string, \"Default\")\n    collation                                                  = optional(string)\n    elastic_pool_key                                           = optional(string)\n    geo_backup_enabled                                         = optional(bool, true)\n    maintenance_configuration_name                             = optional(string)\n    ledger_enabled                                             = optional(bool, false)\n    license_type                                               = optional(string)\n    max_size_gb                                                = optional(number)\n    min_capacity                                               = optional(number)\n    restore_point_in_time                                      = optional(string)\n    recover_database_id                                        = optional(string)\n    restore_dropped_database_id                                = optional(string)\n    read_replica_count                                         = optional(number)\n    read_scale                                                 = optional(bool)\n    sample_name                                                = optional(string)\n    sku_name                                                   = optional(string)\n    storage_account_type                                       = optional(string, \"Geo\")\n    transparent_data_encryption_enabled                        = optional(bool, true)\n    transparent_data_encryption_key_vault_key_id               = optional(string)\n    transparent_data_encryption_key_automatic_rotation_enabled = optional(bool)\n    zone_redundant                                             = optional(bool)\n\n    import = optional(object({\n      storage_uri                  = string\n      storage_key                  = string\n      storage_key_type             = string\n      administrator_login          = string\n      administrator_login_password = string\n      authentication_type          = string\n      storage_account_id           = optional(string)\n    }))\n\n    long_term_retention_policy = optional(object({\n      weekly_retention  = string\n      monthly_retention = string\n      yearly_retention  = string\n      week_of_year      = number\n    }))\n\n    short_term_retention_policy = optional(object({\n      retention_days           = number\n      backup_interval_in_hours = optional(number, 12)\n    }))\n\n    threat_detection_policy = optional(object({\n      state                      = optional(string, \"Disabled\")\n      disabled_alerts            = optional(list(string))\n      email_account_admins       = optional(string, \"Disabled\")\n      email_addresses            = optional(list(string))\n      retention_days             = optional(number)\n      storage_account_access_key = optional(string)\n      storage_endpoint           = optional(string)\n    }))\n\n    role_assignments = optional(map(object({\n      role_definition_id_or_name             = string\n      principal_id                           = string\n      description                            = optional(string, null)\n      skip_service_principal_aad_check       = optional(bool, false)\n      condition                              = optional(string, null)\n      condition_version                      = optional(string, null)\n      delegated_managed_identity_resource_id = optional(string, null)\n      principal_type                         = optional(string, null)\n    })))\n\n    lock = optional(object({\n      kind = string\n      name = optional(string, null)\n    }))\n\n    diagnostic_settings = optional(map(object({\n      name                                     = optional(string, null)\n      event_hub_authorization_rule_resource_id = optional(string, null)\n      event_hub_name                           = optional(string, null)\n      log_analytics_destination_type           = optional(string, null)\n      workspace_resource_id                    = optional(string, null)\n      marketplace_partner_resource_id          = optional(string, null)\n      storage_account_resource_id              = optional(string, null)\n      log_categories                           = optional(list(string))\n      log_groups                               = optional(list(string))\n      metric_categories                        = optional(list(string))\n    })))\n\n    managed_identities = optional(object({\n      system_assigned            = optional(bool, false)\n      user_assigned_resource_ids = optional(set(string), [])\n    }))\n\n    tags = optional(map(string))\n  }))",
+        "required": false
+      },
+      {
+        "name": "firewall_rules",
+        "type": "map(object({\n    end_ip_address   = string\n    start_ip_address = string\n    timeouts = optional(object({\n      create = optional(string)\n      delete = optional(string)\n      read   = optional(string)\n      update = optional(string)\n    }))\n  }))",
+        "required": false
+      },
+      {
+        "name": "connection_policy",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "role_assignments",
+        "type": "map(object({\n    role_definition_id_or_name             = string\n    principal_id                           = string\n    description                            = optional(string, null)\n    skip_service_principal_aad_check       = optional(bool, false)\n    condition                              = optional(string, null)\n    condition_version                      = optional(string, null)\n    delegated_managed_identity_resource_id = optional(string, null)\n    principal_type                         = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "elastic_pools",
+        "type": "map(object({\n    name     = string\n    location = optional(string)\n    sku = optional(object({\n      name     = string\n      capacity = number\n      tier     = string\n      family   = optional(string)\n    }))\n    per_database_settings = optional(object({\n      min_capacity = number\n      max_capacity = number\n    }))\n    maintenance_configuration_name = optional(string, \"SQL_Default\")\n    zone_redundant                 = optional(bool, \"true\")\n    license_type                   = optional(string)\n    max_size_gb                    = optional(number)\n    max_size_bytes                 = optional(number)\n\n    role_assignments = optional(map(object({\n      role_definition_id_or_name             = string\n      principal_id                           = string\n      description                            = optional(string, null)\n      skip_service_principal_aad_check       = optional(bool, false)\n      condition                              = optional(string, null)\n      condition_version                      = optional(string, null)\n      delegated_managed_identity_resource_id = optional(string, null)\n      principal_type                         = optional(string, null)\n    })))\n\n    lock = optional(object({\n      kind = string\n      name = optional(string, null)\n    }))\n\n    diagnostic_settings = optional(map(object({\n      name                                     = optional(string, null)\n      event_hub_authorization_rule_resource_id = optional(string, null)\n      event_hub_name                           = optional(string, null)\n      log_analytics_destination_type           = optional(string, null)\n      workspace_resource_id                    = optional(string, null)\n      marketplace_partner_resource_id          = optional(string, null)\n      storage_account_resource_id              = optional(string, null)\n      log_categories                           = optional(list(string))\n      log_groups                               = optional(list(string))\n      metric_categories                        = optional(list(string))\n    })))\n\n    tags = optional(map(string))\n  }))",
+        "required": false
+      },
+      {
+        "name": "server_version",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "administrator_login",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "public_network_access_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "lock",
+        "type": "object({\n    kind = string\n    name = optional(string, null)\n  })",
+        "required": false
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "express_vulnerability_assessment_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "outbound_network_restriction_enabled",
+        "type": "bool",
+        "required": false
+      }
+    ],
+    "outputs": [
+      {
+        "name": "resource_id",
+        "description": "This is the id of the resource.",
+        "sensitive": false
+      },
+      {
+        "name": "resource_name",
+        "description": "This is the name of the resource.",
+        "sensitive": false
+      },
+      {
+        "name": "private_endpoints",
+        "description": "  A map of the private endpoints created.\n",
+        "sensitive": false
+      },
+      {
+        "name": "resource",
+        "description": "This is the full output for the resource.",
+        "sensitive": false
+      },
+      {
+        "name": "resource_databases",
+        "description": "A map of databases. The map key is the supplied input to var.databases. The map value is the entire azurerm_mssql_database resource.",
+        "sensitive": false
+      },
+      {
+        "name": "resource_elasticpools",
+        "description": "A map of elastic pools. The map key is the supplied input to var.elastic_pools. The map value is the entire azurerm_mssql_elasticpool resource.",
+        "sensitive": false
+      }
+    ]
+  }
+}

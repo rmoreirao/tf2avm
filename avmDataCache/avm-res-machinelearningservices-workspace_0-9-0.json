@@ -1,0 +1,243 @@
+{
+  "module": {
+    "name": "avm-res-machinelearningservices-workspace",
+    "display_name": "Azure/avm-res-machinelearningservices-workspace",
+    "version": "0.9.0",
+    "description": "Terraform Azure Verified Resource Module for Machine Learning Services Workspace",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-machinelearningservices-workspace/azurerm",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-machinelearningservices-workspace",
+    "requirements": [
+      "azapi ~> 2.6",
+      "azurerm >= 4.17.0, < 5.0",
+      "modtm ~> 0.3",
+      "random >= 3.5.0, < 4.0"
+    ],
+    "resources": [
+      "azurerm_monitor_diagnostic_setting",
+      "azurerm_private_endpoint",
+      "azurerm_private_endpoint",
+      "azurerm_private_endpoint_application_security_group_association",
+      "random_uuid",
+      "modtm_telemetry",
+      "azapi_resource",
+      "azurerm_management_lock",
+      "azapi_resource",
+      "azapi_resource",
+      "azurerm_role_assignment"
+    ],
+    "inputs": [
+      {
+        "name": "hbi_workspace",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "primary_user_assigned_identity",
+        "type": "object({\n    resource_id = optional(string, null)\n  })",
+        "required": false
+      },
+      {
+        "name": "public_network_access_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "workspace_managed_network",
+        "type": "object({\n    isolation_mode = string\n    spark_ready    = optional(bool, true)\n    outbound_rules = optional(object({\n      fqdn = optional(map(object({\n        destination = string\n      })), {})\n      private_endpoint = optional(map(object({\n        resource_id         = string\n        sub_resource_target = string\n        spark_enabled       = optional(bool, false)\n      })), {})\n      service_tag = optional(map(object({\n        action           = string\n        service_tag      = string\n        address_prefixes = optional(list(string), null)\n        protocol         = string\n        port_ranges      = string\n      })), {})\n    }), {})\n    firewall_sku = optional(string, \"Standard\")\n  })",
+        "required": false
+      },
+      {
+        "name": "resource_group_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "storage_account",
+        "type": "object({\n    resource_id = optional(string)\n  })",
+        "required": false
+      },
+      {
+        "name": "kind",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "lock",
+        "type": "object({\n    kind = string\n    name = optional(string, null)\n  })",
+        "required": false
+      },
+      {
+        "name": "private_endpoints_manage_dns_zone_group",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "provision_network_now_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "azure_ai_hub",
+        "type": "object({\n    resource_id = optional(string)\n  })",
+        "required": false
+      },
+      {
+        "name": "image_build_compute",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "is_private",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "outbound_rules",
+        "type": "map(object({\n    resource_id         = string\n    sub_resource_target = string\n  }))",
+        "required": false
+      },
+      {
+        "name": "location",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "customer_managed_key",
+        "type": "object({\n    key_vault_resource_id = string\n    key_name              = string\n    key_version           = optional(string, null)\n    user_assigned_identity = optional(object({\n      resource_id = string\n    }), null)\n  })",
+        "required": false
+      },
+      {
+        "name": "serverless_compute",
+        "type": "object({\n    subnet_id         = optional(string)\n    public_ip_enabled = optional(bool, false)\n  })",
+        "required": false
+      },
+      {
+        "name": "service_side_cmk_encryption_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "storage_access_type",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "diagnostic_settings",
+        "type": "map(object({\n    name                                     = optional(string, null)\n    log_categories                           = optional(set(string), [])\n    log_groups                               = optional(set(string), [\"allLogs\"])\n    metric_categories                        = optional(set(string), [\"AllMetrics\"])\n    log_analytics_destination_type           = optional(string, \"Dedicated\")\n    workspace_resource_id                    = optional(string, null)\n    storage_account_resource_id              = optional(string, null)\n    event_hub_authorization_rule_resource_id = optional(string, null)\n    event_hub_name                           = optional(string, null)\n    marketplace_partner_resource_id          = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "managed_identities",
+        "type": "object({\n    system_assigned            = optional(bool, false)\n    user_assigned_resource_ids = optional(set(string), [])\n  })",
+        "required": false
+      },
+      {
+        "name": "timeouts",
+        "type": "object({\n    create = optional(string, \"30m\")\n    delete = optional(string, \"30m\")\n    read   = optional(string, \"5m\")\n  })",
+        "required": false
+      },
+      {
+        "name": "container_registry",
+        "type": "object({\n    resource_id = optional(string)\n  })",
+        "required": false
+      },
+      {
+        "name": "ip_allowlist",
+        "type": "set(string)",
+        "required": false
+      },
+      {
+        "name": "key_vault",
+        "type": "object({\n    resource_id                     = optional(string)\n    use_microsoft_managed_key_vault = optional(bool, false)\n  })",
+        "required": false
+      },
+      {
+        "name": "public_access_when_behind_vnet_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "workspace_friendly_name",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "application_insights",
+        "type": "object({\n    resource_id = optional(string)\n  })",
+        "required": false
+      },
+      {
+        "name": "private_endpoints",
+        "type": "map(object({\n    name = optional(string, null)\n    role_assignments = optional(map(object({\n      role_definition_id_or_name             = string\n      principal_id                           = string\n      description                            = optional(string, null)\n      skip_service_principal_aad_check       = optional(bool, false)\n      condition                              = optional(string, null)\n      condition_version                      = optional(string, null)\n      delegated_managed_identity_resource_id = optional(string, null)\n      principal_type                         = optional(string, null)\n    })), {})\n    lock = optional(object({\n      kind = string\n      name = optional(string, null)\n    }), null)\n    tags               = optional(map(string), null)\n    subnet_resource_id = string\n    #subresource_name                        = string # NOTE: `subresource_name` can be excluded if the resource does not support multiple sub resource types (e.g. storage account supports blob, queue, etc)\n    private_dns_zone_group_name             = optional(string, \"default\")\n    private_dns_zone_resource_ids           = optional(set(string), [])\n    application_security_group_associations = optional(map(string), {})\n    private_service_connection_name         = optional(string, null)\n    network_interface_name                  = optional(string, null)\n    location                                = optional(string, null)\n    resource_group_name                     = optional(string, null)\n    ip_configurations = optional(map(object({\n      name               = string\n      private_ip_address = string\n    })), {})\n  }))",
+        "required": false
+      },
+      {
+        "name": "role_assignments",
+        "type": "map(object({\n    role_definition_id_or_name             = string\n    principal_id                           = string\n    description                            = optional(string, null)\n    skip_service_principal_aad_check       = optional(bool, false)\n    condition                              = optional(string, null)\n    condition_version                      = optional(string, null)\n    delegated_managed_identity_resource_id = optional(string, null)\n    principal_type                         = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "workspace_description",
+        "type": "string",
+        "required": false
+      }
+    ],
+    "outputs": [
+      {
+        "name": "ai_services",
+        "description": "DEPRECATED. Will always be null.",
+        "sensitive": false
+      },
+      {
+        "name": "ai_services_service_connection",
+        "description": "DEPRECATED. Will always be null.",
+        "sensitive": false
+      },
+      {
+        "name": "resource",
+        "description": "DEPRECATED. Use `workspace` or other outputs instead. If additional fields are required, open a bug. Note: the only input value that should be output too is `name`",
+        "sensitive": false
+      },
+      {
+        "name": "workspace_identity",
+        "description": "DEPRECATED. Use `system_assigned_mi_principal_id` instead, if the workspace was configured for system-assigned managed identity.",
+        "sensitive": false
+      },
+      {
+        "name": "private_endpoints",
+        "description": "A map of the private endpoints created.",
+        "sensitive": false
+      },
+      {
+        "name": "resource_id",
+        "description": "The ID of the machine learning workspace.",
+        "sensitive": false
+      },
+      {
+        "name": "system_assigned_mi_principal_id",
+        "description": "The system-assigned managed identity for the created workspace, if applicable.",
+        "sensitive": false
+      },
+      {
+        "name": "workspace",
+        "description": "The machine learning workspace created.",
+        "sensitive": false
+      }
+    ]
+  }
+}

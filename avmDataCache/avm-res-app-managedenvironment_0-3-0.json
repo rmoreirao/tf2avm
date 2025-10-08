@@ -1,0 +1,218 @@
+{
+  "module": {
+    "name": "avm-res-app-managedenvironment",
+    "display_name": "Azure/avm-res-app-managedenvironment",
+    "version": "0.3.0",
+    "description": "AVM Terraform module for Container Apps Managed Environments",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-app-managedenvironment/azurerm",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-app-managedenvironment",
+    "requirements": [
+      "azapi ~> 2.4",
+      "azurerm ~> 4.0",
+      "modtm ~> 0.3",
+      "random ~> 3.5"
+    ],
+    "resources": [
+      "random_uuid",
+      "modtm_telemetry",
+      "azapi_resource",
+      "azurerm_management_lock",
+      "azurerm_role_assignment",
+      "azurerm_monitor_diagnostic_setting"
+    ],
+    "inputs": [
+      {
+        "name": "name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "custom_domain_certificate_password",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "diagnostic_settings",
+        "type": "map(object({\n    name                                     = optional(string, null)\n    log_categories                           = optional(set(string), [])\n    log_groups                               = optional(set(string), [\"allLogs\"])\n    metric_categories                        = optional(set(string), [\"AllMetrics\"])\n    log_analytics_destination_type           = optional(string, \"Dedicated\")\n    workspace_resource_id                    = optional(string, null)\n    storage_account_resource_id              = optional(string, null)\n    event_hub_authorization_rule_resource_id = optional(string, null)\n    event_hub_name                           = optional(string, null)\n    marketplace_partner_resource_id          = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "internal_load_balancer_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "managed_identities",
+        "type": "object({\n    system_assigned            = optional(bool, false)\n    user_assigned_resource_ids = optional(set(string), [])\n  })",
+        "required": false
+      },
+      {
+        "name": "role_assignments",
+        "type": "map(object({\n    role_definition_id_or_name             = string\n    principal_id                           = string\n    description                            = optional(string, null)\n    skip_service_principal_aad_check       = optional(bool, false)\n    condition                              = optional(string, null)\n    condition_version                      = optional(string, null)\n    delegated_managed_identity_resource_id = optional(string, null)\n    principal_type                         = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "zone_redundancy_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "location",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "resource_group_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "custom_domain_dns_suffix",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "infrastructure_subnet_id",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "lock",
+        "type": "object({\n    kind = string\n    name = optional(string, null)\n  })",
+        "required": false
+      },
+      {
+        "name": "log_analytics_workspace_customer_id",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "log_analytics_workspace_primary_shared_key",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "peer_authentication_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "dapr_application_insights_connection_string",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "infrastructure_resource_group_name",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "log_analytics_workspace",
+        "type": "object({\n    resource_id = string\n  })",
+        "required": false
+      },
+      {
+        "name": "storages",
+        "type": "map(object({\n    access_key   = string\n    access_mode  = string\n    account_name = string\n    share_name   = string\n    timeouts = optional(object({\n      create = optional(string)\n      delete = optional(string)\n      read   = optional(string)\n    }))\n  }))",
+        "required": false
+      },
+      {
+        "name": "timeouts",
+        "type": "object({\n    create = optional(string)\n    delete = optional(string)\n    read   = optional(string)\n    update = optional(string)\n  })",
+        "required": false
+      },
+      {
+        "name": "workload_profile",
+        "type": "set(object({\n    maximum_count         = optional(number)\n    minimum_count         = optional(number)\n    name                  = string\n    workload_profile_type = string\n  }))",
+        "required": false
+      },
+      {
+        "name": "dapr_components",
+        "type": "map(object({\n    component_type         = string\n    ignore_errors          = optional(bool, true)\n    init_timeout           = optional(string)\n    secret_store_component = optional(string)\n    scopes                 = optional(list(string))\n    version                = string\n    metadata = optional(list(object({\n      name        = string\n      secret_name = optional(string)\n      value       = optional(string)\n    })))\n    secret = optional(set(object({\n      name  = string\n      value = string\n    })))\n    timeouts = optional(object({\n      create = optional(string)\n      delete = optional(string)\n      read   = optional(string)\n    }))\n  }))",
+        "required": false
+      },
+      {
+        "name": "log_analytics_workspace_destination",
+        "type": "string",
+        "required": false
+      }
+    ],
+    "outputs": [
+      {
+        "name": "resource_id",
+        "description": "The ID of the container app management environment resource.",
+        "sensitive": false
+      },
+      {
+        "name": "storage_resource_ids",
+        "description": "A map of storage shares connected to this environment. The map key is the supplied input to var.storages. The map value is the azurerm-formatted version of the entire storage shares resource.",
+        "sensitive": false
+      },
+      {
+        "name": "custom_domain_verification_id",
+        "description": "The custom domain verification ID of the Container Apps Managed Environment.",
+        "sensitive": false
+      },
+      {
+        "name": "dapr_component_resource_ids",
+        "description": "A map of dapr components connected to this environment. The map key is the supplied input to var.dapr_components. The map value is the azurerm-formatted version of the entire dapr_components resource.",
+        "sensitive": false
+      },
+      {
+        "name": "default_domain",
+        "description": "The default domain of the Container Apps Managed Environment.",
+        "sensitive": false
+      },
+      {
+        "name": "managed_identities",
+        "description": "The managed identities assigned to the Container Apps Managed Environment.",
+        "sensitive": false
+      },
+      {
+        "name": "name",
+        "description": "The name of the resource",
+        "sensitive": false
+      },
+      {
+        "name": "platform_reserved_dns_ip_address",
+        "description": "The platform reserved DNS IP address of the Container Apps Managed Environment.",
+        "sensitive": false
+      },
+      {
+        "name": "static_ip_address",
+        "description": "The static IP address of the Container Apps Managed Environment.",
+        "sensitive": false
+      },
+      {
+        "name": "docker_bridge_cidr",
+        "description": "The Docker bridge CIDR of the Container Apps Managed Environment.",
+        "sensitive": false
+      },
+      {
+        "name": "id",
+        "description": "The ID of the container app management environment resource.",
+        "sensitive": false
+      },
+      {
+        "name": "infrastructure_resource_group",
+        "description": "The infrastructure resource group of the Container Apps Managed Environment.",
+        "sensitive": false
+      },
+      {
+        "name": "platform_reserved_cidr",
+        "description": "The platform reserved CIDR of the Container Apps Managed Environment.",
+        "sensitive": false
+      }
+    ]
+  }
+}

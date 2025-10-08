@@ -1,0 +1,236 @@
+{
+  "module": {
+    "name": "avm-res-azurestackhci-virtualmachineinstance",
+    "display_name": "Azure/avm-res-azurestackhci-virtualmachineinstance",
+    "version": "2.1.1",
+    "description": "Terraform Azure Verified Resource Module for Stack HCI Virtual Machine Instance",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-azurestackhci-virtualmachineinstance/azurerm",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-azurestackhci-virtualmachineinstance",
+    "requirements": [
+      "azapi ~> 2.4",
+      "azurerm ~> 4.0",
+      "modtm ~> 0.3",
+      "random ~> 3.5"
+    ],
+    "resources": [
+      "azapi_resource",
+      "random_uuid",
+      "modtm_telemetry",
+      "azurerm_management_lock",
+      "azapi_resource",
+      "azapi_resource",
+      "azapi_resource",
+      "azurerm_role_assignment",
+      "azapi_resource"
+    ],
+    "inputs": [
+      {
+        "name": "admin_username",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "location",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "resource_group_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "dynamic_memory_buffer",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "linux_ssh_config",
+        "type": "object({\n    publicKeys = list(object({\n      keyData = string\n      path    = string\n    }))\n  })",
+        "required": false
+      },
+      {
+        "name": "dynamic_memory",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "dynamic_memory_max",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "dynamic_memory_min",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "private_ip_address",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "role_assignments",
+        "type": "map(object({\n    role_definition_id_or_name             = string\n    principal_id                           = string\n    description                            = optional(string, null)\n    skip_service_principal_aad_check       = optional(bool, false)\n    condition                              = optional(string, null)\n    condition_version                      = optional(string, null)\n    delegated_managed_identity_resource_id = optional(string, null)\n    principal_type                         = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "secure_boot_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "security_type",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "image_id",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "custom_location_id",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "no_proxy",
+        "type": "list(string)",
+        "required": false
+      },
+      {
+        "name": "tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "v_cpu_count",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "memory_mb",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "domain_join_password",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "domain_join_user_name",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "https_proxy",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "os_type",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "type_handler_version",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "windows_ssh_config",
+        "type": "object({\n    publicKeys = list(object({\n      keyData = string\n      path    = string\n    }))\n  })",
+        "required": false
+      },
+      {
+        "name": "admin_password",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "data_disk_params",
+        "type": "map(object({\n    name        = string\n    diskSizeGB  = number\n    dynamic     = bool\n    tags        = optional(map(string))\n    containerId = optional(string)\n  }))",
+        "required": false
+      },
+      {
+        "name": "domain_join_extension_tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "domain_to_join",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "http_proxy",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "logical_network_id",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "auto_upgrade_minor_version",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "nic_tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "trusted_ca",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "user_storage_id",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "domain_target_ou",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "enable_tpm",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "lock",
+        "type": "object({\n    kind = string\n    name = optional(string, null)\n  })",
+        "required": false
+      },
+      {
+        "name": "managed_identities",
+        "type": "object({\n    system_assigned            = optional(bool, false)\n    user_assigned_resource_ids = optional(set(string), [])\n  })",
+        "required": false
+      }
+    ],
+    "outputs": [
+      {
+        "name": "resource_id",
+        "description": "This is the full output for the resource.",
+        "sensitive": false
+      }
+    ]
+  }
+}

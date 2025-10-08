@@ -1,0 +1,72 @@
+{
+  "module": {
+    "name": "avm-res-compute-sshpublickey",
+    "display_name": "Azure/avm-res-compute-sshpublickey",
+    "version": "0.1.0",
+    "description": "Public SSH Key AVM module",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-compute-sshpublickey/azurerm",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-compute-sshpublickey",
+    "requirements": [
+      "azurerm >= 3.71.0"
+    ],
+    "resources": [
+      "azurerm_management_lock",
+      "azurerm_role_assignment",
+      "azurerm_ssh_public_key"
+    ],
+    "inputs": [
+      {
+        "name": "name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "resource_group_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "lock",
+        "type": "object({\n    kind = string\n    name = optional(string, null)\n  })",
+        "required": false
+      },
+      {
+        "name": "public_key",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "location",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "managed_identities",
+        "type": "object({\n    system_assigned            = optional(bool, false)\n    user_assigned_resource_ids = optional(set(string), [])\n  })",
+        "required": false
+      },
+      {
+        "name": "role_assignments",
+        "type": "map(object({\n    role_definition_id_or_name             = string\n    principal_id                           = string\n    description                            = optional(string, null)\n    skip_service_principal_aad_check       = optional(bool, false)\n    condition                              = optional(string, null)\n    condition_version                      = optional(string, null)\n    delegated_managed_identity_resource_id = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "tags",
+        "type": "map(string)",
+        "required": false
+      }
+    ],
+    "outputs": [
+      {
+        "name": "resource",
+        "description": "This is the full output for the resource.",
+        "sensitive": false
+      }
+    ]
+  }
+}

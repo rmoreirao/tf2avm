@@ -7,7 +7,8 @@ from config.logging import get_logger
 from config.settings import get_settings
 from agents.avm_knowledge_agent import AVMKnowledgeAgent
 from agents.avm_resource_details_agent import AVMResourceDetailsAgent
-from schemas.models import AVMKnowledgeAgentResult, AVMResourceDetailsAgentResult
+from plugins.terraform_plugin import TerraformPlugin
+from schemas.models import AVMKnowledgeAgentResult, AVMModuleDetailed, AVMResourceDetailsAgentResult
 
 
 class AVMService:
@@ -178,9 +179,12 @@ class AVMService:
         
         # Cache miss or disabled - fetch from agent
         self.logger.info(f"Fetching AVM module details from agent: {module_name}@{module_version}")
-        agent = await self._get_avm_resource_details_agent()
-        result = await agent.fetch_avm_resource_details(module_name, module_version)
+        # agent = await self._get_avm_resource_details_agent()
+        # result = await agent.fetch_avm_resource_details(module_name, module_version)
         
+        terraform_plugin = TerraformPlugin()
+        avm_model: AVMModuleDetailed = await terraform_plugin.get_avm_module_details_model(module_name, module_version)
+        result = AVMResourceDetailsAgentResult(module=avm_model)
         # Save to cache if enabled
         if self.cache_enabled:
             self._save_cache(cache_file, result.model_dump())
