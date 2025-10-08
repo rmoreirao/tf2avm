@@ -164,7 +164,7 @@ NEVER ask questions or wait for user input. Always proceed autonomously and hand
         response = await self.agent.get_response(message)
         
         # Parse and validate the response
-        result = MappingAgentResult.model_validate(json.loads(response.content))
+        result = MappingAgentResult.model_validate(json.loads(response.message.content))
         
         self.logger.info(f"Mapping review completed. Found {len(result.resource_mappings)} mappings, {len(result.unmapped_resources)} unmapped")
         
