@@ -1,5 +1,6 @@
 import asyncio
 from datetime import datetime
+import json
 from pathlib import Path
 import shutil
 import traceback
@@ -13,6 +14,7 @@ from agents.converter_planning_agent import ConverterPlanningAgent
 from agents.converter_agent import ConverterAgent
 from agents.validator_agent import ValidatorAgent
 from agents.report_agent import ReportAgent
+from schemas.models import TerraformMetadataAgentResult
 
 
 class TerraformAVMOrchestrator:
@@ -102,13 +104,13 @@ class TerraformAVMOrchestrator:
 
         # Step 1: Repository Scanner Agent
         self.logger.info("Step 1: Running Repository Scanner Agent")
-        scanner_agent = await TFMetadataAgent.create()
-        scanner_result = await scanner_agent.scan_repository(tf_files)
-        self._log_agent_response("TFMetadataAgent", scanner_result)
+        tf_metadata_agent = await TFMetadataAgent.create()
+        tf_metadata_agent_output : TerraformMetadataAgentResult = await tf_metadata_agent.scan_repository(tf_files)
+        self._log_agent_response("TFMetadataAgent", tf_metadata_agent_output)
 
         # store the results on output folder
-        with open(f"{output_dir}/repo_scan.md", "w", encoding="utf-8") as f:
-            f.write(str(scanner_result))
+        with open(f"{output_dir}/01_tf_metadata.json", "w", encoding="utf-8") as f:
+            f.write(tf_metadata_agent_output.model_dump_json(indent=2))
                
         # Step 2: AVM Knowledge Agent
         self.logger.info("Step 2: Running AVM Knowledge Agent")
@@ -117,13 +119,15 @@ class TerraformAVMOrchestrator:
         self._log_agent_response("AVMKnowledgeAgent", knowledge_result)
 
         # store the results on output folder
-        with open(f"{output_dir}/avm_knowledge.json", "w", encoding="utf-8") as f:
+        with open(f"{output_dir}/02_avm_knowledge.json", "w", encoding="utf-8") as f:
             f.write(str(knowledge_result))
+
+        exit()
 
         # Step 3: Converter Planning Agent (now includes mapping functionality)
         self.logger.info("Step 3: Running Converter Planning Agent (with integrated mapping)")
         planning_agent = await ConverterPlanningAgent.create()
-        planning_result = await planning_agent.create_conversion_plan(str(scanner_result), str(knowledge_result), tf_files)
+        planning_result = await planning_agent.create_conversion_plan(str(tf_metadata_agent_output), str(knowledge_result), tf_files)
         self._log_agent_response("ConverterPlanningAgent", planning_result)
         with open(f"{output_dir}/conversion_plan.md", "w", encoding="utf-8") as f:
             f.write(str(planning_result))
@@ -144,8 +148,6 @@ class TerraformAVMOrchestrator:
         converter_result = await converter_agent.run_conversion(planning_result, migrated_output_dir, tf_files)
         self._log_agent_response("ConverterAgent", converter_result)
 
-        exit()
-
         # Step 5: Validator Agent
         self.logger.info("Step 5: Running Validator Agent")
         validator_agent = await ValidatorAgent.create()
@@ -158,7 +160,7 @@ class TerraformAVMOrchestrator:
         
         # Prepare all results for the report
         all_results = {
-            "scanner": str(scanner_result),
+            "scanner": str(tf_metadata_agent_output),
             "knowledge": str(knowledge_result),
             "planning": str(planning_result),
             "conversion": str(converter_result),

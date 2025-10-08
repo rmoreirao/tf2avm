@@ -1,43 +1,23 @@
+from __future__ import annotations
 from typing import Dict, List, Optional, Any
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from enum import Enum
 
-
-class ConversionStatus(str, Enum):
-    """Status of conversion process."""
-    PENDING = "pending"
-    IN_PROGRESS = "in_progress"
-    SUCCESS = "success"
-    FAILED = "failed"
-    PARTIAL = "partial"
 
 
 class TerraformResource(BaseModel):
     """Represents a Terraform resource."""
-    type: str
-    name: str
-    attributes: Dict[str, Any]
-    file_path: str
-    line_number: Optional[int] = None
+    type: str = Field(description="The resource type (e.g., 'azurerm_resource_group')")
+    name: str = Field(description="The resource name as defined in Terraform")
+    file_path: str = Field(description="Path to the file containing this resource")
+    child_resources: List['TerraformResource'] = Field(default=[], description="List of child resources nested within this resource")
+    parent_resource: Optional['TerraformResource'] = Field(default=None, description="The parent resource if this is a child resource")
 
 
-class TerraformFile(BaseModel):
-    """Represents a Terraform file and its contents."""
-    path: str
-    content: str
-    resources: List[TerraformResource] = []
-    variables: List[str] = []
-    outputs: List[str] = []
-    locals: List[str] = []
-
-
-class RepoScanResult(BaseModel):
+class TerraformMetadataAgentResult(BaseModel):
     """Result of repository scanning."""
-    repo_path: str
-    terraform_files: List[TerraformFile]
-    azurerm_resources: List[TerraformResource]
-    total_resources: int
-    scan_timestamp: str
+    azurerm_resources: List[TerraformResource] = Field(description="List of Azure Resource Manager resources found in the repository")
+    
 
 
 class AVMModule(BaseModel):
@@ -87,7 +67,7 @@ class ConvertedFile(BaseModel):
 
 class ConversionResult(BaseModel):
     """Result of conversion process."""
-    status: ConversionStatus
+    # status: ConversionStatus
     converted_files: List[ConvertedFile]
     output_directory: str
     conversion_timestamp: str
@@ -105,7 +85,7 @@ class ValidationIssue(BaseModel):
 
 class ValidationResult(BaseModel):
     """Result of validation process."""
-    status: ConversionStatus
+    # status: ConversionStatus
     issues: List[ValidationIssue]
     validation_timestamp: str
     is_valid: bool
@@ -115,7 +95,7 @@ class ConversionReport(BaseModel):
     """Comprehensive conversion report."""
     repo_path: str
     output_directory: str
-    scan_result: RepoScanResult
+    # scan_result: RepoScanResult
     avm_knowledge: AVMKnowledgeResult
     mapping_result: MappingResult
     conversion_result: ConversionResult
@@ -129,7 +109,7 @@ class WorkflowState(BaseModel):
     repo_path: str
     output_directory: str
     current_agent: str
-    scan_result: Optional[RepoScanResult] = None
+    # scan_result: Optional[RepoScanResult] = None
     avm_knowledge: Optional[AVMKnowledgeResult] = None
     mapping_result: Optional[MappingResult] = None
     conversion_result: Optional[ConversionResult] = None

@@ -1,9 +1,14 @@
+import json
 from semantic_kernel.agents import ChatCompletionAgent
 from semantic_kernel.connectors.ai.open_ai import AzureChatCompletion
 from semantic_kernel import Kernel
 from config.settings import get_settings
 from config.logging import get_logger
 from plugins.terraform_plugin import TerraformPlugin
+from semantic_kernel.connectors.ai.open_ai import OpenAIChatCompletion, OpenAIChatPromptExecutionSettings
+from semantic_kernel.functions import KernelArguments
+
+from schemas.models import TerraformMetadataAgentResult
 
 
 class TFMetadataAgent:
@@ -30,7 +35,7 @@ class TFMetadataAgent:
     
         # Create kernel and add services
         kernel = Kernel()
-        
+        execution_settings = OpenAIChatPromptExecutionSettings(response_format=TerraformMetadataAgentResult)
         chat_completion_service = AzureChatCompletion(
             deployment_name=settings.azure_openai_deployment_name,
             api_key=settings.azure_openai_api_key,
@@ -40,16 +45,14 @@ class TFMetadataAgent:
         
         kernel.add_service(chat_completion_service)
         
-        # Initialize plugins (only terraform plugin needed since we receive file contents directly)
-        terraform_plugin = TerraformPlugin()
-        
+                
         # Create the agent
         agent = ChatCompletionAgent(
             service=chat_completion_service,
             kernel=kernel,
             name="RepoScannerAgent",
             description="A specialist agent that analyzes Terraform repositories and extracts resource information.",
-            plugins=[terraform_plugin],
+            arguments=KernelArguments(execution_settings),
             instructions="""You are the Repository Scanner Agent for Terraform to Azure Verified Modules (AVM) conversion.
 
 Your responsibilities:
@@ -82,25 +85,13 @@ Examples of child resources:
 
 >>>Instructions:
 
-NEVER ask questions or wait for user input. Always proceed autonomously and provide the output as specified below.
-
-Output Format (MD format):
-
-# List of all azurerm_* resources
-Table with the following columns:
-    - Resource Type
-    - Display Name
-    - File Location
-    - Child Resources
-    
-    
-Only output the MD table above. Output the full list and never truncate it. NEVER ask questions or wait for user input. Always proceed autonomously."""
+NEVER ask questions or wait for user input. Always proceed autonomously and provide the output as specified below."""
         )
         
         logger.info("Repository Scanner Agent initialized successfully")
         return cls(agent)
         
-    async def scan_repository(self, tf_files: dict) -> str:
+    async def scan_repository(self, tf_files: dict) -> TerraformMetadataAgentResult:
         """
         Scan and analyze Terraform repository from tf_files dictionary.
         
@@ -116,5 +107,6 @@ Only output the MD table above. Output the full list and never truncate it. NEVE
         files_summary = "\n".join([f"File: {path}\nContent:\n{content}\n---" for path, content in tf_files.items()])
         
         message = f"Scan and analyze Terraform repository from the following files:\n\n{files_summary}"
-        return await self.agent.get_response(message)
-        
+        response = await self.agent.get_response(message)
+        output = TerraformMetadataAgentResult.model_validate(json.loads(response.message.content))
+        return output
