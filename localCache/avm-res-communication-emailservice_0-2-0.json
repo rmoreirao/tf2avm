@@ -1,0 +1,88 @@
+{
+  "module": {
+    "name": "avm-res-communication-emailservice",
+    "display_name": "avm-res-communication-emailservice",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-communication-emailservice/azurerm/0.2.0",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-communication-emailservice",
+    "version": "0.2.0",
+    "description": "Terraform Azure Verified Resource Module for Email Communication Service",
+    "resources": [
+      "random_uuid.telemetry",
+      "modtm_telemetry.telemetry",
+      "azurerm_management_lock.this",
+      "azurerm_role_assignment.this",
+      "azapi_resource.email_communication_service",
+      "azapi_resource.email_communication_service_domain",
+      "azapi_resource.email_communication_service_domain_sender_username"
+    ],
+    "inputs": [
+      {
+        "name": "data_location",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "resource_group_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "email_communication_service_domain_sender_usernames",
+        "type": "map(object({\n    name                                        = string\n    email_communication_service_domain_name_key = string\n    display_name                                = optional(string, \"\")\n  }))",
+        "required": false
+      },
+      {
+        "name": "email_communication_service_domains",
+        "type": "map(object({\n    name                             = string\n    domain_management                = string\n    user_engagement_tracking_enabled = optional(bool, false)\n    tags                             = optional(map(string), null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "lock",
+        "type": "object({\n    kind = string\n    name = optional(string, null)\n  })",
+        "required": false
+      },
+      {
+        "name": "tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "location",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "role_assignments",
+        "type": "map(object({\n    role_definition_id_or_name             = string\n    principal_id                           = string\n    description                            = optional(string, null)\n    skip_service_principal_aad_check       = optional(bool, false)\n    condition                              = optional(string, null)\n    condition_version                      = optional(string, null)\n    delegated_managed_identity_resource_id = optional(string, null)\n    principal_type                         = optional(string, null)\n  }))",
+        "required": false
+      }
+    ],
+    "outputs": [
+      {
+        "name": "resource_id",
+        "description": "The resource ID of email communication service",
+        "sensitive": false
+      },
+      {
+        "name": "resource_in_azurerm_schema",
+        "description": "The resource of email communication service in azurerm schema",
+        "sensitive": false
+      },
+      {
+        "name": "resource",
+        "description": "The resource of email communication service",
+        "sensitive": false
+      }
+    ]
+  }
+}

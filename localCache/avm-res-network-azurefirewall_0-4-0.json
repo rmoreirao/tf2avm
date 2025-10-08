@@ -1,0 +1,124 @@
+{
+  "module": {
+    "name": "avm-res-network-azurefirewall",
+    "display_name": "Azure Firewall AVM Module",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-network-azurefirewall/azurerm/0.4.0",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-network-azurefirewall",
+    "version": "0.4.0",
+    "description": "Azure Firewall AVM Module",
+    "resources": [
+      "azurerm_firewall.this",
+      "azurerm_management_lock.this",
+      "azurerm_monitor_diagnostic_setting.this",
+      "azurerm_role_assignment.this",
+      "modtm_telemetry.telemetry",
+      "random_uuid.telemetry",
+      "azurerm_client_config.telemetry",
+      "modtm_module_source.telemetry"
+    ],
+    "inputs": [
+      {
+        "name": "name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "resource_group_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "diagnostic_settings",
+        "type": "map(object({\n    name                                     = optional(string, null)\n    log_categories                           = optional(set(string), [])\n    log_groups                               = optional(set(string), [\"allLogs\"])\n    metric_categories                        = optional(set(string), [\"AllMetrics\"])\n    log_analytics_destination_type           = optional(string, \"Dedicated\")\n    workspace_resource_id                    = optional(string, null)\n    storage_account_resource_id              = optional(string, null)\n    event_hub_authorization_rule_resource_id = optional(string, null)\n    event_hub_name                           = optional(string, null)\n    marketplace_partner_resource_id          = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "firewall_management_ip_configuration",
+        "type": "object({\n    name                 = string\n    public_ip_address_id = string\n    subnet_id            = string\n  })",
+        "required": false
+      },
+      {
+        "name": "firewall_private_ip_ranges",
+        "type": "set(string)",
+        "required": false
+      },
+      {
+        "name": "firewall_zones",
+        "type": "set(string)",
+        "required": false
+      },
+      {
+        "name": "firewall_sku_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "firewall_sku_tier",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "location",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "ip_configurations",
+        "type": "map(object({\n    name                 = string\n    public_ip_address_id = optional(string)\n    subnet_id            = optional(string)\n  }))",
+        "required": false
+      },
+      {
+        "name": "lock",
+        "type": "object({\n    kind = string\n    name = optional(string, null)\n  })",
+        "required": false
+      },
+      {
+        "name": "role_assignments",
+        "type": "map(object({\n    role_definition_id_or_name             = string\n    principal_id                           = string\n    description                            = optional(string, null)\n    skip_service_principal_aad_check       = optional(bool, false)\n    condition                              = optional(string, null)\n    condition_version                      = optional(string, null)\n    delegated_managed_identity_resource_id = optional(string, null)\n    principal_type                         = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "firewall_ip_configuration",
+        "type": "list(object({\n    name                 = string\n    public_ip_address_id = optional(string)\n    subnet_id            = optional(string)\n  }))",
+        "required": false
+      },
+      {
+        "name": "firewall_policy_id",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "firewall_timeouts",
+        "type": "object({\n    create = optional(string)\n    delete = optional(string)\n    read   = optional(string)\n    update = optional(string)\n  })",
+        "required": false
+      },
+      {
+        "name": "firewall_virtual_hub",
+        "type": "object({\n    public_ip_count = optional(number)\n    virtual_hub_id  = string\n  })",
+        "required": false
+      },
+      {
+        "name": "tags",
+        "type": "map(string)",
+        "required": false
+      }
+    ],
+    "outputs": [
+      {
+        "name": "resource",
+        "description": "\"This is the full output for the resource. This is the default output for the module following AVM standards. Review the examples below for the correct output to use in your module.\"  \nExamples:\n- module.firewall.resource.id\n- module.firewall.resource.name\n- module.firewall.resource.ip_configuration\n- module.firewall.resource.virtual_hub",
+        "sensitive": false
+      },
+      {
+        "name": "resource_id",
+        "description": "This is the resource id for the firewall resource.",
+        "sensitive": false
+      }
+    ]
+  }
+}

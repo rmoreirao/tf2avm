@@ -1,0 +1,141 @@
+{
+  "module": {
+    "name": "avm-res-batch-batchaccount",
+    "display_name": "Terraform Azure Batch Account Module",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-batch-batchaccount/azurerm/0.2.0",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-batch-batchaccount",
+    "version": "0.2.0",
+    "description": "This Terraform module is designed to create and manage Azure Batch Accounts and their associated resources. Azure Batch is a cloud-based job scheduling service that enables you to run large-scale parallel and high-performance computing applications efficiently on Azure.\n\nFeatures:\n* Create and manage Azure Batch Accounts\n* Supports customer-managed keys for encryption\n* Enable private endpoints for secure network access\n* Apply locks to protect resources from accidental deletion\n* Configure role-based access control (RBAC) for fine-grained permissions\n* Integration with Azure diagnostics and monitoring capabilities\n\nLimitations:\n* Batch Account names must be unique within the Azure region\n* Some features may require specific subscriptions or regions where the service is available",
+    "resources": [
+      "azurerm_batch_account.this",
+      "azurerm_management_lock.this",
+      "azurerm_private_endpoint.this_managed_dns_zone_groups",
+      "azurerm_private_endpoint.this_unmanaged_dns_zone_groups",
+      "azurerm_private_endpoint_application_security_group_association.this",
+      "azurerm_role_assignment.this",
+      "modtm_telemetry.telemetry",
+      "random_uuid.telemetry",
+      "azurerm_client_config.telemetry",
+      "modtm_module_source.telemetry"
+    ],
+    "inputs": [
+      {
+        "name": "network_profile",
+        "type": "list(map(any))",
+        "required": false
+      },
+      {
+        "name": "role_assignments",
+        "type": "map(object({\n    role_definition_id_or_name             = string\n    principal_id                           = string\n    description                            = optional(string, null)\n    skip_service_principal_aad_check       = optional(bool, false)\n    condition                              = optional(string, null)\n    condition_version                      = optional(string, null)\n    delegated_managed_identity_resource_id = optional(string, null)\n    principal_type                         = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "storage_account_node_identity",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "key_vault_reference",
+        "type": "object({\n    id  = string\n    url = string\n  })",
+        "required": false
+      },
+      {
+        "name": "managed_identities",
+        "type": "object({\n    system_assigned            = optional(bool, false)\n    user_assigned_resource_ids = optional(set(string), [])\n  })",
+        "required": false
+      },
+      {
+        "name": "private_endpoints",
+        "type": "map(object({\n    name = optional(string, null)\n    role_assignments = optional(map(object({\n      role_definition_id_or_name             = string\n      principal_id                           = string\n      description                            = optional(string, null)\n      skip_service_principal_aad_check       = optional(bool, false)\n      condition                              = optional(string, null)\n      condition_version                      = optional(string, null)\n      delegated_managed_identity_resource_id = optional(string, null)\n      principal_type                         = optional(string, null)\n    })), {})\n    lock = optional(object({\n      kind = string\n      name = optional(string, null)\n    }), null)\n    tags                                    = optional(map(string), null)\n    subnet_resource_id                      = string\n    subresource_name                        = string\n    private_dns_zone_group_name             = optional(string, \"default\")\n    private_dns_zone_resource_ids           = optional(set(string), [])\n    application_security_group_associations = optional(map(string), {})\n    private_service_connection_name         = optional(string, null)\n    network_interface_name                  = optional(string, null)\n    location                                = optional(string, null)\n    resource_group_name                     = optional(string, null)\n    ip_configurations = optional(map(object({\n      name               = string\n      private_ip_address = string\n    })), {})\n  }))",
+        "required": false
+      },
+      {
+        "name": "private_endpoints_manage_dns_zone_group",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "allowed_authentication_modes",
+        "type": "list(string)",
+        "required": false
+      },
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "public_network_access_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "resource_group_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "storage_account_id",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "encryption",
+        "type": "object({\n    key_vault_key_id = string\n  })",
+        "required": false
+      },
+      {
+        "name": "identity",
+        "type": "list(object({\n    type         = string\n    identity_ids = optional(set(string), [])\n  }))",
+        "required": false
+      },
+      {
+        "name": "pool_allocation_mode",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "storage_account_authentication_mode",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "location",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "lock",
+        "type": "object({\n    kind = string\n    name = optional(string, null)\n  })",
+        "required": false
+      }
+    ],
+    "outputs": [
+      {
+        "name": "resource",
+        "description": "This is the full output for the resource.",
+        "sensitive": false
+      },
+      {
+        "name": "resource_id",
+        "description": "The ID of the Batch account created.",
+        "sensitive": false
+      },
+      {
+        "name": "resource_private_endpoints",
+        "description": "A map of private endpoints. The map key is the supplied input to var.private_endpoints. The map value is the entire azurerm_private_endpoint resource.",
+        "sensitive": false
+      }
+    ]
+  }
+}

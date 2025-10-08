@@ -1,0 +1,155 @@
+{
+  "module": {
+    "name": "avm-res-network-connection",
+    "display_name": "Terraform Azure Verified Resource Module for Virtual Network Gateway Connection",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-network-connection/azurerm/0.2.0",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-network-connection",
+    "version": "0.2.0",
+    "description": "Terraform Azure Verified Resource Module for Virtual Network Gateway Connection",
+    "resources": [
+      "modtm_telemetry.telemetry",
+      "azurerm_virtual_network_gateway_connection.this",
+      "azurerm_management_lock.this",
+      "random_uuid.telemetry"
+    ],
+    "inputs": [
+      {
+        "name": "type",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "egress_nat_rule_resource_ids",
+        "type": "list(string)",
+        "required": false
+      },
+      {
+        "name": "express_route_circuit_resource_id",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "routing_weight",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "use_policy_based_traffic_selectors",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "location",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "ipsec_policy",
+        "type": "map(object({\n    dh_group         = string\n    ike_encryption   = string\n    ike_integrity    = string\n    ipsec_encryption = string\n    ipsec_integrity  = string\n    pfs_group        = string\n    sa_datasize      = optional(string)\n    sa_lifetime      = optional(string)\n\n  }))",
+        "required": false
+      },
+      {
+        "name": "local_azure_ip_address_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "virtual_network_gateway_resource_id",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "authorization_key",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "connection_mode",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "connection_protocol",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "express_route_gateway_bypass",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "ingress_nat_rule_resource_ids",
+        "type": "list(string)",
+        "required": false
+      },
+      {
+        "name": "private_link_fast_path_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "traffic_selector_policy",
+        "type": "map(object({\n    local_address_cidrs  = list(string)\n    remote_address_cidrs = list(string)\n  }))",
+        "required": false
+      },
+      {
+        "name": "resource_group_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "custom_bgp_addresses",
+        "type": "object({\n    primary   = string\n    secondary = optional(string, null)\n  })",
+        "required": false
+      },
+      {
+        "name": "dpd_timeout_seconds",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "enable_bgp",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "local_network_gateway_resource_id",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "lock",
+        "type": "object({\n    kind = string\n    name = optional(string, null)\n  })",
+        "required": false
+      },
+      {
+        "name": "shared_key",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "required": true
+      }
+    ],
+    "outputs": [
+      {
+        "name": "resource_id",
+        "description": "The full Azure resource ID of the Virtual Network Gateway Connection.",
+        "sensitive": false
+      }
+    ]
+  }
+}

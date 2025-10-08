@@ -1,0 +1,154 @@
+{
+  "module": {
+    "name": "avm-res-insights-component",
+    "display_name": "AVM Terraform Module for Application Insights",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-insights-component/azurerm/0.2.0",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-insights-component",
+    "version": "0.2.0",
+    "description": "AVM Terraform Module for Application Insights",
+    "resources": [
+      "random_uuid.telemetry",
+      "modtm_telemetry.telemetry",
+      "azurerm_application_insights.this",
+      "azurerm_management_lock.this",
+      "azapi_resource.monitor_private_link_scope",
+      "azapi_resource.linked_storage_account",
+      "azurerm_client_config.telemetry",
+      "modtm_module_source.telemetry"
+    ],
+    "inputs": [
+      {
+        "name": "internet_ingestion_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "managed_identities",
+        "type": "object({\n    system_assigned            = optional(bool, false)\n    user_assigned_resource_ids = optional(set(string), [])\n  })",
+        "required": false
+      },
+      {
+        "name": "tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "workspace_id",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "lock",
+        "type": "object({\n    kind = string\n    name = optional(string, null)\n  })",
+        "required": false
+      },
+      {
+        "name": "monitor_private_link_scope",
+        "type": "map(object({\n    resource_id           = optional(string, null)\n    name                  = optional(string, null)\n    kind                  = optional(string, \"Resource\")\n    subscription_location = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "location",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "resource_group_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "linked_storage_account",
+        "type": "map(object({\n    resource_id = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "local_authentication_disabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "sampling_percentage",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "application_type",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "daily_data_cap_in_gb",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "force_customer_storage_for_profiler",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "internet_query_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "retention_in_days",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "daily_data_cap_notifications_disabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "disable_ip_masking",
+        "type": "bool",
+        "required": false
+      }
+    ],
+    "outputs": [
+      {
+        "name": "connection_string",
+        "description": "Connection String of the Application Insights",
+        "sensitive": false
+      },
+      {
+        "name": "instrumentation_key",
+        "description": "Instrumentation Key of the Application Insights",
+        "sensitive": false
+      },
+      {
+        "name": "name",
+        "description": "Name of the Application Insights",
+        "sensitive": false
+      },
+      {
+        "name": "resource",
+        "description": "This is the full output for the resource.",
+        "sensitive": false
+      },
+      {
+        "name": "resource_id",
+        "description": "The ID of the Application Insights",
+        "sensitive": false
+      },
+      {
+        "name": "app_id",
+        "description": "App ID of the Application Insights",
+        "sensitive": false
+      }
+    ]
+  }
+}

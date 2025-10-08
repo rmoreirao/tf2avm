@@ -1,0 +1,69 @@
+{
+  "module": {
+    "name": "avm-res-resources-resourcegroup",
+    "display_name": "Azure Resource Group (AVM)",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-resources-resourcegroup/azurerm/0.2.1",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-resources-resourcegroup",
+    "version": "0.2.1",
+    "description": "Module to deploy resource groups in Azure",
+    "resources": [
+      "azurerm_management_lock.this",
+      "azurerm_resource_group.this",
+      "azurerm_role_assignment.this",
+      "modtm_telemetry.telemetry",
+      "random_uuid.telemetry",
+      "azurerm_client_config.telemetry (data source)",
+      "azurerm_subscription.current (data source)",
+      "modtm_module_source.telemetry (data source)"
+    ],
+    "inputs": [
+      {
+        "name": "location",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "lock",
+        "type": "object({\n    kind = string\n    name = optional(string, null)\n  })",
+        "required": false
+      },
+      {
+        "name": "role_assignments",
+        "type": "map(object({\n    role_definition_id_or_name             = string\n    principal_id                           = string\n    description                            = optional(string, null)\n    skip_service_principal_aad_check       = optional(bool, false)\n    condition                              = optional(string, null)\n    condition_version                      = optional(string, null)\n    delegated_managed_identity_resource_id = optional(string, null)\n    principal_type                         = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "tags",
+        "type": "map(string)",
+        "required": false
+      }
+    ],
+    "outputs": [
+      {
+        "name": "name",
+        "description": "The name of the resource group",
+        "sensitive": false
+      },
+      {
+        "name": "resource",
+        "description": "This is the full output for the resource group.",
+        "sensitive": false
+      },
+      {
+        "name": "resource_id",
+        "description": "The resource Id of the resource group",
+        "sensitive": false
+      }
+    ]
+  }
+}

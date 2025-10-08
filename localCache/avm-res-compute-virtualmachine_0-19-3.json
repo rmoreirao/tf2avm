@@ -1,0 +1,378 @@
+{
+  "module": {
+    "name": "avm-res-compute-virtualmachine",
+    "display_name": "avm-res-compute-virtualmachine",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-compute-virtualmachine/azurerm/0.19.3",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-compute-virtualmachine",
+    "version": "0.19.3",
+    "description": "Terraform AVM module for virtual machines",
+    "resources": [
+      "random_password.admin_password",
+      "azapi_resource.this_backup_intent",
+      "azurerm_dev_test_global_vm_shutdown_schedule.this",
+      "tls_private_key.this",
+      "azurerm_role_assignment.system_managed_identity",
+      "azurerm_monitor_diagnostic_setting.this_vm_diags",
+      "azurerm_public_ip.virtualmachine_public_ips",
+      "modtm_telemetry.telemetry",
+      "azurerm_role_assignment.this_virtual_machine",
+      "azurerm_managed_disk.this",
+      "azurerm_management_lock.this_disk",
+      "azurerm_management_lock.this_linux_virtualmachine",
+      "azurerm_management_lock.this_nic",
+      "azurerm_management_lock.this_public_ip",
+      "azurerm_network_interface_application_gateway_backend_address_pool_association.this",
+      "azurerm_network_interface.virtualmachine_network_interfaces",
+      "azurerm_role_assignment.this_network_interface",
+      "azurerm_monitor_diagnostic_setting.this_nic_diags",
+      "random_uuid.telemetry",
+      "azurerm_virtual_machine_data_disk_attachment.this_linux",
+      "azurerm_management_lock.this_windows_virtualmachine",
+      "azurerm_key_vault_secret.admin_password",
+      "azurerm_maintenance_assignment_virtual_machine.this",
+      "azurerm_network_interface_nat_rule_association.this",
+      "azurerm_role_assignment.disks",
+      "azurerm_virtual_machine_data_disk_attachment.this_windows",
+      "azurerm_network_interface_backend_address_pool_association.this",
+      "azurerm_network_interface_security_group_association.this",
+      "azurerm_network_interface_application_security_group_association.this",
+      "azurerm_linux_virtual_machine.this",
+      "azurerm_windows_virtual_machine.this",
+      "azurerm_network_interface.this_nic"
+    ],
+    "inputs": [
+      {
+        "name": "disable_password_authentication",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "additional_unattend_contents",
+        "type": "list(object({\n    content = string\n    setting = string\n  }))",
+        "required": false
+      },
+      {
+        "name": "winrm_listeners",
+        "type": "set(object({\n    protocol        = string\n    certificate_url = optional(string)\n  }))",
+        "required": false
+      },
+      {
+        "name": "enable_automatic_updates",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "hotpatching_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "virtual_machine_scale_set_resource_id",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "maintenance_configuration_resource_ids",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "dedicated_host_resource_id",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "generated_secrets_key_vault_secret_config",
+        "type": "object({\n    key_vault_resource_id          = string\n    name                           = optional(string, null)\n    expiration_date_length_in_days = optional(number, 45)\n    content_type                   = optional(string, \"text/plain\")\n    not_before_date                = optional(string, null)\n    tags                           = optional(map(string), {})\n  })",
+        "required": false
+      },
+      {
+        "name": "bypass_platform_safety_checks_on_user_schedule_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "computer_name",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "custom_data",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "lock",
+        "type": "object({\n    name = optional(string, null)\n    kind = string\n  })",
+        "required": false
+      },
+      {
+        "name": "shutdown_schedules",
+        "type": "map(object({\n    daily_recurrence_time = string\n    notification_settings = optional(object({\n      enabled         = optional(bool, false)\n      email           = optional(string, null)\n      time_in_minutes = optional(string, \"30\")\n      webhook_url     = optional(string, null)\n    }), { enabled = false })\n    timezone = string\n    enabled  = optional(bool, true)\n    tags     = optional(map(string), null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "vtpm_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "generate_admin_password_or_ssh_key",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "boot_diagnostics",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "data_disk_managed_disks",
+        "type": "map(object({\n    caching                                   = string\n    lun                                       = number\n    name                                      = string\n    storage_account_type                      = string\n    create_option                             = optional(string, \"Empty\")\n    disk_access_resource_id                   = optional(string)\n    disk_attachment_create_option             = optional(string)\n    disk_encryption_set_resource_id           = optional(string)\n    disk_iops_read_only                       = optional(number, null)\n    disk_iops_read_write                      = optional(number, null)\n    disk_mbps_read_only                       = optional(number, null)\n    disk_mbps_read_write                      = optional(number, null)\n    disk_size_gb                              = optional(number, 128)\n    gallery_image_reference_resource_id       = optional(string)\n    hyper_v_generation                        = optional(string)\n    image_reference_resource_id               = optional(string)\n    inherit_tags                              = optional(bool, true)\n    lock_level                                = optional(string, null)\n    lock_name                                 = optional(string, null)\n    logical_sector_size                       = optional(number, null)\n    max_shares                                = optional(number)\n    network_access_policy                     = optional(string)\n    on_demand_bursting_enabled                = optional(bool)\n    optimized_frequent_attach_enabled         = optional(bool, false)\n    os_type                                   = optional(string)\n    performance_plus_enabled                  = optional(bool, false)\n    public_network_access_enabled             = optional(bool)\n    resource_group_name                       = optional(string)\n    secure_vm_disk_encryption_set_resource_id = optional(string)\n    security_type                             = optional(string)\n    source_resource_id                        = optional(string)\n    source_uri                                = optional(string)\n    storage_account_resource_id               = optional(string)\n    tags                                      = optional(map(string), null)\n    tier                                      = optional(string)\n    trusted_launch_enabled                    = optional(bool)\n    upload_size_bytes                         = optional(number, null)\n    write_accelerator_enabled                 = optional(bool)\n\n    encryption_settings = optional(list(object({\n      disk_encryption_key_vault_secret_url  = optional(string)\n      disk_encryption_key_vault_resource_id = optional(string)\n      key_encryption_key_vault_secret_url   = optional(string)\n      key_encryption_key_vault_resource_id  = optional(string)\n    })), [])\n\n    role_assignments = optional(map(object({\n      role_definition_id_or_name             = string\n      principal_id                           = string\n      description                            = optional(string, null)\n      skip_service_principal_aad_check       = optional(bool, false)\n      condition                              = optional(string, null)\n      condition_version                      = optional(string, null)\n      delegated_managed_identity_resource_id = optional(string, null)\n      principal_type                         = optional(string, null)\n    })), {})\n  }))",
+        "required": false
+      },
+      {
+        "name": "dedicated_host_group_resource_id",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "eviction_policy",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "os_type",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "platform_fault_domain",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "run_commands_secrets",
+        "type": "map(object({\n    protected_parameters = optional(map(object({\n      name  = string\n      value = string\n    })), {})\n    run_as_password = optional(string)\n    run_as_user     = optional(string)\n  }))",
+        "required": false
+      },
+      {
+        "name": "os_disk",
+        "type": "object({\n    caching                          = string\n    storage_account_type             = string\n    disk_encryption_set_id           = optional(string)\n    disk_size_gb                     = optional(number)\n    name                             = optional(string)\n    secure_vm_disk_encryption_set_id = optional(string)\n    security_encryption_type         = optional(string)\n    write_accelerator_enabled        = optional(bool, false)\n    diff_disk_settings = optional(object({\n      option    = string\n      placement = optional(string, \"CacheDisk\")\n    }), null)\n  })",
+        "required": false
+      },
+      {
+        "name": "priority",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "provision_vm_agent",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "proximity_placement_group_resource_id",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "public_ip_configuration_details",
+        "type": "object({\n    allocation_method       = optional(string, \"Static\")\n    ddos_protection_mode    = optional(string, \"VirtualNetworkInherited\")\n    ddos_protection_plan_id = optional(string)\n    domain_name_label       = optional(string)\n    idle_timeout_in_minutes = optional(number, 30)\n    inherit_tags            = optional(bool, false)\n    ip_version              = optional(string, \"IPv4\")\n    lock_level              = optional(string, null)\n    sku                     = optional(string, \"Standard\")\n    sku_tier                = optional(string, \"Regional\")\n    tags                    = optional(map(string), null)\n    zones                   = optional(set(string), [\"1\", \"2\", \"3\"])\n  })",
+        "required": false
+      },
+      {
+        "name": "reboot_setting",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "role_assignments",
+        "type": "map(object({\n    role_definition_id_or_name             = string\n    principal_id                           = string\n    condition                              = optional(string, null)\n    condition_version                      = optional(string, null)\n    delegated_managed_identity_resource_id = optional(string, null)\n    description                            = optional(string, null)\n    principal_type                         = optional(string, null)\n    skip_service_principal_aad_check       = optional(bool, false)\n\n    }\n  ))",
+        "required": false
+      },
+      {
+        "name": "admin_password",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "resource_group_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "run_commands",
+        "type": "map(object({\n    location        = string\n    name            = string\n    deploy_sequence = optional(number, 3)\n    script_source = object({\n      command_id = optional(string)\n      script     = optional(string)\n      script_uri = optional(string)\n      script_uri_managed_identity = optional(object({\n        client_id = optional(string)\n        object_id = optional(string)\n      }))\n    })\n    error_blob_managed_identity = optional(object({\n      client_id = optional(string)\n      object_id = optional(string)\n    }))\n    error_blob_uri = optional(string)\n    output_blob_managed_identity = optional(object({\n      client_id = optional(string)\n      object_id = optional(string)\n    }))\n    output_blob_uri = optional(string)\n    parameters = optional(map(object({\n      name  = string\n      value = string\n    })), {})\n\n    timeouts = optional(object({\n      create = optional(string)\n      delete = optional(string)\n      update = optional(string)\n      read   = optional(string)\n      })\n    )\n\n    tags = optional(map(string))\n  }))",
+        "required": false
+      },
+      {
+        "name": "network_interfaces",
+        "type": "map(object({\n    name = string\n    ip_configurations = map(object({\n      name = string\n      app_gateway_backend_pools = optional(map(object({\n        app_gateway_backend_pool_resource_id = string\n      })), {})\n      create_public_ip_address                                    = optional(bool, false)\n      gateway_load_balancer_frontend_ip_configuration_resource_id = optional(string)\n      is_primary_ipconfiguration                                  = optional(bool, true)\n      load_balancer_backend_pools = optional(map(object({\n        load_balancer_backend_pool_resource_id = string\n      })), {})\n      load_balancer_nat_rules = optional(map(object({\n        load_balancer_nat_rule_resource_id = string\n      })), {})\n      private_ip_address            = optional(string)\n      private_ip_address_allocation = optional(string, \"Dynamic\")\n      private_ip_address_version    = optional(string, \"IPv4\")\n      private_ip_subnet_resource_id = optional(string)\n      public_ip_address_lock_name   = optional(string)\n      public_ip_address_name        = optional(string)\n      public_ip_address_resource_id = optional(string)\n    }))\n    accelerated_networking_enabled = optional(bool, false)\n    application_security_groups = optional(map(object({\n      application_security_group_resource_id = string\n    })), {})\n    diagnostic_settings = optional(map(object({\n      name                                     = optional(string, null)\n      log_categories                           = optional(set(string), [])\n      log_groups                               = optional(set(string), [])\n      metric_categories                        = optional(set(string), [\"AllMetrics\"])\n      log_analytics_destination_type           = optional(string, null)\n      workspace_resource_id                    = optional(string, null)\n      storage_account_resource_id              = optional(string, null)\n      event_hub_authorization_rule_resource_id = optional(string, null)\n      event_hub_name                           = optional(string, null)\n      marketplace_partner_resource_id          = optional(string, null)\n    })), {})\n    dns_servers             = optional(list(string))\n    inherit_tags            = optional(bool, true)\n    internal_dns_name_label = optional(string)\n    ip_forwarding_enabled   = optional(bool, false)\n    is_primary              = optional(bool, false)\n    lock_level              = optional(string)\n    lock_name               = optional(string)\n    network_security_groups = optional(map(object({\n      network_security_group_resource_id = string\n    })), {})\n    resource_group_name = optional(string)\n    role_assignments = optional(map(object({\n      principal_id                           = string\n      role_definition_id_or_name             = string\n      assign_to_child_public_ip_addresses    = optional(bool, true)\n      condition                              = optional(string, null)\n      condition_version                      = optional(string, null)\n      delegated_managed_identity_resource_id = optional(string, null)\n      description                            = optional(string, null)\n      skip_service_principal_aad_check       = optional(bool, false)\n      principal_type                         = optional(string, null)\n    })), {})\n    tags = optional(map(string), null)\n  }))",
+        "required": true
+      },
+      {
+        "name": "diagnostic_settings",
+        "type": "map(object({\n    name                                     = optional(string, null)\n    log_categories                           = optional(set(string), [])\n    log_groups                               = optional(set(string), [])\n    metric_categories                        = optional(set(string), [\"AllMetrics\"])\n    log_analytics_destination_type           = optional(string, \"Dedicated\")\n    workspace_resource_id                    = optional(string, null)\n    storage_account_resource_id              = optional(string, null)\n    event_hub_authorization_rule_resource_id = optional(string, null)\n    event_hub_name                           = optional(string, null)\n    marketplace_partner_resource_id          = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "patch_mode",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "secure_boot_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "termination_notification",
+        "type": "object({\n    enabled = optional(bool, false)\n    timeout = optional(string, \"PT5M\")\n  })",
+        "required": false
+      },
+      {
+        "name": "managed_identities",
+        "type": "object({\n    system_assigned            = optional(bool, false)\n    user_assigned_resource_ids = optional(set(string), [])\n  })",
+        "required": false
+      },
+      {
+        "name": "max_bid_price",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "role_assignments_system_managed_identity",
+        "type": "map(object({\n    role_definition_id_or_name             = string\n    scope_resource_id                      = string\n    condition                              = optional(string, null)\n    condition_version                      = optional(string, null)\n    description                            = optional(string, null)\n    skip_service_principal_aad_check       = optional(bool, false)\n    delegated_managed_identity_resource_id = optional(string, null)\n    principal_type                         = optional(string, null)\n    }\n  ))",
+        "required": false
+      },
+      {
+        "name": "secrets",
+        "type": "list(object({\n    key_vault_id = string\n    certificate = set(object({\n      url   = string\n      store = optional(string)\n    }))\n  }))",
+        "required": false
+      },
+      {
+        "name": "admin_ssh_keys",
+        "type": "list(object({\n    public_key = string\n    username   = string\n  }))",
+        "required": false
+      },
+      {
+        "name": "location",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "azure_backup_configurations",
+        "type": "map(object({\n    resource_group_name        = optional(string, null)\n    recovery_vault_name        = optional(string, null)\n    recovery_vault_resource_id = string\n    backup_policy_resource_id  = optional(string, null)\n    exclude_disk_luns          = optional(list(number), null)\n    include_disk_luns          = optional(list(number), null)\n\n  }))",
+        "required": false
+      },
+      {
+        "name": "gallery_applications",
+        "type": "map(object({\n    version_id             = string\n    configuration_blob_uri = optional(string)\n    order                  = optional(number, 0)\n    tag                    = optional(string)\n  }))",
+        "required": false
+      },
+      {
+        "name": "edge_zone",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "admin_username",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "account_credentials",
+        "type": "object({\n    admin_credentials = optional(object({\n      username                           = optional(string, \"azureuser\")\n      password                           = optional(string, null)\n      ssh_keys                           = optional(list(string), [])\n      generate_admin_password_or_ssh_key = optional(bool, true) # Use of flag is required to avoid known after apply issues\n    }), {})\n    key_vault_configuration = optional(object({\n      resource_id = string\n      secret_configuration = optional(object({\n        name                           = optional(string, null)\n        expiration_date_length_in_days = optional(number, 45)\n        content_type                   = optional(string, \"text/plain\")\n        not_before_date                = optional(string, null)\n        tags                           = optional(map(string), {})\n      }), {})\n    }), null)\n    password_authentication_disabled = optional(bool, true)\n    #future addditional user credentials map?\n  })",
+        "required": false
+      },
+      {
+        "name": "extensions",
+        "type": "map(object({\n    name                        = string\n    publisher                   = string\n    type                        = string\n    type_handler_version        = string\n    auto_upgrade_minor_version  = optional(bool)\n    automatic_upgrade_enabled   = optional(bool)\n    deploy_sequence             = optional(number, 5)\n    failure_suppression_enabled = optional(bool, false)\n    settings                    = optional(string)\n    protected_settings          = optional(string)\n    provision_after_extensions  = optional(list(string), [])\n    tags                        = optional(map(string), null)\n    protected_settings_from_key_vault = optional(object({\n      secret_url      = string\n      source_vault_id = string\n    }))\n    timeouts = optional(object({\n      create = optional(string)\n      delete = optional(string)\n      update = optional(string)\n      read   = optional(string)\n      })\n    )\n  }))",
+        "required": false
+      },
+      {
+        "name": "extensions_time_budget",
+        "type": "string",
+        "required": false
+      }
+    ],
+    "outputs": [
+      {
+        "name": "network_interfaces",
+        "description": "The full ARM object map associated with the deployed network interface(s). Exporting this in the event that a nic property not exposed as part of the azurerm vm export is required.",
+        "sensitive": false
+      },
+      {
+        "name": "admin_generated_ssh_private_key",
+        "description": "Returns the private key for the generated ssh key. This is only available if the generation option is selected and no additional keys are provided.",
+        "sensitive": false
+      },
+      {
+        "name": "name",
+        "description": "The name used for the virtual machines name.",
+        "sensitive": false
+      },
+      {
+        "name": "public_ips",
+        "description": "The full ARM object map associated with any deployed public ip(s). Exporting this in the event that a public ip property not exposed as part of the azurerm vm export is required.",
+        "sensitive": false
+      },
+      {
+        "name": "resource",
+        "description": "The full object for the deployed virtual machine.  This is marked sensitive as it contains specific sensitive values",
+        "sensitive": true
+      },
+      {
+        "name": "resource_id",
+        "description": "The Azure resource id for the deployed virtual machine",
+        "sensitive": false
+      },
+      {
+        "name": "system_assigned_mi_principal_id",
+        "description": "The principal id of the system managed identity assigned to the virtual machine",
+        "sensitive": false
+      },
+      {
+        "name": "virtual_machine",
+        "description": "The full object for the deployed virtual machine.  This is marked sensitive as it contains specific sensitive values. This output has been duplicated to the resource output to comply with the spec and may be deprecated in the future.",
+        "sensitive": true
+      },
+      {
+        "name": "virtual_machine_azurerm",
+        "description": "    The default attributes exported by the azurerm provider.  These are defined as a map containing the following attributes  \n    id                   = The Azure resource ID of the deployed virtual machine  \n    identity             = { #An identity map with the following attributes  \n        principal_id     = The Principal ID associated with the virtual machine's system assigned managed identity  \n        tenant_id        = The Tenant ID associated with the virtual machine's system assigned managed identity\n    }  \n    private_ip_address   = The primary private IP address of the deployed virtual machine  \n    private_ip_addresses = A list of Private IP Addresses assigned to this Virtual Machine.  \n    public_ip_address    = The Primary Public IP Address assigned to this Virtual Machine.  \n    public_ip_addresses  = A list of the Public IP Addresses assigned to this Virtual Machine.  \n    virtual_machine_id   = A 128-bit identifier which uniquely identifies this Virtual Machine.\n",
+        "sensitive": false
+      },
+      {
+        "name": "admin_password",
+        "description": "Returns the admin password if installation is configured to use the password.  Otherwise returns null",
+        "sensitive": false
+      },
+      {
+        "name": "admin_ssh_keys",
+        "description": "Returns a list containing all of the provided or generated public ssh keys. This is a single key if the generation option is selected and no additional keys are provided.",
+        "sensitive": false
+      },
+      {
+        "name": "admin_username",
+        "description": "The admin username used when creating this virtual machine.",
+        "sensitive": false
+      },
+      {
+        "name": "data_disks",
+        "description": "The full ARM object map associated with any deployed data disk(s). Exporting this in the event that a disk property not exposed as part of the azurerm vm export is required.",
+        "sensitive": false
+      }
+    ]
+  }
+}

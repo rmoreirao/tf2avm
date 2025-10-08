@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from datetime import datetime, timedelta
+from datetime import datetime
 from typing import Optional
 
 from config.logging import get_logger
@@ -18,19 +18,17 @@ class AVMService:
     a local file-based cache to improve performance and reduce API calls.
     """
     
-    def __init__(self, cache_enabled: bool = True, cache_ttl: int = 3000000):
+    def __init__(self, cache_enabled: bool = True):
         """
         Initialize the AVM Service.
         
         Args:
             cache_enabled: Whether to use caching functionality
-            cache_ttl: Time to live for cache entries in seconds (default: 24 hours)
         """
         self.logger = get_logger(__name__)
         self.settings = get_settings()
         self.cache_enabled = cache_enabled
-        self.cache_dir = Path("localCache")
-        self.cache_ttl = cache_ttl
+        self.cache_dir = Path("avmDataCache")
         
         # Create cache directory if it doesn't exist
         if self.cache_enabled:
@@ -52,30 +50,6 @@ class AVMService:
         if self._avm_resource_details_agent is None:
             self._avm_resource_details_agent = await AVMResourceDetailsAgent.create()
         return self._avm_resource_details_agent
-    
-    def _is_cache_valid(self, cache_file: Path) -> bool:
-        """
-        Check if a cache file exists and is still valid based on TTL.
-        
-        Args:
-            cache_file: Path to the cache file
-            
-        Returns:
-            True if cache is valid, False otherwise
-        """
-        if not cache_file.exists():
-            return False
-        
-        # Check if file is within TTL
-        file_mtime = datetime.fromtimestamp(cache_file.stat().st_mtime)
-        expiry_time = file_mtime + timedelta(seconds=self.cache_ttl)
-        
-        is_valid = datetime.now() < expiry_time
-        
-        if not is_valid:
-            self.logger.debug(f"Cache file expired: {cache_file}")
-        
-        return is_valid
     
     def _load_cache(self, cache_file: Path) -> Optional[dict]:
         """
@@ -148,7 +122,7 @@ class AVMService:
         cache_file = self.cache_dir / "avm_knowledge.json"
         
         # Try to load from cache first
-        if use_cache and self.cache_enabled and self._is_cache_valid(cache_file):
+        if use_cache and self.cache_enabled and cache_file.exists():
             cached_data = self._load_cache(cache_file)
             if cached_data:
                 try:
@@ -192,7 +166,7 @@ class AVMService:
         cache_file = self.cache_dir / cache_filename
         
         # Try to load from cache first
-        if use_cache and self.cache_enabled and self._is_cache_valid(cache_file):
+        if use_cache and self.cache_enabled and cache_file.exists():
             cached_data = self._load_cache(cache_file)
             if cached_data:
                 try:
@@ -276,7 +250,6 @@ class AVMService:
         cache_info = {
             "cache_enabled": True,
             "cache_directory": str(self.cache_dir),
-            "cache_ttl_seconds": self.cache_ttl,
             "files": []
         }
         
@@ -284,13 +257,11 @@ class AVMService:
             for cache_file in self.cache_dir.glob("*.json"):
                 file_stat = cache_file.stat()
                 file_mtime = datetime.fromtimestamp(file_stat.st_mtime)
-                is_valid = self._is_cache_valid(cache_file)
                 
                 cache_info["files"].append({
                     "filename": cache_file.name,
                     "size_bytes": file_stat.st_size,
-                    "modified": file_mtime.isoformat(),
-                    "is_valid": is_valid
+                    "modified": file_mtime.isoformat()
                 })
         
         return cache_info

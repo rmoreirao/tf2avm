@@ -1,0 +1,86 @@
+{
+  "module": {
+    "name": "avm-res-insights-autoscalesetting",
+    "display_name": "avm-res-insights-autoscalesetting",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-insights-autoscalesetting/azurerm/0.1.2",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-insights-autoscalesetting",
+    "version": "0.1.2",
+    "description": "This module provides autoscaling configuration for VMSS, App Services and other scalable resources.",
+    "resources": [
+      "azurerm_monitor_autoscale_setting.monitor_autoscale_setting",
+      "modtm_telemetry.telemetry",
+      "random_uuid.telemetry",
+      "azurerm_client_config.telemetry",
+      "modtm_module_source.telemetry"
+    ],
+    "inputs": [
+      {
+        "name": "location",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "resource_group_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "target_resource_id",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "predictive",
+        "type": "object({\n    scale_mode      = string\n    look_ahead_time = optional(string)\n  })",
+        "required": false
+      },
+      {
+        "name": "profiles",
+        "type": "map(object({\n    name = string\n    capacity = object({\n      default = number\n      maximum = number\n      minimum = number\n    })\n    rules = optional(map(object({\n      metric_trigger = object({\n        metric_name        = string\n        metric_resource_id = optional(string)\n        operator           = string\n        statistic          = string\n        time_aggregation   = string\n        time_grain         = string\n        time_window        = string\n        threshold          = number\n        metric_namespace   = optional(string)\n        dimensions = optional(map(object({\n          name     = string\n          operator = string\n          values   = list(string)\n        })))\n        divide_by_instance_count = optional(bool)\n      })\n      scale_action = object({\n        cooldown  = string\n        direction = string\n        type      = string\n        value     = string\n      })\n    })))\n    fixed_date = optional(object({\n      end      = string\n      start    = string\n      timezone = optional(string, \"UTC\")\n    }))\n    recurrence = optional(object({\n      timezone = optional(string, \"UTC\")\n      days     = list(string)\n      hours    = list(number)\n      minutes  = list(number)\n    }))\n  }))",
+        "required": true
+      },
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "notification",
+        "type": "object({\n    email = optional(object({\n      send_to_subscription_administrator    = optional(bool, false)\n      send_to_subscription_co_administrator = optional(bool, false)\n      custom_emails                         = optional(list(string), [])\n    }))\n    webhooks = optional(map(object({\n      service_uri = string\n      properties  = optional(map(string), {})\n    })))\n  })",
+        "required": false
+      },
+      {
+        "name": "tags",
+        "type": "map(string)",
+        "required": false
+      }
+    ],
+    "outputs": [
+      {
+        "name": "resource",
+        "description": "All attributes of the Monitor Autoscale Setting resource.",
+        "sensitive": false
+      },
+      {
+        "name": "resource_id",
+        "description": "The ID of the Monitor Autoscale Setting.",
+        "sensitive": false
+      },
+      {
+        "name": "resource_name",
+        "description": "The name of the Monitor Autoscale Setting.",
+        "sensitive": false
+      }
+    ]
+  }
+}

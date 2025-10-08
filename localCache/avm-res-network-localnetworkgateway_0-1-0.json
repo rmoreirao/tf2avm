@@ -1,0 +1,93 @@
+{
+  "module": {
+    "name": "avm-res-network-localnetworkgateway",
+    "display_name": "avm-res-network-localnetworkgateway",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-network-localnetworkgateway/azurerm/0.1.0",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-network-localnetworkgateway",
+    "version": "0.1.0",
+    "description": "AVM Terraform module for Local Network Gateway",
+    "resources": [
+      "azurerm_local_network_gateway.this",
+      "azurerm_management_lock.this",
+      "azurerm_role_assignment.this",
+      "modtm_telemetry.telemetry",
+      "random_uuid.telemetry",
+      "azurerm_client_config.telemetry",
+      "modtm_module_source.telemetry"
+    ],
+    "inputs": [
+      {
+        "name": "name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "resource_group_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "customer_managed_key",
+        "type": "object({\n    key_vault_resource_id = string\n    key_name              = string\n    key_version           = optional(string, null)\n    user_assigned_identity = optional(object({\n      resource_id = string\n    }), null)\n  })",
+        "required": false
+      },
+      {
+        "name": "address_space",
+        "type": "list(string)",
+        "required": true
+      },
+      {
+        "name": "location",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "bgp_settings",
+        "type": "object({\n    asn                 = optional(number, null) # ASN is optional and defaults to null\n    bgp_peering_address = optional(string, null) # Peering address is optional and defaults to null\n    peer_weight         = optional(number, null) # Peering weight is optional and defaults to null\n  })",
+        "required": false
+      },
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "lock",
+        "type": "object({\n    kind = string\n    name = optional(string, null)\n  })",
+        "required": false
+      },
+      {
+        "name": "managed_identities",
+        "type": "object({\n    system_assigned            = optional(bool, false)\n    user_assigned_resource_ids = optional(set(string), [])\n  })",
+        "required": false
+      },
+      {
+        "name": "role_assignments",
+        "type": "map(object({\n    role_definition_id_or_name             = string\n    principal_id                           = string\n    description                            = optional(string, null)\n    skip_service_principal_aad_check       = optional(bool, false)\n    condition                              = optional(string, null)\n    condition_version                      = optional(string, null)\n    delegated_managed_identity_resource_id = optional(string, null)\n    principal_type                         = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "gateway_address",
+        "type": "string",
+        "required": true
+      }
+    ],
+    "outputs": [
+      {
+        "name": "name",
+        "description": "The name of the local network gateway",
+        "sensitive": false
+      },
+      {
+        "name": "resource_id",
+        "description": "The name of the local network gateway",
+        "sensitive": false
+      }
+    ]
+  }
+}

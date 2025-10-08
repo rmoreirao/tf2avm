@@ -1,0 +1,233 @@
+{
+  "module": {
+    "name": "avm-res-authorization-roleassignment",
+    "display_name": "Azure Authorization Role Assignment Module",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-authorization-roleassignment/azurerm/0.3.0",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-authorization-roleassignment",
+    "version": "0.3.0",
+    "description": "Terraform Azure Verified Resource Module for Role Assignment.\n\nThis module is a convenience wrapper around the `azurerm_role_assignment` resource to make it easier to create role assignments at different scopes for different types of principals.\n\nSupports built in and custom role definitions and the following scopes: Entra ID, Management Group, Subscription, Resource Group, Resource.\n\nSupports principals: User, Group, App Registrations (Service Principal), System Assigned Managed Identity, User Assigned Managed Identity.\n\nProvides helper variables to resolve principal ids (object ids).\n\nDoes not create principals or role definitions; only creates role assignments.",
+    "resources": [
+      "random_uuid.telemetry",
+      "modtm_telemetry.telemetry",
+      "azurerm_role_assignment.this",
+      "azuread_directory_role_assignment.this",
+      "azurerm_role_assignment.basic",
+      "azuread_directory_role_assignment.basic",
+      "azuread_directory_role.entra_id_role_definitions_by_name"
+    ],
+    "inputs": [
+      {
+        "name": "app_registrations_by_client_id",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "app_registrations_by_display_name",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "app_registrations_by_object_id",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "app_registrations_by_principal_id",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "entra_id_role_definitions",
+        "type": "map(object({template_id: \"optional(string)\", display_name: \"optional(string)\"}))",
+        "required": false
+      },
+      {
+        "name": "groups_by_display_name",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "groups_by_mail_nickname",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "groups_by_object_id",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "role_assignments_azure_resource_manager",
+        "type": "map(object({role_definition_id: \"optional(string)\", role_definition_name: \"optional(string)\", principal_type: \"optional(string)\", principal_id: \"string\", scope: \"string\", condition: \"optional(string)\", condition_version: \"optional(string)\", delegated_managed_identity_resource_id: \"optional(string)\", description: \"optional(string)\", skip_service_principal_aad_check: \"optional(bool,false)\"}))",
+        "required": false
+      },
+      {
+        "name": "role_assignments_entra_id",
+        "type": "map(object({app_scope_id: \"optional(string)\", directory_scope_id: \"optional(string)\", principal_object_id: \"string\", role_id: \"string\"}))",
+        "required": false
+      },
+      {
+        "name": "role_assignments_for_entra_id",
+        "type": "map(object({role_assignments: \"map(object({role_definition: string, users: \"optional(set(string), [])\", groups: \"optional(set(string), [])\", app_registrations: \"optional(set(string), [])\", system_assigned_managed_identities: \"optional(set(string), [])\", user_assigned_managed_identities: \"optional(set(string), [])\", any_principals: \"optional(set(string), [])\"}))\"}))",
+        "required": false
+      },
+      {
+        "name": "role_assignments_for_management_groups",
+        "type": "map(object({management_group_id: \"optional(string,null)\", management_group_display_name: \"optional(string,null)\", role_assignments: \"map(object({role_definition: string, users: \"optional(set(string), [])\", groups: \"optional(set(string), [])\", app_registrations: \"optional(set(string), [])\", system_assigned_managed_identities: \"optional(set(string), [])\", user_assigned_managed_identities: \"optional(set(string), [])\", any_principals: \"optional(set(string), [])\", skip_service_principal_aad_check: \"optional(bool,false)\"}))\"}))",
+        "required": false
+      },
+      {
+        "name": "role_assignments_for_resource_groups",
+        "type": "map(object({resource_group_name: string, subscription_id: \"optional(string,null)\", role_assignments: \"map(object({role_definition: string, users: \"optional(set(string), [])\", groups: \"optional(set(string), [])\", app_registrations: \"optional(set(string), [])\", system_assigned_managed_identities: \"optional(set(string), [])\", user_assigned_managed_identities: \"optional(set(string), [])\", any_principals: \"optional(set(string), [])\", skip_service_principal_aad_check: \"optional(bool,false)\"}))\"}))",
+        "required": false
+      },
+      {
+        "name": "role_assignments_for_resources",
+        "type": "map(object({resource_name: string, resource_group_name: string, role_assignments: \"map(object({role_definition: string, users: \"optional(set(string), [])\", groups: \"optional(set(string), [])\", app_registrations: \"optional(set(string), [])\", system_assigned_managed_identities: \"optional(set(string), [])\", user_assigned_managed_identities: \"optional(set(string), [])\", any_principals: \"optional(set(string), [])\", skip_service_principal_aad_check: \"optional(bool,false)\"}))\"}))",
+        "required": false
+      },
+      {
+        "name": "role_assignments_for_scopes",
+        "type": "map(object({scope: string, role_assignments: \"map(object({role_definition: string, users: \"optional(set(string), [])\", groups: \"optional(set(string), [])\", app_registrations: \"optional(set(string), [])\", system_assigned_managed_identities: \"optional(set(string), [])\", user_assigned_managed_identities: \"optional(set(string), [])\", any_principals: \"optional(set(string), [])\", skip_service_principal_aad_check: \"optional(bool,false)\"}))\"}))",
+        "required": false
+      },
+      {
+        "name": "role_assignments_for_subscriptions",
+        "type": "map(object({subscription_id: \"optional(string,null)\", role_assignments: \"map(object({role_definition: string, users: \"optional(set(string), [])\", groups: \"optional(set(string), [])\", app_registrations: \"optional(set(string), [])\", system_assigned_managed_identities: \"optional(set(string), [])\", user_assigned_managed_identities: \"optional(set(string), [])\", any_principals: \"optional(set(string), [])\", skip_service_principal_aad_check: \"optional(bool,false)\"}))\"}))",
+        "required": false
+      },
+      {
+        "name": "role_definitions",
+        "type": "map(object({id: \"optional(string)\", name: \"optional(string)\", scope: \"optional(string)\"}))",
+        "required": false
+      },
+      {
+        "name": "skip_service_principal_aad_check",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "system_assigned_managed_identities_by_client_id",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "system_assigned_managed_identities_by_display_name",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "system_assigned_managed_identities_by_principal_id",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "user_assigned_managed_identities_by_client_id",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "user_assigned_managed_identities_by_display_name",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "user_assigned_managed_identities_by_principal_id",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "user_assigned_managed_identities_by_resource_group_and_name",
+        "type": "map(object({resource_group_name: string, name: string}))",
+        "required": false
+      },
+      {
+        "name": "users_by_employee_id",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "users_by_mail",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "users_by_mail_nickname",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "users_by_object_id",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "users_by_user_principal_name",
+        "type": "map(string)",
+        "required": false
+      }
+    ],
+    "outputs": [
+      {
+        "name": "all_principals",
+        "description": "A map of all principals. The key is the key you supplied and the value is the principal id (object id) of the user, group, service principal, or managed identity.",
+        "sensitive": false
+      },
+      {
+        "name": "app_registrations",
+        "description": "A map of Entra ID application registrations. The key is the key you supplied and the value is the principal id (object id) of the service principal backing the application registration.",
+        "sensitive": false
+      },
+      {
+        "name": "entra_id_role_assignments",
+        "description": "A map of Entra ID role assignments. The key is the key you supplied and the value is the role assignment details:\n\n* `role_definition_id`: The role definition template id of the role assignment.\n* `principal_id`: The principal id (object id) of the user, group, service principal, or managed identity the role assignment is for.",
+        "sensitive": false
+      },
+      {
+        "name": "entra_id_role_definitions",
+        "description": "A map of Entra ID role definitions. The key is the key you supplied and the value is the role definition template id.",
+        "sensitive": false
+      },
+      {
+        "name": "groups",
+        "description": "A map of Entra ID groups. The key is the key you supplied and the value is the principal id (object id) of the group.",
+        "sensitive": false
+      },
+      {
+        "name": "resource_id",
+        "description": "This output is not used and is only here to satisfy the requirements of the module linting.",
+        "sensitive": false
+      },
+      {
+        "name": "role_assignments",
+        "description": "A map of Azure Resource Manager role assignments. The key is the key you supplied and the value is the role assignment details:\n\n* `role_definition_id`: The role definition id of the role assignment.\n* `principal_id`: The principal id (object id) of the user, group, service principal, or managed identity the role assignment is for.\n* `scope`: The scope of the role assignment.",
+        "sensitive": false
+      },
+      {
+        "name": "role_defintions",
+        "description": "A map of Azure Resource Manager role definitions. The key is the key you supplied and the value consists of is the role definition id and the allowed scopes.",
+        "sensitive": false
+      },
+      {
+        "name": "system_assigned_managed_identities",
+        "description": "A map of system assigned managed identities. The key is the key you supplied and value is the principal id (object id) of the service principal backing system assigned managed identity.",
+        "sensitive": false
+      },
+      {
+        "name": "user_assigned_managed_identities",
+        "description": "A map of user assigned managed identities. The key is the key you supplied and value is the principal id (object id) of the service principal backing user assigned managed identity.",
+        "sensitive": false
+      },
+      {
+        "name": "users",
+        "description": "A map of Entra ID users. The key is the key you supplied and the value is the principal id (object id) of the user.",
+        "sensitive": false
+      }
+    ]
+  }
+}

@@ -1,0 +1,73 @@
+{
+  "module": {
+    "name": "avm-res-network-ddosprotectionplan",
+    "display_name": "avm-res-network-ddosprotectionplan",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-network-ddosprotectionplan/azurerm/0.3.0",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-network-ddosprotectionplan",
+    "version": "0.3.0",
+    "description": "DDoS protection plan Azure Verified Module",
+    "resources": [
+      "random_uuid.telemetry",
+      "modtm_telemetry.telemetry",
+      "azurerm_network_ddos_protection_plan.this",
+      "azurerm_management_lock.this",
+      "azurerm_role_assignment.this",
+      "azurerm_client_config.telemetry",
+      "modtm_module_source.telemetry"
+    ],
+    "inputs": [
+      {
+        "name": "tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "location",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "resource_group_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "lock",
+        "type": "object({\n    kind = string\n    name = optional(string, null)\n  })",
+        "required": false
+      },
+      {
+        "name": "role_assignments",
+        "type": "map(object({\n    role_definition_id_or_name             = string\n    principal_id                           = string\n    description                            = optional(string, null)\n    skip_service_principal_aad_check       = optional(bool, false)\n    condition                              = optional(string, null)\n    condition_version                      = optional(string, null)\n    delegated_managed_identity_resource_id = optional(string, null)\n    principal_type                         = optional(string, null)\n  }))",
+        "required": false
+      }
+    ],
+    "outputs": [
+      {
+        "name": "name",
+        "description": "The name of the ddos protection plan resource.",
+        "sensitive": false
+      },
+      {
+        "name": "resource",
+        "description": "The ddos protection plan resource.",
+        "sensitive": false
+      },
+      {
+        "name": "resource_id",
+        "description": "The ID of the ddos protection plan resource.",
+        "sensitive": false
+      }
+    ]
+  }
+}

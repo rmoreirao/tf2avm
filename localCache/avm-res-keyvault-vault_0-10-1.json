@@ -1,0 +1,212 @@
+{
+  "module": {
+    "name": "avm-res-keyvault-vault",
+    "display_name": "avm-res-keyvault-vault",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-keyvault-vault/azurerm/0.10.1",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-keyvault-vault",
+    "version": "0.10.1",
+    "description": "Terraform Azure Verified Resource Module for Key Vault",
+    "resources": [
+      "azurerm_key_vault.this",
+      "azurerm_key_vault_access_policy.this",
+      "azurerm_key_vault_certificate_contacts.this",
+      "azurerm_management_lock.this",
+      "azurerm_monitor_diagnostic_setting.this",
+      "azurerm_private_endpoint.this",
+      "azurerm_private_endpoint.this_unmanaged_dns_zone_groups",
+      "azurerm_private_endpoint_application_security_group_association.this",
+      "azurerm_role_assignment.this",
+      "modtm_telemetry.telemetry",
+      "random_uuid.telemetry",
+      "time_sleep.wait_for_rbac_before_contact_operations",
+      "time_sleep.wait_for_rbac_before_key_operations",
+      "time_sleep.wait_for_rbac_before_secret_operations",
+      "azapi_client_config.telemetry",
+      "modtm_module_source.telemetry"
+    ],
+    "inputs": [
+      {
+        "name": "sku_name",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "wait_for_rbac_before_contact_operations",
+        "type": "object({\n    create  = optional(string, \"30s\")\n    destroy = optional(string, \"0s\")\n  })",
+        "required": false
+      },
+      {
+        "name": "wait_for_rbac_before_key_operations",
+        "type": "object({\n    create  = optional(string, \"30s\")\n    destroy = optional(string, \"0s\")\n  })",
+        "required": false
+      },
+      {
+        "name": "location",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "tenant_id",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "enabled_for_deployment",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "enabled_for_disk_encryption",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "keys",
+        "type": "map(object({\n    name     = string\n    key_type = string\n    key_opts = optional(list(string), [\"sign\", \"verify\"])\n\n    key_size        = optional(number, null)\n    curve           = optional(string, null)\n    not_before_date = optional(string, null)\n    expiration_date = optional(string, null)\n    tags            = optional(map(any), null)\n\n    role_assignments = optional(map(object({\n      role_definition_id_or_name             = string\n      principal_id                           = string\n      description                            = optional(string, null)\n      skip_service_principal_aad_check       = optional(bool, false)\n      condition                              = optional(string, null)\n      condition_version                      = optional(string, null)\n      delegated_managed_identity_resource_id = optional(string, null)\n      principal_type                         = optional(string, null)\n    })), {})\n\n    rotation_policy = optional(object({\n      automatic = optional(object({\n        time_after_creation = optional(string, null)\n        time_before_expiry  = optional(string, null)\n      }), null)\n      expire_after         = optional(string, null)\n      notify_before_expiry = optional(string, null)\n    }), null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "lock",
+        "type": "object({\n    kind = string\n    name = optional(string, null)\n  })",
+        "required": false
+      },
+      {
+        "name": "contacts",
+        "type": "map(object({\n    email = string\n    name  = optional(string, null)\n    phone = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "enabled_for_template_deployment",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "legacy_access_policies_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "network_acls",
+        "type": "object({\n    bypass                     = optional(string, \"None\")\n    default_action             = optional(string, \"Deny\")\n    ip_rules                   = optional(list(string), [])\n    virtual_network_subnet_ids = optional(list(string), [])\n  })",
+        "required": false
+      },
+      {
+        "name": "private_endpoints_manage_dns_zone_group",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "role_assignments",
+        "type": "map(object({\n    role_definition_id_or_name             = string\n    principal_id                           = string\n    description                            = optional(string, null)\n    skip_service_principal_aad_check       = optional(bool, false)\n    condition                              = optional(string, null)\n    condition_version                      = optional(string, null)\n    delegated_managed_identity_resource_id = optional(string, null)\n    principal_type                         = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "secrets",
+        "type": "map(object({\n    name            = string\n    content_type    = optional(string, null)\n    tags            = optional(map(any), null)\n    not_before_date = optional(string, null)\n    expiration_date = optional(string, null)\n\n    role_assignments = optional(map(object({\n      role_definition_id_or_name             = string\n      principal_id                           = string\n      description                            = optional(string, null)\n      skip_service_principal_aad_check       = optional(bool, false)\n      condition                              = optional(string, null)\n      condition_version                      = optional(string, null)\n      delegated_managed_identity_resource_id = optional(string, null)\n      principal_type                         = optional(string, null)\n    })), {})\n  }))",
+        "required": false
+      },
+      {
+        "name": "secrets_value",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "resource_group_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "diagnostic_settings",
+        "type": "map(object({\n    name                                     = optional(string, null)\n    log_categories                           = optional(set(string), [])\n    log_groups                               = optional(set(string), [\"allLogs\"])\n    metric_categories                        = optional(set(string), [\"AllMetrics\"])\n    log_analytics_destination_type           = optional(string, \"Dedicated\")\n    workspace_resource_id                    = optional(string, null)\n    storage_account_resource_id              = optional(string, null)\n    event_hub_authorization_rule_resource_id = optional(string, null)\n    event_hub_name                           = optional(string, null)\n    marketplace_partner_resource_id          = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "private_endpoints",
+        "type": "map(object({\n    name = optional(string, null)\n    role_assignments = optional(map(object({\n      role_definition_id_or_name             = string\n      principal_id                           = string\n      description                            = optional(string, null)\n      skip_service_principal_aad_check       = optional(bool, false)\n      condition                              = optional(string, null)\n      condition_version                      = optional(string, null)\n      delegated_managed_identity_resource_id = optional(string, null)\n      principal_type                         = optional(string, null)\n    })), {})\n    lock = optional(object({\n      kind = string\n      name = optional(string, null)\n    }), null)\n    tags                                    = optional(map(string), null)\n    subnet_resource_id                      = string\n    private_dns_zone_group_name             = optional(string, \"default\")\n    private_dns_zone_resource_ids           = optional(set(string), [])\n    application_security_group_associations = optional(map(string), {})\n    private_service_connection_name         = optional(string, null)\n    network_interface_name                  = optional(string, null)\n    location                                = optional(string, null)\n    resource_group_name                     = optional(string, null)\n    ip_configurations = optional(map(object({\n      name               = string\n      private_ip_address = string\n    })), {})\n  }))",
+        "required": false
+      },
+      {
+        "name": "public_network_access_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "soft_delete_retention_days",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "wait_for_rbac_before_secret_operations",
+        "type": "object({\n    create  = optional(string, \"30s\")\n    destroy = optional(string, \"0s\")\n  })",
+        "required": false
+      },
+      {
+        "name": "legacy_access_policies",
+        "type": "map(object({\n    object_id               = string\n    application_id          = optional(string, null)\n    certificate_permissions = optional(set(string), [])\n    key_permissions         = optional(set(string), [])\n    secret_permissions      = optional(set(string), [])\n    storage_permissions     = optional(set(string), [])\n  }))",
+        "required": false
+      },
+      {
+        "name": "purge_protection_enabled",
+        "type": "bool",
+        "required": false
+      }
+    ],
+    "outputs": [
+      {
+        "name": "name",
+        "description": "The name of the key vault.",
+        "sensitive": false
+      },
+      {
+        "name": "private_endpoints",
+        "description": "A map of private endpoints. The map key is the supplied input to var.private_endpoints. The map value is the entire azurerm_private_endpoint resource.",
+        "sensitive": false
+      },
+      {
+        "name": "resource_id",
+        "description": "The Azure resource id of the key vault.",
+        "sensitive": false
+      },
+      {
+        "name": "secrets",
+        "description": "A map of secret keys to secret values. The secret value is the entire azurerm_key_vault_secret resource.\n\nThe secret value contains the following attributes:\n- id: The Key Vault Secret ID\n- resource_id: The Azure resource id of the secret.\n- resource_versionless_id: The versionless Azure resource id of the secret.\n- versionless_id: The Base ID of the Key Vault Secret\n",
+        "sensitive": false
+      },
+      {
+        "name": "secrets_resource_ids",
+        "description": "A map of secret keys to resource ids.",
+        "sensitive": false
+      },
+      {
+        "name": "uri",
+        "description": "The URI of the vault for performing operations on keys and secrets",
+        "sensitive": false
+      },
+      {
+        "name": "keys",
+        "description": "A map of key keys to key values. The key value is the entire azurerm_key_vault_key resource.\n\nThe key value contains the following attributes:\n- id: The Key Vault Key ID\n- resource_id: The Azure resource id of the key.\n- resource_versionless_id: The versionless Azure resource id of the key.\n- versionless_id: The Base ID of the Key Vault Key\n",
+        "sensitive": false
+      },
+      {
+        "name": "keys_resource_ids",
+        "description": "A map of key keys to resource ids.",
+        "sensitive": false
+      }
+    ]
+  }
+}

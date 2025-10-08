@@ -1,0 +1,268 @@
+{
+  "module": {
+    "name": "avm-res-network-applicationgateway",
+    "display_name": "Application Gateway",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-network-applicationgateway/azurerm/0.4.3",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-network-applicationgateway",
+    "version": "0.4.3",
+    "description": "Terraform Azure Verified Resource Module for Application Gateway",
+    "resources": [
+      "azurerm_management_lock.this",
+      "azurerm_role_assignment.this",
+      "azurerm_monitor_diagnostic_setting.this",
+      "azurerm_public_ip.this",
+      "azurerm_application_gateway.this",
+      "random_uuid.telemetry",
+      "modtm_telemetry.telemetry"
+    ],
+    "inputs": [
+      {
+        "name": "trusted_root_certificate",
+        "type": "map(object({\n    data                = optional(string)\n    key_vault_secret_id = optional(string)\n    name                = string\n  }))",
+        "required": false
+      },
+      {
+        "name": "probe_configurations",
+        "type": "map(object({\n    name                                      = string\n    host                                      = optional(string)\n    interval                                  = number\n    timeout                                   = number\n    unhealthy_threshold                       = number\n    protocol                                  = string\n    port                                      = optional(number)\n    path                                      = string\n    pick_host_name_from_backend_http_settings = optional(bool)\n    minimum_servers                           = optional(number)\n    match = optional(object({\n      body        = optional(string)\n      status_code = optional(list(string))\n    }))\n  }))",
+        "required": false
+      },
+      {
+        "name": "autoscale_configuration",
+        "type": "object({\n    min_capacity = optional(number, 1) # Minimum in the range 0 to 100\n    max_capacity = optional(number, 2) # Maximum in the range 2 to 125\n  })",
+        "required": false
+      },
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "frontend_ip_configuration_private",
+        "type": "object({\n    name                            = optional(string)\n    private_ip_address              = optional(string)\n    private_ip_address_allocation   = optional(string)\n    private_link_configuration_name = optional(string)\n  })",
+        "required": false
+      },
+      {
+        "name": "managed_identities",
+        "type": "object({\n    system_assigned            = optional(bool, false)\n    user_assigned_resource_ids = optional(set(string), [])\n  })",
+        "required": false
+      },
+      {
+        "name": "sku",
+        "type": "object({\n    name     = string              # Standard_Small, Standard_Medium, Standard_Large, Standard_v2, WAF_Medium, WAF_Large, and WAF_v2\n    tier     = string              # Standard, Standard_v2, WAF and WAF_v2\n    capacity = optional(number, 2) # V1 SKU this value must be between 1 and 32, and 1 to 125 for a V2 SKU\n  })",
+        "required": false
+      },
+      {
+        "name": "tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "timeouts",
+        "type": "object({\n    create = optional(string)\n    delete = optional(string)\n    read   = optional(string)\n    update = optional(string)\n  })",
+        "required": false
+      },
+      {
+        "name": "authentication_certificate",
+        "type": "map(object({\n    data = string\n    name = string\n  }))",
+        "required": false
+      },
+      {
+        "name": "diagnostic_settings",
+        "type": "map(object({\n    name                                     = optional(string, null)\n    log_categories                           = optional(set(string), [])\n    log_groups                               = optional(set(string), [\"allLogs\"])\n    metric_categories                        = optional(set(string), [\"AllMetrics\"])\n    log_analytics_destination_type           = optional(string, \"Dedicated\")\n    workspace_resource_id                    = optional(string, null)\n    storage_account_resource_id              = optional(string, null)\n    event_hub_authorization_rule_resource_id = optional(string, null)\n    event_hub_name                           = optional(string, null)\n    marketplace_partner_resource_id          = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "ssl_policy",
+        "type": "object({\n    cipher_suites        = optional(list(string))\n    disabled_protocols   = optional(list(string))\n    min_protocol_version = optional(string, \"TLSv1_2\") # Default to TLSv1_2\n    policy_name          = optional(string)\n    policy_type          = optional(string)\n  })",
+        "required": false
+      },
+      {
+        "name": "gateway_ip_configuration",
+        "type": "object({\n    name      = optional(string)\n    subnet_id = string\n  })",
+        "required": true
+      },
+      {
+        "name": "http2_enable",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "role_assignments",
+        "type": "map(object({\n    role_definition_id_or_name             = string\n    principal_id                           = string\n    description                            = optional(string, null)\n    skip_service_principal_aad_check       = optional(bool, false)\n    condition                              = optional(string, null)\n    condition_version                      = optional(string, null)\n    delegated_managed_identity_resource_id = optional(string, null)\n    principal_type                         = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "ssl_profile",
+        "type": "map(object({\n    name                                 = string\n    trusted_client_certificate_names     = optional(list(string))\n    verify_client_cert_issuer_dn         = optional(bool, false)\n    verify_client_certificate_revocation = optional(string, \"OCSP\")\n    ssl_policy = optional(object({\n      cipher_suites        = optional(list(string))\n      disabled_protocols   = optional(list(string))\n      min_protocol_version = optional(string, \"TLSv1_2\") # Default to TLSv1_2\n      policy_name          = optional(string)\n      policy_type          = optional(string)\n    }))\n  }))",
+        "required": false
+      },
+      {
+        "name": "trusted_client_certificate",
+        "type": "map(object({\n    data = string\n    name = string\n  }))",
+        "required": false
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "request_routing_rules",
+        "type": "map(object({\n    name                        = string\n    rule_type                   = string\n    http_listener_name          = string\n    backend_address_pool_name   = string\n    priority                    = number\n    url_path_map_name           = optional(string)\n    backend_http_settings_name  = string\n    redirect_configuration_name = optional(string)\n    rewrite_rule_set_name       = optional(string)\n  }))",
+        "required": true
+      },
+      {
+        "name": "resource_group_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "frontend_ip_configuration_public_name",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "global",
+        "type": "object({\n    request_buffering_enabled  = bool\n    response_buffering_enabled = bool\n  })",
+        "required": false
+      },
+      {
+        "name": "public_ip_resource_id",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "backend_address_pools",
+        "type": "map(object({\n    name         = string\n    fqdns        = optional(set(string))\n    ip_addresses = optional(set(string))\n  }))",
+        "required": true
+      },
+      {
+        "name": "http_listeners",
+        "type": "map(object({\n    name                           = string\n    frontend_port_name             = string\n    frontend_ip_configuration_name = optional(string)\n    firewall_policy_id             = optional(string)\n    require_sni                    = optional(bool)\n    host_name                      = optional(string)\n    host_names                     = optional(list(string))\n    ssl_certificate_name           = optional(string)\n    ssl_profile_name               = optional(string)\n    custom_error_configuration = optional(list(object({\n      status_code           = string\n      custom_error_page_url = string\n    })))\n  }))",
+        "required": true
+      },
+      {
+        "name": "app_gateway_waf_policy_resource_id",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "url_path_map_configurations",
+        "type": "map(object({\n    name                                = string\n    default_redirect_configuration_name = optional(string)\n    default_rewrite_rule_set_name       = optional(string)\n    default_backend_http_settings_name  = optional(string)\n    default_backend_address_pool_name   = optional(string)\n    path_rules = map(object({\n      name                        = string\n      paths                       = list(string)\n      backend_address_pool_name   = optional(string)\n      backend_http_settings_name  = optional(string)\n      redirect_configuration_name = optional(string)\n      rewrite_rule_set_name       = optional(string)\n      firewall_policy_id          = optional(string)\n    }))\n  }))",
+        "required": false
+      },
+      {
+        "name": "zones",
+        "type": "set(string)",
+        "required": false
+      },
+      {
+        "name": "create_public_ip",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "fips_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "public_ip_name",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "redirect_configuration",
+        "type": "map(object({\n    include_path         = optional(bool)\n    include_query_string = optional(bool)\n    name                 = string\n    redirect_type        = string\n    target_listener_name = optional(string)\n    target_url           = optional(string)\n  }))",
+        "required": false
+      },
+      {
+        "name": "rewrite_rule_set",
+        "type": "map(object({\n    name = string\n    rewrite_rules = optional(map(object({\n      name          = string\n      rule_sequence = number\n      conditions = optional(map(object({\n        ignore_case = optional(bool)\n        negate      = optional(bool)\n        pattern     = string\n        variable    = string\n      })))\n      request_header_configurations = optional(map(object({\n        header_name  = string\n        header_value = string\n      })))\n      response_header_configurations = optional(map(object({\n        header_name  = string\n        header_value = string\n      })))\n      url = optional(object({\n        components   = optional(string)\n        path         = optional(string)\n        query_string = optional(string)\n        reroute      = optional(bool)\n      }))\n    })))\n  }))",
+        "required": false
+      },
+      {
+        "name": "backend_http_settings",
+        "type": "map(object({\n    cookie_based_affinity               = optional(string, \"Disabled\")\n    name                                = string\n    port                                = number\n    protocol                            = string\n    affinity_cookie_name                = optional(string)\n    host_name                           = optional(string)\n    path                                = optional(string)\n    pick_host_name_from_backend_address = optional(bool)\n    probe_name                          = optional(string)\n    request_timeout                     = optional(number)\n    trusted_root_certificate_names      = optional(list(string))\n    authentication_certificate = optional(list(object({\n      name = string\n    })))\n    connection_draining = optional(object({\n      drain_timeout_sec          = number\n      enable_connection_draining = bool\n    }))\n  }))",
+        "required": true
+      }
+    ],
+    "outputs": [
+      {
+        "name": "request_routing_rules",
+        "description": "Information about request routing rules defined for the Application Gateway, including their names and configurations.",
+        "sensitive": false
+      },
+      {
+        "name": "ssl_certificates",
+        "description": "Information about SSL certificates used by the Application Gateway, including their names and other details.",
+        "sensitive": false
+      },
+      {
+        "name": "tags",
+        "description": "The tags applied to the Application Gateway.",
+        "sensitive": false
+      },
+      {
+        "name": "waf_configuration",
+        "description": "Information about the Web Application Firewall (WAF) configuration, if applicable.",
+        "sensitive": false
+      },
+      {
+        "name": "application_gateway_name",
+        "description": "The name of the Azure Application Gateway.",
+        "sensitive": false
+      },
+      {
+        "name": "backend_http_settings",
+        "description": "Information about the backend HTTP settings for the Application Gateway, including settings like port and protocol.",
+        "sensitive": false
+      },
+      {
+        "name": "frontend_port",
+        "description": "Information about the frontend ports used by the Application Gateway, including their names and port numbers.",
+        "sensitive": false
+      },
+      {
+        "name": "http_listeners",
+        "description": "Information about the HTTP listeners configured for the Application Gateway, including their names and settings.",
+        "sensitive": false
+      },
+      {
+        "name": "new_public_ip_address",
+        "description": "The actual public IP address associated with the Public IP resource, if we create a new one.",
+        "sensitive": false
+      },
+      {
+        "name": "probes",
+        "description": "Information about health probes configured for the Application Gateway, including their settings.",
+        "sensitive": false
+      },
+      {
+        "name": "public_ip_id",
+        "description": "The ID of the Azure Public IP address associated with the Application Gateway.",
+        "sensitive": false
+      },
+      {
+        "name": "request_routing_rules",
+        "description": "Information about request routing rules defined for the Application Gateway, including their names and configurations.",
+        "sensitive": false
+      },
+      {
+        "name": "resource_id",
+        "description": "Resource ID of Container Group Instance",
+        "sensitive": false
+      },
+      {
+        "name": "application_gateway_id",
+        "description": "The ID of the Azure Application Gateway.",
+        "sensitive": false
+      },
+      {
+        "name": "backend_address_pools",
+        "description": "Information about the backend address pools configured for the Application Gateway, including their names.",
+        "sensitive": false
+      }
+    ]
+  }
+}

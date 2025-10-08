@@ -1,0 +1,79 @@
+{
+  "module": {
+    "name": "avm-res-resourcegraph-query",
+    "display_name": "avm-res-resourcegraph-query",
+    "version": "0.1.0",
+    "description": "",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-resourcegraph-query/azurerm/0.1.0",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-resourcegraph-query",
+    "resources": [
+      "azapi_resource.query",
+      "azurerm_management_lock.this",
+      "azurerm_role_assignment.this",
+      "modtm_telemetry.telemetry",
+      "random_uuid.telemetry",
+      "azurerm_client_config.telemetry",
+      "azurerm_resource_group.this",
+      "modtm_module_source.telemetry"
+    ],
+    "inputs": [
+      {
+        "name": "query_string",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "resource_group_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "customer_managed_key",
+        "type": "object({\n    key_vault_resource_id = string\n    key_name              = string\n    key_version           = optional(string, null)\n    user_assigned_identity = optional(object({\n      resource_id = string\n    }), null)\n  })",
+        "required": false
+      },
+      {
+        "name": "lock",
+        "type": "object({\n    kind = string\n    name = optional(string, null)\n  })",
+        "required": false
+      },
+      {
+        "name": "role_assignments",
+        "type": "map(object({\n    role_definition_id_or_name             = string\n    principal_id                           = string\n    description                            = optional(string, null)\n    skip_service_principal_aad_check       = optional(bool, false)\n    condition                              = optional(string, null)\n    condition_version                      = optional(string, null)\n    delegated_managed_identity_resource_id = optional(string, null)\n    principal_type                         = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "description",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "location",
+        "type": "string",
+        "required": true
+      }
+    ],
+    "outputs": [
+      {
+        "name": "resource_id",
+        "description": "resourceId of the query",
+        "sensitive": false
+      }
+    ]
+  }
+}

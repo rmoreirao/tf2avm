@@ -1,0 +1,186 @@
+{
+  "module": {
+    "name": "avm-res-network-loadbalancer",
+    "display_name": "avm-res-network-loadbalancer",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-network-loadbalancer/azurerm/0.4.1",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-network-loadbalancer",
+    "version": "0.4.1",
+    "description": "Module to deploy load balancers in Azure.",
+    "resources": [
+      "azurerm_lb.this",
+      "azurerm_lb_backend_address_pool.this",
+      "azurerm_lb_backend_address_pool_address.this",
+      "azurerm_lb_nat_pool.this",
+      "azurerm_lb_nat_rule.this",
+      "azurerm_lb_outbound_rule.this",
+      "azurerm_lb_probe.this",
+      "azurerm_lb_rule.this",
+      "azurerm_management_lock.pip",
+      "azurerm_management_lock.this",
+      "azurerm_monitor_diagnostic_setting.pip",
+      "azurerm_monitor_diagnostic_setting.this",
+      "azurerm_network_interface_backend_address_pool_association.this",
+      "azurerm_public_ip.this",
+      "azurerm_role_assignment.pip",
+      "azurerm_role_assignment.this",
+      "modtm_telemetry.telemetry",
+      "random_uuid.telemetry",
+      "azurerm_client_config.telemetry",
+      "modtm_module_source.telemetry"
+    ],
+    "inputs": [
+      {
+        "name": "frontend_ip_configurations",
+        "type": "map(object({\n    name                                               = optional(string)\n    frontend_private_ip_address                        = optional(string)\n    frontend_private_ip_address_version                = optional(string)\n    frontend_private_ip_address_allocation             = optional(string, \"Dynamic\")\n    frontend_private_ip_subnet_resource_id             = optional(string)\n    gateway_load_balancer_frontend_ip_configuration_id = optional(string)\n    public_ip_address_resource_name                    = optional(string)\n    public_ip_address_resource_id                      = optional(string)\n    public_ip_prefix_resource_id                       = optional(string)\n    tags                              = optional(map(any), {})\n    create_public_ip_address          = optional(bool, false)\n    new_public_ip_resource_group_name = optional(string)\n    new_public_ip_location            = optional(string)\n    inherit_lock                      = optional(bool, true)\n    lock_type_if_not_inherited        = optional(string, null)\n    inherit_tags                      = optional(bool, true)\n    edge_zone                         = optional(string)\n    zones                             = optional(list(string), [\"1\", \"2\", \"3\"])\n\n    role_assignments = optional(map(object({\n      role_definition_id_or_name             = string\n      principal_id                           = string\n      description                            = optional(string, null)\n      skip_service_principal_aad_check       = optional(bool, false)\n      condition                              = optional(string, null)\n      condition_version                      = optional(string, null)\n      delegated_managed_identity_resource_id = optional(string, null)\n    })), {})\n\n    diagnostic_settings = optional(map(object({\n      name                                     = optional(string, null)\n      log_categories                           = optional(set(string), [])\n      log_groups                               = optional(set(string), [\"allLogs\"])\n      metric_categories                        = optional(set(string), [\"AllMetrics\"])\n      log_analytics_destination_type           = optional(string, \"Dedicated\")\n      workspace_resource_id                    = optional(string, null)\n      storage_account_resource_id              = optional(string, null)\n      event_hub_authorization_rule_resource_id = optional(string, null)\n      event_hub_name                           = optional(string, null)\n      marketplace_partner_resource_id          = optional(string, null)\n    })), {})\n  }))",
+        "required": true
+      },
+      {
+        "name": "backend_address_pool_addresses",
+        "type": "map(object({\n    name                             = optional(string)\n    backend_address_pool_object_name = optional(string)\n    ip_address                       = optional(string)\n    virtual_network_resource_id      = optional(string)\n  }))",
+        "required": false
+      },
+      {
+        "name": "backend_address_pools",
+        "type": "map(object({\n    name                        = optional(string, \"bepool-1\")\n    virtual_network_resource_id = optional(string)\n    tunnel_interfaces = optional(map(object({\n      identifier = optional(number)\n      type       = optional(string)\n      protocol   = optional(string)\n      port       = optional(number)\n    })), {})\n  }))",
+        "required": false
+      },
+      {
+        "name": "lb_outbound_rules",
+        "type": "map(object({\n    name                               = optional(string)\n    frontend_ip_configurations         = optional(list(object({ name = optional(string) })))\n    backend_address_pool_resource_id   = optional(string)\n    backend_address_pool_object_name   = optional(string)\n    protocol                           = optional(string, \"Tcp\")\n    enable_tcp_reset                   = optional(bool, false)\n    number_of_allocated_outbound_ports = optional(number, 1024)\n    idle_timeout_in_minutes            = optional(number, 4)\n  }))",
+        "required": false
+      },
+      {
+        "name": "lock",
+        "type": "object({\n    kind = string\n    name = optional(string, null)\n  })",
+        "required": false
+      },
+      {
+        "name": "public_ip_address_configuration",
+        "type": "object({\n    resource_group_name              = optional(string)\n    allocation_method                = optional(string, \"Static\")\n    ddos_protection_mode             = optional(string, \"VirtualNetworkInherited\")\n    ddos_protection_plan_resource_id = optional(string)\n    domain_name_label                = optional(string)\n    idle_timeout_in_minutes          = optional(number, 4)\n    ip_tags                          = optional(map(string))\n    ip_version                       = optional(string, \"IPv4\")\n    public_ip_prefix_resource_id     = optional(string)\n    reverse_fqdn                     = optional(string)\n    sku                              = optional(string, \"Standard\")\n    sku_tier                         = optional(string, \"Regional\")\n    tags                             = optional(map(any), {})\n  })",
+        "required": false
+      },
+      {
+        "name": "location",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "lb_nat_rules",
+        "type": "map(object({\n    name                             = optional(string)\n    frontend_ip_configuration_name   = optional(string)\n    protocol                         = optional(string)\n    frontend_port                    = optional(number)\n    backend_port                     = optional(number)\n    frontend_port_start              = optional(number)\n    frontend_port_end                = optional(number)\n    backend_address_pool_resource_id = optional(string)\n    backend_address_pool_object_name = optional(string)\n    idle_timeout_in_minutes          = optional(number, 4)\n    enable_floating_ip               = optional(bool, false)\n    enable_tcp_reset                 = optional(bool, false)\n  }))",
+        "required": false
+      },
+      {
+        "name": "lb_probes",
+        "type": "map(object({\n    name                            = optional(string)\n    protocol                        = optional(string, \"Tcp\")\n    port                            = optional(number, 80)\n    interval_in_seconds             = optional(number, 15)\n    probe_threshold                 = optional(number, 1)\n    request_path                    = optional(string)\n    number_of_probes_before_removal = optional(number, 2)\n  }))",
+        "required": false
+      },
+      {
+        "name": "role_assignments",
+        "type": "map(object({\n    role_definition_id_or_name             = string\n    principal_id                           = string\n    description                            = optional(string, null)\n    skip_service_principal_aad_check       = optional(bool, false)\n    condition                              = optional(string, null)\n    condition_version                      = optional(string, null)\n    delegated_managed_identity_resource_id = optional(string, null)\n    principal_type                         = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "sku",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "backend_address_pool_configuration",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "backend_address_pool_network_interfaces",
+        "type": "map(object({\n    backend_address_pool_object_name = optional(string)\n    ip_configuration_name            = optional(string)\n    network_interface_resource_id    = optional(string)\n  }))",
+        "required": false
+      },
+      {
+        "name": "edge_zone",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "frontend_subnet_resource_id",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "lb_rules",
+        "type": "map(object({\n    name                              = optional(string)\n    frontend_ip_configuration_name    = optional(string)\n    protocol                          = optional(string, \"Tcp\")\n    frontend_port                     = optional(number, 3389)\n    backend_port                      = optional(number, 3389)\n    backend_address_pool_resource_ids = optional(list(string))\n    backend_address_pool_object_names = optional(list(string))\n    probe_resource_id                 = optional(string)\n    probe_object_name                 = optional(string)\n    enable_floating_ip                = optional(bool, false)\n    idle_timeout_in_minutes           = optional(number, 4)\n    load_distribution                 = optional(string, \"Default\")\n    disable_outbound_snat             = optional(bool, false)\n    enable_tcp_reset                  = optional(bool, false)\n  }))",
+        "required": false
+      },
+      {
+        "name": "sku_tier",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "resource_group_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "diagnostic_settings",
+        "type": "map(object({\n    name                                     = optional(string, null)\n    log_categories                           = optional(set(string), [])\n    log_groups                               = optional(set(string), [\"allLogs\"])\n    metric_categories                        = optional(set(string), [\"AllMetrics\"])\n    log_analytics_destination_type           = optional(string, \"Dedicated\")\n    workspace_resource_id                    = optional(string, null)\n    storage_account_resource_id              = optional(string, null)\n    event_hub_authorization_rule_resource_id = optional(string, null)\n    event_hub_name                           = optional(string, null)\n    marketplace_partner_resource_id          = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "lb_nat_pools",
+        "type": "map(object({\n    name                           = optional(string)\n    frontend_ip_configuration_name = optional(string)\n    protocol                       = optional(string, \"Tcp\")\n    frontend_port_start            = optional(number, 3000)\n    frontend_port_end              = optional(number, 3389)\n    backend_port                   = optional(number, 3389)\n    idle_timeout_in_minutes        = optional(number, 4)\n    enable_floating_ip             = optional(bool, false)\n    enable_tcp_reset               = optional(bool, false)\n  }))",
+        "required": false
+      }
+    ],
+    "outputs": [
+      {
+        "name": "resource",
+        "description": "Outputs the entire Azure Load Balancer resource",
+        "sensitive": false
+      },
+      {
+        "name": "resource_id",
+        "description": "Outputs the entire Azure Load Balancer resource",
+        "sensitive": false
+      },
+      {
+        "name": "azurerm_lb",
+        "description": "Outputs the entire Azure Load Balancer resource",
+        "sensitive": false
+      },
+      {
+        "name": "azurerm_lb_backend_address_pool",
+        "description": "Outputs each backend address pool in its entirety",
+        "sensitive": false
+      },
+      {
+        "name": "azurerm_lb_nat_rule",
+        "description": "Outputs each NAT rule in its entirety",
+        "sensitive": false
+      },
+      {
+        "name": "azurerm_public_ip",
+        "description": "Outputs each Public IP Address resource in its entirety",
+        "sensitive": false
+      },
+      {
+        "name": "name",
+        "description": "Outputs the entire Azure Load Balancer resource",
+        "sensitive": false
+      }
+    ]
+  }
+}

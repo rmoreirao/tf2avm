@@ -1,0 +1,613 @@
+{
+  "module": {
+    "name": "avm-res-azurestackhci-cluster",
+    "display_name": "avm-res-azurestackhci-cluster",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-azurestackhci-cluster/azurerm/2.0.2",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-azurestackhci-cluster",
+    "version": "2.0.2",
+    "description": "Module to provision azure stack hci.",
+    "resources": [
+      "azapi_resource.cluster",
+      "azapi_resource.validatedeploymentsetting",
+      "azapi_update_resource.deploymentsetting",
+      "azurerm_key_vault.deployment_keyvault",
+      "azurerm_key_vault_secret.azure_stack_lcm_user_credential",
+      "azurerm_key_vault_secret.default_arb_application",
+      "azurerm_key_vault_secret.local_admin_credential",
+      "azurerm_key_vault_secret.witness_storage_key",
+      "azurerm_management_lock.this",
+      "azurerm_role_assignment.machine_role_assign",
+      "azurerm_role_assignment.service_principal_role_assign",
+      "azurerm_role_assignment.this",
+      "azurerm_storage_account.witness",
+      "modtm_telemetry.telemetry",
+      "random_integer.random_suffix",
+      "random_uuid.telemetry",
+      "azapi_resource.arc_settings",
+      "azapi_resource.arcbridge",
+      "azapi_resource.customlocation",
+      "azapi_resource_list.user_storages",
+      "azuread_service_principal.hci_rp",
+      "azurerm_arc_machine.arcservers",
+      "azurerm_client_config.current",
+      "azurerm_client_config.telemetry",
+      "azurerm_key_vault.key_vault",
+      "azurerm_storage_account.witness",
+      "modtm_module_source.telemetry"
+    ],
+    "inputs": [
+      {
+        "name": "resource_group_id",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "account_replication_type",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "compute_traffic_type",
+        "type": "list(string)",
+        "required": false
+      },
+      {
+        "name": "local_admin_credential_content_type",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "ending_address",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "azure_stack_lcm_user_credential_expiration_date",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "create_hci_rp_role_assignments",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "min_tls_version",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "override_qos_policy",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "storage_override_adapter_property",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "storage_override_qos_policy",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "storage_rdma_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "keyvault_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "allow_nested_items_to_be_public",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "create_key_vault",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "drtm_protection",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "keyvault_secrets",
+        "type": "list(object({\n    eceSecretName = string\n    secretSuffix  = string\n  }))",
+        "required": false
+      },
+      {
+        "name": "local_admin_credential_expiration_date",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "random_suffix",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "side_channel_mitigation_enforced",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "compute_qos_policy_overrides",
+        "type": "object({\n    priorityValue8021Action_SMB     = string\n    priorityValue8021Action_Cluster = string\n    bandwidthPercentage_SMB         = string\n  })",
+        "required": false
+      },
+      {
+        "name": "drift_control_enforced",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "hvci_protection",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "smb_cluster_encryption",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "storage_rdma_jumbo_packet",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "subnet_mask",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "witness_storage_key_content_type",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "witness_storage_key_expiration_date",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "azure_stack_lcm_user_credential_tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "deployment_user_password",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "site_id",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "create_witness_storage_account",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "storage_qos_policy_overrides",
+        "type": "object({\n    priorityValue8021Action_SMB     = string\n    priorityValue8021Action_Cluster = string\n    bandwidthPercentage_SMB         = string\n  })",
+        "required": false
+      },
+      {
+        "name": "use_legacy_key_vault_model",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "dns_servers",
+        "type": "list(string)",
+        "required": true
+      },
+      {
+        "name": "default_arb_application_tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "rp_service_principal_object_id",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "storage_rdma_protocol",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "witness_storage_key_tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "witness_type",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "cluster_name",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "compute_rdma_jumbo_packet",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "default_arb_application_content_type",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "default_arb_application_expiration_date",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "keyvault_soft_delete_retention_days",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "lock",
+        "type": "object({\n    kind = string\n    name = optional(string, null)\n  })",
+        "required": false
+      },
+      {
+        "name": "secrets_location",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "service_principal_secret",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "starting_address",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "bitlocker_data_volumes",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "compute_override_adapter_property",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "compute_override_qos_policy",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "naming_prefix",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "qos_policy_overrides",
+        "type": "object({\n    priorityValue8021Action_SMB     = string\n    priorityValue8021Action_Cluster = string\n    bandwidthPercentage_SMB         = string\n  })",
+        "required": false
+      },
+      {
+        "name": "smb_signing_enforced",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "cross_tenant_replication_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "deployment_configuration_version",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "key_vault_location",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "azure_service_endpoint",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "compute_rdma_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "operation_type",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "rdma_protocol",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "adou_path",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "eu_location",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "intent_name",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "rdma_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "storage_connectivity_switchless",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "storage_traffic_type",
+        "type": "list(string)",
+        "required": false
+      },
+      {
+        "name": "service_principal_id",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "key_vault_resource_group",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "witness_storage_account_resource_group_name",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "deployment_user",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "configuration_mode",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "local_admin_credential_tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "rdma_jumbo_packet",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "storage_intent_name",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "wdac_enforced",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "bitlocker_boot_volume",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "local_admin_password",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "servers",
+        "type": "list(object({\n    name        = string\n    ipv4Address = string\n  }))",
+        "required": true
+      },
+      {
+        "name": "compute_intent_name",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "storage_adapter_ip_info",
+        "type": "map(list(object({\n    physicalNode = string\n    ipv4Address  = string\n    subnetMask   = string\n  })))",
+        "required": false
+      },
+      {
+        "name": "tenant_id",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "default_gateway",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "cluster_tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "is_exported",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "resource_group_location",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "custom_location_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "compute_rdma_protocol",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "keyvault_purge_protection_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "keyvault_tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "management_adapters",
+        "type": "list(string)",
+        "required": false
+      },
+      {
+        "name": "role_assignments",
+        "type": "map(object({\n    role_definition_id_or_name             = string\n    principal_id                           = string\n    description                            = optional(string, null)\n    skip_service_principal_aad_check       = optional(bool, false)\n    condition                              = optional(string, null)\n    condition_version                      = optional(string, null)\n    delegated_managed_identity_resource_id = optional(string, null)\n    principal_type                         = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "witness_storage_account_name",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "domain_fqdn",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "override_adapter_property",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "storage_networks",
+        "type": "list(object({\n    name               = string\n    networkAdapterName = string\n    vlanId             = string\n  }))",
+        "required": false
+      },
+      {
+        "name": "storage_tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "traffic_type",
+        "type": "list(string)",
+        "required": false
+      },
+      {
+        "name": "witness_path",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "credential_guard_enforced",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "azure_stack_lcm_user_credential_content_type",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "local_admin_user",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "location",
+        "type": "string",
+        "required": true
+      }
+    ],
+    "outputs": [
+      {
+        "name": "resource_id",
+        "description": "This is the full output for the resource.",
+        "sensitive": false
+      },
+      {
+        "name": "user_storages",
+        "description": "User storage instances after HCI connected.",
+        "sensitive": false
+      },
+      {
+        "name": "v_switch_name",
+        "description": "The name of the virtual switch that is used by the network.",
+        "sensitive": false
+      },
+      {
+        "name": "arc_settings",
+        "description": "Arc settings instance after HCI connected.",
+        "sensitive": false
+      },
+      {
+        "name": "arcbridge",
+        "description": "Arc resource bridge instance after HCI connected.",
+        "sensitive": false
+      },
+      {
+        "name": "cluster",
+        "description": "HCI Cluster instance",
+        "sensitive": false
+      },
+      {
+        "name": "customlocation",
+        "description": "Custom location instance after HCI connected.",
+        "sensitive": false
+      },
+      {
+        "name": "keyvault",
+        "description": "Keyvault instance that stores deployment secrets.",
+        "sensitive": false
+      }
+    ]
+  }
+}

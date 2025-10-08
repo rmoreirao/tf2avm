@@ -1,0 +1,174 @@
+{
+  "module": {
+    "name": "avm-res-network-expressroutecircuit",
+    "display_name": "Azure ExpressRoute Circuit",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-network-expressroutecircuit/azurerm/0.3.2",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-network-expressroutecircuit",
+    "version": "0.3.2",
+    "description": "Terraform Azure Verified Resource Module for ExpressRoute Circuit",
+    "resources": [
+      "azurerm_express_route_circuit.this",
+      "azurerm_express_route_circuit_authorization.this",
+      "azurerm_express_route_circuit_connection.this",
+      "azurerm_express_route_circuit_peering.this",
+      "azurerm_express_route_connection.this",
+      "azurerm_management_lock.this",
+      "azurerm_monitor_diagnostic_setting.this",
+      "azurerm_role_assignment.this",
+      "azurerm_virtual_network_gateway_connection.this",
+      "modtm_telemetry.telemetry",
+      "random_uuid.telemetry",
+      "azapi_client_config.telemetry",
+      "modtm_module_source.telemetry"
+    ],
+    "inputs": [
+      {
+        "name": "location",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "bandwidth_in_gbps",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "peering_location",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "vnet_gw_connections",
+        "type": "map(object({\n    name                                = optional(string, \"\")\n    resource_group_name                 = string\n    location                            = string\n    virtual_network_gateway_resource_id = string\n    authorization_key                   = optional(string, null)\n    routing_weight                      = optional(number, 0)\n    express_route_gateway_bypass        = optional(bool, false)\n    private_link_fast_path_enabled      = optional(bool, false)\n    shared_key                          = optional(string, null)\n    tags                                = optional(map(string), null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "sku",
+        "type": "object({\n    tier   = string\n    family = string\n  })",
+        "required": true
+      },
+      {
+        "name": "diagnostic_settings",
+        "type": "map(object({\n    name                                     = optional(string, null)\n    log_categories                           = optional(set(string), [])\n    log_groups                               = optional(set(string), [\"allLogs\"])\n    metric_categories                        = optional(set(string), [\"AllMetrics\"])\n    log_analytics_destination_type           = optional(string, \"Dedicated\")\n    workspace_resource_id                    = optional(string, null)\n    storage_account_resource_id              = optional(string, null)\n    event_hub_authorization_rule_resource_id = optional(string, null)\n    event_hub_name                           = optional(string, null)\n    marketplace_partner_resource_id          = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "express_route_port_resource_id",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "exr_circuit_tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "lock",
+        "type": "object({\n    kind = string\n    name = optional(string, null)\n  })",
+        "required": false
+      },
+      {
+        "name": "service_provider_name",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "allow_classic_operations",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "circuit_connections",
+        "type": "map(object({\n    name                     = string\n    peer_resource_id         = optional(string, null)\n    peer_map_key             = optional(string, null)\n    peer_peering_resource_id = string\n    address_prefix_ipv4      = string\n    authorization_key        = optional(string, null)\n    address_prefix_ipv6      = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "er_gw_connections",
+        "type": "map(object({\n    name                                      = optional(string, \"\")\n    express_route_circuit_peering_resource_id = optional(string, null)\n    peering_map_key                           = optional(string, null)\n    express_route_gateway_resource_id         = string\n    authorization_key                         = optional(string, null)\n    enable_internet_security                  = optional(bool, false)\n    express_route_gateway_bypass_enabled      = optional(bool, false)\n    routing_weight                            = optional(number, 0)\n    routing = optional(object({\n      associated_route_table_resource_id = optional(string)\n      inbound_route_map_resource_id      = optional(string)\n      outbound_route_map_resource_id     = optional(string)\n      propagated_route_table = object({\n        labels                   = optional(list(string), null)\n        route_table_resource_ids = optional(list(string), null)\n      })\n    }), null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "express_route_circuit_authorizations",
+        "type": "map(object({\n    name = string\n  }))",
+        "required": false
+      },
+      {
+        "name": "peerings",
+        "type": "map(object({\n    peering_type                  = string\n    vlan_id                       = number\n    primary_peer_address_prefix   = optional(string, null)\n    secondary_peer_address_prefix = optional(string, null)\n    ipv4_enabled                  = optional(bool, true)\n    shared_key                    = optional(string, null)\n    peer_asn                      = optional(number, null)\n    route_filter_resource_id      = optional(string, null)\n    microsoft_peering_config = optional(object({\n      advertised_public_prefixes = list(string)\n      customer_asn               = optional(number, null)\n      routing_registry_name      = optional(string, \"NONE\")\n      advertised_communities     = optional(list(string), null)\n    }), null)\n    ipv6 = optional(object({\n      primary_peer_address_prefix   = string\n      secondary_peer_address_prefix = string\n      enabled                       = optional(bool, true)\n      route_filter_resource_id      = optional(string, null)\n      microsoft_peering = optional(object({\n        advertised_public_prefixes = optional(list(string))\n        customer_asn               = optional(number, null)\n        routing_registry_name      = optional(string, \"NONE\")\n        advertised_communities     = optional(list(string), null)\n      }), null)\n    }), null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "resource_group_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "authorization_key",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "bandwidth_in_mbps",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "role_assignments",
+        "type": "map(object({\n    role_definition_id_or_name             = string\n    principal_id                           = string\n    description                            = optional(string, null)\n    skip_service_principal_aad_check       = optional(bool, false)\n    condition                              = optional(string, null)\n    condition_version                      = optional(string, null)\n    delegated_managed_identity_resource_id = optional(string, null)\n    principal_type                         = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "tags",
+        "type": "map(string)",
+        "required": false
+      }
+    ],
+    "outputs": [
+      {
+        "name": "name",
+        "description": "The resource name of the ExpressRoute circuit.",
+        "sensitive": false
+      },
+      {
+        "name": "peerings",
+        "description": "ExpressRoute Circuit peering configurations.",
+        "sensitive": false
+      },
+      {
+        "name": "resource_id",
+        "description": "The resource ID of the ExpressRoute circuit.",
+        "sensitive": false
+      },
+      {
+        "name": "virtual_network_gateway_connections",
+        "description": "Virtual network gateway connections.",
+        "sensitive": false
+      },
+      {
+        "name": "authorization_keys",
+        "description": "Authorization keys for the ExpressRoute circuit.",
+        "sensitive": false
+      },
+      {
+        "name": "authorization_used_status",
+        "description": "Authorization used status.",
+        "sensitive": false
+      },
+      {
+        "name": "express_route_gateway_connections",
+        "description": "ExpressRoute gateway connections.",
+        "sensitive": false
+      }
+    ]
+  }
+}

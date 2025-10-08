@@ -1,0 +1,149 @@
+{
+  "module": {
+    "name": "avm-res-network-publicipaddress",
+    "display_name": "avm-res-network-publicipaddress",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-network-publicipaddress/azurerm/0.2.0",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-network-publicipaddress",
+    "version": "0.2.0",
+    "description": "Repository for 'Public IP address' AVM module",
+    "resources": [
+      "random_uuid.telemetry",
+      "modtm_telemetry.telemetry",
+      "azurerm_public_ip.this",
+      "azurerm_management_lock.this",
+      "azurerm_role_assignment.this",
+      "azurerm_monitor_diagnostic_setting.this",
+      "azurerm_client_config.telemetry",
+      "modtm_module_source.telemetry"
+    ],
+    "inputs": [
+      {
+        "name": "diagnostic_settings",
+        "type": "map(object({\n    name                                     = optional(string, null)\n    log_categories                           = optional(set(string), [])\n    log_groups                               = optional(set(string), [\"allLogs\"])\n    metric_categories                        = optional(set(string), [\"AllMetrics\"])\n    log_analytics_destination_type           = optional(string, \"Dedicated\")\n    workspace_resource_id                    = optional(string, null)\n    storage_account_resource_id              = optional(string, null)\n    event_hub_authorization_rule_resource_id = optional(string, null)\n    event_hub_name                           = optional(string, null)\n    marketplace_partner_resource_id          = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "domain_name_label",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "idle_timeout_in_minutes",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "public_ip_prefix_id",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "sku_tier",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "ddos_protection_mode",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "ip_tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "lock",
+        "type": "object({\n    kind = string\n    name = optional(string, null)\n  })",
+        "required": false
+      },
+      {
+        "name": "reverse_fqdn",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "resource_group_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "ddos_protection_plan_id",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "edge_zone",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "role_assignments",
+        "type": "map(object({\n    role_definition_id_or_name             = string\n    principal_id                           = string\n    description                            = optional(string, null)\n    skip_service_principal_aad_check       = optional(bool, false)\n    condition                              = optional(string, null)\n    condition_version                      = optional(string, null)\n    delegated_managed_identity_resource_id = optional(string, null)\n    principal_type                         = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "ip_version",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "sku",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "zones",
+        "type": "set(number)",
+        "required": false
+      },
+      {
+        "name": "location",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "allocation_method",
+        "type": "string",
+        "required": false
+      }
+    ],
+    "outputs": [
+      {
+        "name": "name",
+        "description": "The name of the created public IP address",
+        "sensitive": false
+      },
+      {
+        "name": "public_ip_address",
+        "description": "The assigned IP address of the public IP",
+        "sensitive": false
+      },
+      {
+        "name": "public_ip_id",
+        "description": "The ID of the created public IP address",
+        "sensitive": false
+      },
+      {
+        "name": "resource_id",
+        "description": "The ID of the created public IP address",
+        "sensitive": false
+      }
+    ]
+  }
+}

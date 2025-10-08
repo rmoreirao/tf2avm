@@ -1,0 +1,185 @@
+{
+  "module": {
+    "name": "avm-res-web-staticsite",
+    "display_name": "AVM Terraform module for Azure Static Web Apps",
+    "version": "0.6.2",
+    "description": "Module to deploy Static Web Apps in Azure. Note: After the Static Site is provisioned, you must associate the target repository containing your web app to the Static Site (see Azure Static Site documentation). This may involve manual configuration of the YAML for GitHub Actions workflow.",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-web-staticsite/azurerm/0.6.2",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-web-staticsite",
+    "resources": [
+      "azurerm_static_web_app.this",
+      "azapi_update_resource.this",
+      "azurerm_dns_cname_record.this",
+      "azurerm_private_endpoint.this",
+      "azurerm_private_endpoint.this_unmanaged_dns_zone_groups",
+      "azurerm_role_assignment.this",
+      "random_uuid.telemetry",
+      "modtm_telemetry.telemetry",
+      "azurerm_static_web_app_custom_domain.this",
+      "azurerm_dns_txt_record.this",
+      "azurerm_management_lock.this",
+      "azurerm_management_lock.pe",
+      "azurerm_private_endpoint_application_security_group_association.this",
+      "azurerm_role_assignment.pe"
+    ],
+    "inputs": [
+      {
+        "name": "name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "location",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "resource_group_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "all_child_resources_inherit_lock",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "branch",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "configuration_file_changes_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "basic_auth_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "private_endpoints_manage_dns_zone_group",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "role_assignments",
+        "type": "map(object({\n    role_definition_id_or_name             = string\n    principal_id                           = string\n    description                            = optional(string, null)\n    skip_service_principal_aad_check       = optional(bool, false)\n    condition                              = optional(string, null)\n    condition_version                      = optional(string, null)\n    delegated_managed_identity_resource_id = optional(string, null)\n    principal_type                         = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "sku_tier",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "all_child_resources_inherit_tags",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "app_settings",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "basic_auth",
+        "type": "object({\n    password     = string\n    environments = string\n  })",
+        "required": false
+      },
+      {
+        "name": "lock",
+        "type": "object({\n    kind = string\n    name = optional(string, null)\n  })",
+        "required": false
+      },
+      {
+        "name": "managed_identities",
+        "type": "object({\n    system_assigned            = optional(bool, false)\n    user_assigned_resource_ids = optional(set(string), [])\n  })",
+        "required": false
+      },
+      {
+        "name": "private_endpoints_inherit_lock",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "repository_url",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "custom_domains",
+        "type": "map(object({\n    resource_group_name = optional(string)\n    domain_name         = optional(string)\n    ttl                 = optional(number, 300)\n    validation_type     = optional(string, \"cname-delegation\")\n\n    create_cname_records     = optional(bool, false)\n    cname_name               = optional(string)\n    cname_zone_name          = optional(string)\n    cname_record             = optional(string)\n    cname_target_resource_id = optional(string)\n\n    create_txt_records = optional(bool, false)\n    txt_name           = optional(string)\n    txt_zone_name      = optional(string)\n    txt_records        = optional(map(object({ value = string })))\n  }))",
+        "required": false
+      },
+      {
+        "name": "preview_environments_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "private_endpoints",
+        "type": "map(object({\n    name = optional(string, null)\n    role_assignments = optional(map(object({\n      role_definition_id_or_name             = string\n      principal_id                           = string\n      description                            = optional(string, null)\n      skip_service_principal_aad_check       = optional(bool, false)\n      condition                              = optional(string, null)\n      condition_version                      = optional(string, null)\n      delegated_managed_identity_resource_id = optional(string, null)\n      principal_type                         = optional(string, null)\n    })), {})\n    lock = optional(object({\n      kind = string\n      name = optional(string, null)\n    }), null)\n    tags                                    = optional(map(string), null)\n    subnet_resource_id                      = string\n    private_dns_zone_group_name             = optional(string, \"default\")\n    private_dns_zone_resource_ids           = optional(set(string), [])\n    application_security_group_associations = optional(map(string), {})\n    private_service_connection_name         = optional(string, null)\n    network_interface_name                  = optional(string, null)\n    location                                = optional(string, null)\n    resource_group_name                     = optional(string, null)\n    ip_configurations = optional(map(object({\n      name               = string\n      private_ip_address = string\n    })), {})\n  }))",
+        "required": false
+      },
+      {
+        "name": "public_network_access_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "sku_size",
+        "type": "string",
+        "required": false
+      }
+    ],
+    "outputs": [
+      {
+        "name": "name",
+        "description": "The name of the static web app.",
+        "sensitive": false
+      },
+      {
+        "name": "resource",
+        "description": "This is the full output for the resource.",
+        "sensitive": false
+      },
+      {
+        "name": "resource_id",
+        "description": "The ID of the static web app.",
+        "sensitive": false
+      },
+      {
+        "name": "resource_private_endpoints",
+        "description": "A map of private endpoints. The map key is the supplied input to var.private_endpoints. The map value is the entire azurerm_private_endpoint resource.",
+        "sensitive": false
+      },
+      {
+        "name": "resource_uri",
+        "description": "The default hostname of the static web app.",
+        "sensitive": false
+      },
+      {
+        "name": "api_key",
+        "description": "The API key of this static web app.",
+        "sensitive": false
+      },
+      {
+        "name": "domains",
+        "description": "The domains of this static web app.",
+        "sensitive": false
+      }
+    ]
+  }
+}

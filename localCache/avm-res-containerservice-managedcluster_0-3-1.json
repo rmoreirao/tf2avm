@@ -1,0 +1,400 @@
+{
+  "module": {
+    "name": "avm-res-containerservice-managedcluster",
+    "display_name": "Terraform Azure Verified Resource Module for AKS managed clusters",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-containerservice-managedcluster/azurerm/0.3.1",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-containerservice-managedcluster",
+    "version": "0.3.1",
+    "description": "Terraform Azure Verified Resource Module for AKS managed clusters",
+    "resources": [
+      "azurerm_monitor_diagnostic_setting.this",
+      "azurerm_private_endpoint.this_managed_dns_zone_groups",
+      "azurerm_private_endpoint.this_unmanaged_dns_zone_groups",
+      "azurerm_private_endpoint_application_security_group_association.this",
+      "terraform_data.kubernetes_version_keeper",
+      "azapi_update_resource.aks_cluster_post_create",
+      "terraform_data.http_proxy_config_no_proxy_keeper",
+      "azapi_update_resource.aks_cluster_http_proxy_config_no_proxy",
+      "random_uuid.telemetry",
+      "modtm_telemetry.telemetry",
+      "azurerm_kubernetes_cluster.this",
+      "azurerm_management_lock.this",
+      "azurerm_role_assignment.this",
+      "random_string.dns_prefix"
+    ],
+    "inputs": [
+      {
+        "name": "create_nodepools_before_destroy",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "windows_profile",
+        "type": "object({\n    admin_username = string\n    license        = optional(string)\n    gmsa = optional(object({\n      root_domain = string\n      dns_server  = string\n    }))\n  })",
+        "required": false
+      },
+      {
+        "name": "private_cluster_public_fqdn_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "storage_profile",
+        "type": "object({\n    blob_driver_enabled         = optional(bool),\n    disk_driver_enabled         = optional(bool),\n    file_driver_enabled         = optional(bool),\n    snapshot_controller_enabled = optional(bool)\n  })",
+        "required": false
+      },
+      {
+        "name": "default_node_pool",
+        "type": "object({\n    name                          = string\n    vm_size                       = string\n    capacity_reservation_group_id = optional(string)\n    auto_scaling_enabled          = optional(bool, false)\n    host_encryption_enabled       = optional(bool)\n    node_public_ip_enabled        = optional(bool)\n    gpu_instance                  = optional(string)\n    host_group_id                 = optional(string)\n    fips_enabled                  = optional(bool)\n    kubelet_disk_type             = optional(string)\n    max_pods                      = optional(number)\n    node_public_ip_prefix_id      = optional(string)\n    node_labels                   = optional(map(string))\n    only_critical_addons_enabled  = optional(string)\n    orchestrator_version          = optional(string)\n    os_disk_size_gb               = optional(string)\n    os_disk_type                  = optional(string)\n    os_sku                        = optional(string)\n    pod_subnet_id                 = optional(string)\n    proximity_placement_group_id  = optional(string)\n    scale_down_mode               = optional(string)\n    snapshot_id                   = optional(string)\n    temporary_name_for_rotation   = optional(string)\n    type                          = optional(string, \"VirtualMachineScaleSets\")\n    tags                          = optional(map(string))\n    ultra_ssd_enabled             = optional(bool)\n    vnet_subnet_id                = optional(string)\n    workload_runtime              = optional(string)\n    zones                         = optional(list(string))\n    max_count                     = optional(number)\n    min_count                     = optional(number)\n    node_count                    = optional(number)\n    kubelet_config = optional(object({\n      cpu_manager_policy        = optional(string)\n      cpu_cfs_quota_enabled     = optional(bool, true)\n      cpu_cfs_quota_period      = optional(string)\n      image_gc_high_threshold   = optional(number)\n      image_gc_low_threshold    = optional(number)\n      topology_manager_policy   = optional(string)\n      allowed_unsafe_sysctls    = optional(set(string))\n      container_log_max_size_mb = optional(number)\n      container_log_max_line    = optional(number)\n      pod_max_pid               = optional(number)\n    }))\n    linux_os_config = optional(object({\n      sysctl_config = optional(object({\n        fs_aio_max_nr                      = optional(number)\n        fs_file_max                        = optional(number)\n        fs_inotify_max_user_watches        = optional(number)\n        fs_nr_open                         = optional(number)\n        kernel_threads_max                 = optional(number)\n        net_core_netdev_max_backlog        = optional(number)\n        net_core_optmem_max                = optional(number)\n        net_core_rmem_default              = optional(number)\n        net_core_rmem_max                  = optional(number)\n        net_core_somaxconn                 = optional(number)\n        net_core_wmem_default              = optional(number)\n        net_core_wmem_max                  = optional(number)\n        net_ipv4_ip_local_port_range_min   = optional(number)\n        net_ipv4_ip_local_port_range_max   = optional(number)\n        net_ipv4_neigh_default_gc_thresh1  = optional(number)\n        net_ipv4_neigh_default_gc_thresh2  = optional(number)\n        net_ipv4_neigh_default_gc_thresh3  = optional(number)\n        net_ipv4_tcp_fin_timeout           = optional(number)\n        net_ipv4_tcp_keepalive_intvl       = optional(number)\n        net_ipv4_tcp_keepalive_probes      = optional(number)\n        net_ipv4_tcp_keepalive_time        = optional(number)\n        net_ipv4_tcp_max_syn_backlog       = optional(number)\n        net_ipv4_tcp_max_tw_buckets        = optional(number)\n        net_ipv4_tcp_tw_reuse              = optional(bool)\n        net_netfilter_nf_conntrack_buckets = optional(number)\n        net_netfilter_nf_conntrack_max     = optional(number)\n        vm_max_map_count                   = optional(number)\n        vm_swappiness                      = optional(number)\n        vm_vfs_cache_pressure              = optional(number)\n      }))\n\n      transparent_huge_page_enabled = optional(string)\n      transparent_huge_page_defrag  = optional(string)\n      swap_file_size_mb             = optional(number)\n    }))\n    node_network_profile = optional(object({\n      application_security_group_ids = optional(list(string))\n      node_public_ip_tags            = optional(map(string))\n      allowed_host_ports = optional(list(object({\n        port_end   = optional(number)\n        port_start = optional(number)\n        protocol   = optional(string)\n      })))\n    }))\n    upgrade_settings = optional(object({\n      drain_timeout_in_minutes      = optional(number)\n      node_soak_duration_in_minutes = optional(number)\n      max_surge                     = string\n    }))\n\n  })",
+        "required": true
+      },
+      {
+        "name": "api_server_access_profile",
+        "type": "object({\n    authorized_ip_ranges = optional(set(string))\n  })",
+        "required": false
+      },
+      {
+        "name": "confidential_computing",
+        "type": "object({\n    sgx_quote_helper_enabled = bool\n  })",
+        "required": false
+      },
+      {
+        "name": "private_endpoints_manage_dns_zone_group",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "auto_scaler_profile",
+        "type": "object({\n    balance_similar_node_groups                   = optional(string)\n    daemonset_eviction_for_empty_nodes_enabled    = optional(string)\n    daemonset_eviction_for_occupied_nodes_enabled = optional(string)\n    empty_bulk_delete_max                         = optional(string)\n    expander                                      = optional(string)\n    ignore_daemonsets_utilization_enabled         = optional(string)\n    max_graceful_termination_sec                  = optional(string)\n    max_node_provisioning_time                    = optional(string)\n    max_unready_nodes                             = optional(string)\n    max_unready_percentage                        = optional(string)\n    new_pod_scale_up_delay                        = optional(string)\n    scale_down_delay_after_add                    = optional(string)\n    scale_down_delay_after_delete                 = optional(string)\n    scale_down_delay_after_failure                = optional(string)\n    scale_down_unneeded                           = optional(string)\n    scale_down_unready                            = optional(string)\n    scale_down_utilization_threshold              = optional(string)\n    scan_interval                                 = optional(string)\n    skip_nodes_with_local_storage                 = optional(string)\n    skip_nodes_with_system_pods                   = optional(string)\n  })",
+        "required": false
+      },
+      {
+        "name": "edge_zone",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "kubernetes_version",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "maintenance_window",
+        "type": "object({\n    allowed = object({\n      day   = string\n      hours = set(number)\n    })\n    not_allowed = object({\n      start = string\n      end   = string\n    })\n  })",
+        "required": false
+      },
+      {
+        "name": "maintenance_window_auto_upgrade",
+        "type": "object({\n    frequency    = string\n    interval     = string\n    duration     = number\n    day_of_week  = optional(string)\n    day_of_month = optional(number)\n    week_index   = optional(string)\n    start_time   = optional(string)\n    utc_offset   = optional(string)\n    start_date   = optional(string)\n    not_allowed = optional(object({\n      start = string\n      end   = string\n    }))\n  })",
+        "required": false
+      },
+      {
+        "name": "windows_profile_password",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "workload_autoscaler_profile",
+        "type": "object({\n    keda_enabled = optional(bool)\n    vpa_enabled  = optional(bool)\n  })",
+        "required": false
+      },
+      {
+        "name": "http_application_routing_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "linux_profile",
+        "type": "object({\n    admin_username = string\n    ssh_key        = string\n  })",
+        "required": false
+      },
+      {
+        "name": "monitor_metrics",
+        "type": "object({\n    annotations_allowed = optional(string)\n    labels_allowed      = optional(string)\n  })",
+        "required": false
+      },
+      {
+        "name": "node_os_channel_upgrade",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "oidc_issuer_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "disk_encryption_set_id",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "key_vault_secrets_provider",
+        "type": "object({\n    secret_rotation_enabled  = optional(bool)\n    secret_rotation_interval = optional(string)\n  })",
+        "required": false
+      },
+      {
+        "name": "tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "azure_active_directory_role_based_access_control",
+        "type": "object({\n    tenant_id              = optional(string)\n    admin_group_object_ids = optional(list(string))\n    azure_rbac_enabled     = optional(bool)\n  })",
+        "required": false
+      },
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "run_command_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "service_mesh_profile",
+        "type": "object({\n    mode                             = string\n    internal_ingress_gateway_enabled = optional(bool)\n    external_ingress_gateway_enabled = optional(bool)\n    revisions                        = optional(list(string), [])\n    certificate_authority = optional(object({\n      key_vault_id           = string\n      root_cert_object_name  = string\n      cert_chain_object_name = string\n      cert_object_name       = string\n      key_object_name        = string\n    }))\n  })",
+        "required": false
+      },
+      {
+        "name": "support_plan",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "workload_identity_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "http_proxy_config",
+        "type": "object({\n    http_proxy  = optional(string)\n    https_proxy = optional(string)\n    no_proxy    = optional(set(string))\n    trusted_ca  = optional(string)\n  })",
+        "required": false
+      },
+      {
+        "name": "private_dns_zone_id",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "azure_policy_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "image_cleaner_interval_hours",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "kubernetes_cluster_timeouts",
+        "type": "object({\n    create = optional(string)\n    delete = optional(string)\n    read   = optional(string)\n    update = optional(string)\n  })",
+        "required": false
+      },
+      {
+        "name": "node_pools",
+        "type": "map(object({\n    name                          = string\n    vm_size                       = string\n    capacity_reservation_group_id = optional(string)\n    auto_scaling_enabled          = optional(bool, false)\n    max_count                     = optional(number)\n    min_count                     = optional(number)\n    node_count                    = optional(number)\n    host_encryption_enabled       = optional(bool)\n    node_public_ip_enabled        = optional(bool)\n    eviction_policy               = optional(string)\n    host_group_id                 = optional(string)\n    fips_enabled                  = optional(bool)\n    gpu_instance                  = optional(string)\n    gpu_driver                    = optional(string)\n    kubelet_disk_type             = optional(string)\n    max_pods                      = optional(number)\n    mode                          = optional(string)\n    node_network_profile = optional(object({\n      allowed_host_ports = optional(list(object({\n        port_start = optional(number)\n        port_end   = optional(number)\n        protocol   = optional(string)\n      })))\n      application_security_group_ids = optional(list(string))\n      node_public_ip_tags            = optional(map(string))\n    }))\n    node_labels                  = optional(map(string))\n    node_public_ip_prefix_id     = optional(string)\n    node_taints                  = optional(list(string))\n    orchestrator_version         = optional(string)\n    os_disk_size_gb              = optional(number)\n    os_disk_type                 = optional(string)\n    os_sku                       = optional(string)\n    os_type                      = optional(string)\n    pod_subnet_id                = optional(string)\n    priority                     = optional(string)\n    proximity_placement_group_id = optional(string)\n    spot_max_price               = optional(string)\n    snapshot_id                  = optional(string)\n    tags                         = optional(map(string))\n    scale_down_mode              = optional(string)\n    ultra_ssd_enabled            = optional(bool)\n    vnet_subnet_id               = optional(string)\n    zones                        = optional(list(string))\n    temporary_name_for_rotation  = optional(string)\n    workload_runtime             = optional(string)\n    windows_profile = optional(object({\n      outbound_nat_enabled = optional(bool)\n    }))\n    upgrade_settings = optional(object({\n      drain_timeout_in_minutes      = optional(number)\n      node_soak_duration_in_minutes = optional(number)\n      max_surge                     = string\n    }))\n\n    kubelet_config = optional(object({\n      cpu_manager_policy        = optional(string)\n      cpu_cfs_quota_enabled     = optional(bool, true)\n      cpu_cfs_quota_period      = optional(string)\n      image_gc_high_threshold   = optional(number)\n      image_gc_low_threshold    = optional(number)\n      topology_manager_policy   = optional(string)\n      allowed_unsafe_sysctls    = optional(set(string))\n      container_log_max_size_mb = optional(number)\n      container_log_max_line    = optional(number)\n      pod_max_pid               = optional(number)\n    }))\n    linux_os_config = optional(object({\n      sysctl_config = optional(object({\n        fs_aio_max_nr                      = optional(number)\n        fs_file_max                        = optional(number)\n        fs_inotify_max_user_watches        = optional(number)\n        fs_nr_open                         = optional(number)\n        kernel_threads_max                 = optional(number)\n        net_core_netdev_max_backlog        = optional(number)\n        net_core_optmem_max                = optional(number)\n        net_core_rmem_default              = optional(number)\n        net_core_rmem_max                  = optional(number)\n        net_core_somaxconn                 = optional(number)\n        net_core_wmem_default              = optional(number)\n        net_core_wmem_max                  = optional(number)\n        net_ipv4_ip_local_port_range_min   = optional(number)\n        net_ipv4_ip_local_port_range_max   = optional(number)\n        net_ipv4_neigh_default_gc_thresh1  = optional(number)\n        net_ipv4_neigh_default_gc_thresh2  = optional(number)\n        net_ipv4_neigh_default_gc_thresh3  = optional(number)\n        net_ipv4_tcp_fin_timeout           = optional(number)\n        net_ipv4_tcp_keepalive_intvl       = optional(number)\n        net_ipv4_tcp_keepalive_probes      = optional(number)\n        net_ipv4_tcp_keepalive_time        = optional(number)\n        net_ipv4_tcp_max_syn_backlog       = optional(number)\n        net_ipv4_tcp_max_tw_buckets        = optional(number)\n        net_ipv4_tcp_tw_reuse              = optional(bool)\n        net_netfilter_nf_conntrack_buckets = optional(number)\n        net_netfilter_nf_conntrack_max     = optional(number)\n        vm_max_map_count                   = optional(number)\n        vm_swappiness                      = optional(number)\n        vm_vfs_cache_pressure              = optional(number)\n      }))\n    }))\n  }))",
+        "required": false
+      },
+      {
+        "name": "node_resource_group_name",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "oidc_issuer_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "oms_agent",
+        "type": "object({\n    log_analytics_workspace_id      = string\n    msi_auth_for_monitoring_enabled = optional(bool)\n  })",
+        "required": false
+      },
+      {
+        "name": "open_service_mesh_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "private_cluster_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "private_endpoints",
+        "type": "map(object({\n    name = optional(string, null)\n    role_assignments = optional(map(object({\n      role_definition_id_or_name             = string\n      principal_id                           = string\n      description                            = optional(string, null)\n      skip_service_principal_aad_check       = optional(bool, false)\n      condition                              = optional(string, null)\n      condition_version                      = optional(string, null)\n      delegated_managed_identity_resource_id = optional(string, null)\n      principal_type                         = optional(string, null)\n    })), {})\n    lock = optional(object({\n      kind = string\n      name = optional(string, null)\n    }), null)\n    tags                                    = optional(map(string), null)\n    subnet_resource_id                      = string\n    subresource_name                        = string\n    private_dns_zone_group_name             = optional(string, \"default\")\n    private_dns_zone_resource_ids           = optional(set(string), [])\n    application_security_group_associations = optional(map(string), {})\n    private_service_connection_name         = optional(string, null)\n    network_interface_name                  = optional(string, null)\n    location                                = optional(string, null)\n    resource_group_name                     = optional(string, null)\n    ip_configurations = optional(map(object({\n      name               = string\n      private_ip_address = string\n    })), {})\n  }))",
+        "required": false
+      },
+      {
+        "name": "private_endpoints_manage_dns_zone_group",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "role_assignments",
+        "type": "map(object({\n    role_definition_id_or_name             = string\n    principal_id                           = string\n    description                            = optional(string, null)\n    skip_service_principal_aad_check       = optional(bool, false)\n    condition                              = optional(string, null)\n    condition_version                      = optional(string, null)\n    delegated_managed_identity_resource_id = optional(string, null)\n    principal_type                         = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "role_based_access_control_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "run_command_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "sku_tier",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "resource_group_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "cost_analysis_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "default_nginx_controller",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "key_management_service",
+        "type": "object({\n    key_vault_key_id         = string\n    key_vault_network_access = string\n  })",
+        "required": false
+      },
+      {
+        "name": "maintenance_window_node_os",
+        "type": "object({\n    frequency    = string\n    interval     = string\n    duration     = number\n    day_of_week  = optional(string)\n    day_of_month = optional(number)\n    week_index   = optional(string)\n    start_time   = optional(string)\n    utc_offset   = optional(string)\n    start_date   = optional(string)\n    not_allowed = optional(object({\n      start = string\n      end   = string\n    }))\n  })",
+        "required": false
+      },
+      {
+        "name": "network_profile",
+        "type": "object({\n    network_plugin      = string\n    network_mode        = optional(string)\n    network_policy      = optional(string)\n    dns_service_ip      = optional(string)\n    network_data_plane  = optional(string)\n    network_plugin_mode = optional(string)\n    outbound_type       = optional(string, \"loadBalancer\")\n    pod_cidr            = optional(string)\n    pod_cidrs           = optional(list(string))\n    service_cidr        = optional(string)\n    service_cidrs       = optional(list(string))\n    ip_versions         = optional(list(string))\n    load_balancer_sku   = optional(string)\n    load_balancer_profile = optional(object({\n      managed_outbound_ip_count   = optional(number)\n      managed_outbound_ipv6_count = optional(number)\n      outbound_ip_address_ids     = optional(list(string))\n      outbound_ip_prefix_ids      = optional(list(string))\n      outbound_ports_allocated    = optional(number)\n      idle_timeout_in_minutes     = optional(number)\n    }))\n    nat_gateway_profile = optional(object({\n      managed_outbound_ip_count = optional(number)\n      idle_timeout_in_minutes   = optional(number)\n    }))\n  })",
+        "required": false
+      },
+      {
+        "name": "node_os_channel_upgrade",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "node_resource_group_name",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "oms_agent",
+        "type": "object({\n    log_analytics_workspace_id      = string\n    msi_auth_for_monitoring_enabled = optional(bool)\n  })",
+        "required": false
+      },
+      {
+        "name": "web_app_routing_dns_zone_ids",
+        "type": "map(list(string))",
+        "required": false
+      }
+    ],
+    "outputs": [
+      {
+        "name": "private_endpoints",
+        "description": "  A map of the private endpoints created.",
+        "sensitive": false
+      },
+      {
+        "name": "public_fqdn",
+        "description": "Returns .fqdn when both private_cluster_enabled and private_cluster_public_fqdn_enabled are true, otherwise null",
+        "sensitive": false
+      },
+      {
+        "name": "resource_id",
+        "description": "Resource ID of the Kubernetes cluster.",
+        "sensitive": false
+      },
+      {
+        "name": "cluster_ca_certificate",
+        "description": "The CA certificate of the AKS cluster.",
+        "sensitive": false
+      },
+      {
+        "name": "nodepool_resource_ids",
+        "description": "A map of nodepool keys to resource ids.",
+        "sensitive": false
+      },
+      {
+        "name": "web_app_routing_object_id",
+        "description": "The object ID of the web app routing identity",
+        "sensitive": false
+      },
+      {
+        "name": "kube_config",
+        "description": "The kube_config block of the AKS cluster",
+        "sensitive": false
+      },
+      {
+        "name": "name",
+        "description": "Name of the Kubernetes cluster.",
+        "sensitive": false
+      },
+      {
+        "name": "web_app_routing_client_id",
+        "description": "The object ID of the web app routing identity",
+        "sensitive": false
+      },
+      {
+        "name": "host",
+        "description": "AKS API host \t6 returns .fqdn when public_fqdn_enabled, otherwise kube_config[0].host",
+        "sensitive": false
+      },
+      {
+        "name": "ingress_app_object_id",
+        "description": "The object ID of the Ingress Application identity",
+        "sensitive": false
+      },
+      {
+        "name": "key_vault_secrets_provider_object_id",
+        "description": "The object ID of the key vault secrets provider.",
+        "sensitive": false
+      },
+      {
+        "name": "kubelet_identity_id",
+        "description": "The identity ID of the kubelet identity.",
+        "sensitive": false
+      },
+      {
+        "name": "oidc_issuer_url",
+        "description": "The OIDC issuer URL of the Kubernetes cluster.",
+        "sensitive": false
+      },
+      {
+        "name": "aci_connector_object_id",
+        "description": "The object ID of the ACI Connector identity",
+        "sensitive": false
+      },
+      {
+        "name": "kube_admin_config",
+        "description": "The kube_admin_config block of the AKS cluster, only available when Local Accounts & Role-Based Access Control (RBAC) with AAD are enabled.",
+        "sensitive": false
+      },
+      {
+        "name": "node_resource_group_id",
+        "description": "The resource group ID of the node resource group.",
+        "sensitive": false
+      }
+    ]
+  }
+}

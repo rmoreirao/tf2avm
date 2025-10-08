@@ -1,0 +1,98 @@
+{
+  "module": {
+    "name": "avm-res-network-applicationgatewaywebapplicationfirewallpolicy",
+    "display_name": "Application Gateway Web Application Firewall Policy",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-network-applicationgatewaywebapplicationfirewallpolicy/azurerm/0.2.0",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-network-applicationgatewaywebapplicationfirewallpolicy",
+    "version": "0.2.0",
+    "description": "AVM Resource Module for Application Gateway Web Application Firewall (WAF) Policy",
+    "resources": [
+      "azurerm_management_lock.this",
+      "azurerm_role_assignment.this",
+      "azurerm_web_application_firewall_policy.this",
+      "modtm_telemetry.telemetry",
+      "random_uuid.telemetry",
+      "azurerm_client_config.telemetry",
+      "modtm_module_source.telemetry"
+    ],
+    "inputs": [
+      {
+        "name": "role_assignments",
+        "type": "map(object({\n    role_definition_id_or_name             = string\n    principal_id                           = string\n    description                            = optional(string, null)\n    skip_service_principal_aad_check       = optional(bool, false)\n    condition                              = optional(string, null)\n    condition_version                      = optional(string, null)\n    delegated_managed_identity_resource_id = optional(string, null)\n    principal_type                         = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "timeouts",
+        "type": "object({\n    create = optional(string)\n    delete = optional(string)\n    read   = optional(string)\n    update = optional(string)\n  })",
+        "required": false
+      },
+      {
+        "name": "location",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "resource_group_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "policy_settings",
+        "type": "object({\n    enabled                                   = optional(bool)\n    file_upload_limit_in_mb                   = optional(number)\n    js_challenge_cookie_expiration_in_minutes = optional(number)\n    max_request_body_size_in_kb               = optional(number)\n    mode                                      = optional(string)\n    request_body_check                        = optional(bool)\n    request_body_enforcement                  = optional(bool)\n    request_body_inspect_limit_in_kb          = optional(number)\n    log_scrubbing = optional(object({\n      enabled = optional(bool)\n      rule = optional(list(object({\n        enabled                 = optional(bool)\n        match_variable          = string\n        selector                = optional(string)\n        selector_match_operator = optional(string)\n      })))\n    }))\n  })",
+        "required": false
+      },
+      {
+        "name": "managed_rules",
+        "type": "object({\n    exclusion = optional(map(object({\n      match_variable          = string\n      selector                = string\n      selector_match_operator = string\n      excluded_rule_set = optional(object({\n        type    = optional(string)\n        version = optional(string)\n        rule_group = optional(list(object({\n          excluded_rules  = optional(list(string))\n          rule_group_name = string\n        })))\n      }))\n    })))\n    managed_rule_set = map(object({\n      type    = optional(string)\n      version = string\n      rule_group_override = optional(map(object({\n        rule_group_name = string\n        rule = optional(list(object({\n          action  = optional(string)\n          enabled = optional(bool)\n          id      = string\n        })))\n      })))\n    }))\n  })",
+        "required": true
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "custom_rules",
+        "type": "map(object({\n    action               = string\n    enabled              = optional(bool)\n    group_rate_limit_by  = optional(string)\n    name                 = optional(string)\n    priority             = number\n    rate_limit_duration  = optional(string)\n    rate_limit_threshold = optional(number)\n    rule_type            = string\n    match_conditions = map(object({\n      match_values       = optional(list(string))\n      negation_condition = optional(bool)\n      operator           = string\n      transforms         = optional(set(string))\n      match_variables = list(object({\n        selector      = optional(string)\n        variable_name = string\n      }))\n    }))\n  }))",
+        "required": false
+      },
+      {
+        "name": "lock",
+        "type": "object({\n    kind = string\n    name = optional(string, null)\n  })",
+        "required": false
+      }
+    ],
+    "outputs": [
+      {
+        "name": "http_listener_ids",
+        "description": "The ID of the HTTP Listener associated with the WAF Policy.",
+        "sensitive": false
+      },
+      {
+        "name": "name",
+        "description": "The name of the WAF Policy.",
+        "sensitive": false
+      },
+      {
+        "name": "path_based_rule_ids",
+        "description": "The ID of the Path Based Rule associated with the WAF Policy.",
+        "sensitive": false
+      },
+      {
+        "name": "resource_id",
+        "description": "The ID of the WAF Policy.",
+        "sensitive": false
+      }
+    ]
+  }
+}

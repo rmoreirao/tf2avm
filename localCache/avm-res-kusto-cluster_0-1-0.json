@@ -1,0 +1,199 @@
+{
+  "module": {
+    "name": "avm-res-kusto-cluster",
+    "display_name": "avm-res-kusto-cluster",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-kusto-cluster/azurerm/0.1.0",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-kusto-cluster",
+    "version": "0.1.0",
+    "description": "Manages a Kusto (also known as Azure Data Explorer) Cluster and databases\n\n> [!IMPORTANT]\n> As the overall AVM framework is not GA (generally available) yet - the CI framework and test automation is not fully functional and implemented across all supported languages yet - breaking changes are expected, and additional customer feedback is yet to be gathered and incorporated. Hence, modules **MUST NOT** be published at version `1.0.0` or higher at this time.\n>\n> All module **MUST** be published as a pre-release version (e.g., `0.1.0`, `0.1.1`, `0.2.0`, etc.) until the AVM framework becomes GA.\n>\n> However, it is important to note that this **DOES NOT** mean that the modules cannot be consumed and utilized. They **CAN** be leveraged in all types of environments (dev, test, prod etc.). Consumers can treat them just like any other IaC module and raise issues or feature requests against them as they learn from the usage of the module. Consumers should also read the release notes for each version, if considering updating to a more recent version of a module to see if there are any considerations or breaking changes etc.",
+    "resources": [
+      "azurerm_role_assignment",
+      "azurerm_monitor_diagnostic_setting",
+      "azurerm_private_endpoint",
+      "azurerm_private_endpoint_application_security_group_association",
+      "random_id",
+      "azurerm_resource_group_template_deployment",
+      "azurerm_kusto_cluster",
+      "azurerm_management_lock"
+    ],
+    "inputs": [
+      {
+        "name": "resource_group_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "optimized_auto_scale",
+        "type": "object({\n    maximum_instances = number\n    minimum_instances = number\n  })",
+        "required": false
+      },
+      {
+        "name": "private_endpoints",
+        "type": "map(object({\n    name = optional(string, null)\n    role_assignments = optional(map(object({\n      role_definition_id_or_name             = string\n      principal_id                           = string\n      description                            = optional(string, null)\n      skip_service_principal_aad_check       = optional(bool, false)\n      condition                              = optional(string, null)\n      condition_version                      = optional(string, null)\n      delegated_managed_identity_resource_id = optional(string, null)\n    })), {})\n    lock = optional(object({\n      name = optional(string, null)\n      kind = optional(string, \"None\")\n    }), {})\n    tags                                    = optional(map(any), null)\n    subnet_resource_id                      = string\n    private_dns_zone_group_name             = optional(string, \"default\")\n    private_dns_zone_resource_ids           = optional(set(string), [])\n    application_security_group_associations = optional(map(string), {})\n    private_service_connection_name         = optional(string, null)\n    network_interface_name                  = optional(string, null)\n    location                                = optional(string, null)\n    resource_group_name                     = optional(string, null)\n    ip_configurations = optional(map(object({\n      name               = string\n      private_ip_address = string\n    })), {})\n  }))",
+        "required": false
+      },
+      {
+        "name": "role_assignments",
+        "type": "map(object({\n    role_definition_id_or_name             = string\n    principal_id                           = string\n    description                            = optional(string, null)\n    skip_service_principal_aad_check       = optional(bool, false)\n    condition                              = optional(string, null)\n    condition_version                      = optional(string, null)\n    delegated_managed_identity_resource_id = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "kusto_database_principal_assignment",
+        "type": "map(object({\n    database_name  = string\n    name           = string\n    principal_id   = string\n    principal_type = string\n    role           = string\n    tenant_id      = string\n  }))",
+        "required": false
+      },
+      {
+        "name": "managed_identities",
+        "type": "object({\n    type                       = string\n    user_assigned_resource_ids = optional(set(string), [])\n  })",
+        "required": false
+      },
+      {
+        "name": "sku",
+        "type": "object({\n    name     = string\n    capacity = number\n  })",
+        "required": true
+      },
+      {
+        "name": "customer_managed_key",
+        "type": "object({\n    key_vault_resource_id              = optional(string)\n    key_name                           = optional(string)\n    key_version                        = optional(string, null)\n    user_assigned_identity_resource_id = optional(string, null)\n  })",
+        "required": false
+      },
+      {
+        "name": "databases",
+        "type": "map(object({\n    name                = string\n    location            = optional(string, null)\n    resource_group_name = optional(string, null)\n    cluster_name        = optional(string, null)\n    hot_cache_period    = optional(string)\n    soft_delete_period  = optional(string)\n  }))",
+        "required": false
+      },
+      {
+        "name": "purge_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "virtual_network_configuration",
+        "type": "object({\n    data_management_public_ip_id = string\n    engine_public_ip_id          = string\n    subnet_id                    = string\n  })",
+        "required": false
+      },
+      {
+        "name": "double_encryption_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "lock",
+        "type": "object({\n    name = optional(string, null)\n    kind = optional(string, \"None\")\n  })",
+        "required": false
+      },
+      {
+        "name": "public_ip_type",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "outbound_network_access_restricted",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "role_assignments",
+        "type": "map(object({\n    role_definition_id_or_name             = string\n    principal_id                           = string\n    description                            = optional(string, null)\n    skip_service_principal_aad_check       = optional(bool, false)\n    condition                              = optional(string, null)\n    condition_version                      = optional(string, null)\n    delegated_managed_identity_resource_id = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "streaming_ingestion_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "trusted_external_tenants",
+        "type": "set(string)",
+        "required": false
+      },
+      {
+        "name": "allowed_fqdns",
+        "type": "set(string)",
+        "required": false
+      },
+      {
+        "name": "allowed_ip_ranges",
+        "type": "set(string)",
+        "required": false
+      },
+      {
+        "name": "auto_stop_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "public_network_access_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "language_extensions",
+        "type": "set(string)",
+        "required": false
+      },
+      {
+        "name": "disk_encryption_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "zones",
+        "type": "set(string)",
+        "required": false
+      },
+      {
+        "name": "diagnostic_settings",
+        "type": "map(object({\n    name                                     = optional(string, null)\n    log_categories                           = optional(set(string), [])\n    log_groups                               = optional(set(string), [\"allLogs\"])\n    metric_categories                        = optional(set(string), [\"AllMetrics\"])\n    log_analytics_destination_type           = optional(string, \"Dedicated\")\n    workspace_resource_id                    = optional(string, null)\n    storage_account_resource_id              = optional(string, null)\n    event_hub_authorization_rule_resource_id = optional(string, null)\n    event_hub_name                           = optional(string, null)\n    marketplace_partner_resource_id          = optional(string, null)\n  }))",
+        "required": false
+      }
+    ],
+    "outputs": [
+      {
+        "name": "private_endpoints",
+        "description": "A map of private endpoints. The map key is the supplied input to var.private_endpoints. The map value is the entire azurerm_private_endpoint resource.",
+        "sensitive": false
+      },
+      {
+        "name": "resource",
+        "description": "This is the full output for the resource.",
+        "sensitive": false
+      },
+      {
+        "name": "uri",
+        "description": "The FQDN of the Azure Kusto Cluster.",
+        "sensitive": false
+      },
+      {
+        "name": "data_ingestion_uri",
+        "description": "The Kusto Cluster URI to be used for data ingestion.",
+        "sensitive": false
+      },
+      {
+        "name": "id",
+        "description": "The Kusto Cluster ID.",
+        "sensitive": false
+      },
+      {
+        "name": "identity",
+        "description": "An identity block exports the following:\n\nprincipal_id - The Principal ID associated with this System Assigned Managed Service Identity.\n\ntenant_id - The Tenant ID associated with this System Assigned Managed Service Identity.\n",
+        "sensitive": false
+      }
+    ]
+  }
+}

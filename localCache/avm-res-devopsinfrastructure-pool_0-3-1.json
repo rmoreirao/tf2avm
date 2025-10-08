@@ -1,0 +1,195 @@
+{
+  "module": {
+    "name": "avm-res-devopsinfrastructure-pool",
+    "display_name": "Azure Verified Module for Azure Managed DevOps Pool",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-devopsinfrastructure-pool/azurerm/0.3.1",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-devopsinfrastructure-pool",
+    "version": "0.3.1",
+    "description": "Azure Verified Module for Azure Managed DevOps Pool",
+    "resources": [
+      "random_uuid.telemetry",
+      "modtm_telemetry.telemetry",
+      "azapi_resource.managed_devops_pool",
+      "azurerm_management_lock.this",
+      "azurerm_monitor_diagnostic_setting.this",
+      "azurerm_role_assignment.this",
+      "azurerm_client_config.telemetry",
+      "azurerm_client_config.this",
+      "modtm_module_source.telemetry"
+    ],
+    "inputs": [
+      {
+        "name": "version_control_system_organization_name",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "fabric_profile_data_disks",
+        "type": "list(object({\n    caching              = optional(string, \"ReadWrite\")\n    disk_size_gigabytes  = optional(number, 100)\n    drive_letter         = optional(string, null)\n    storage_account_type = optional(string, \"Premium_ZRS\")\n  }))",
+        "required": false
+      },
+      {
+        "name": "fabric_profile_os_profile_logon_type",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "agent_profile_resource_prediction_profile_automatic",
+        "type": "object({\n    kind                  = optional(string, \"Automatic\")\n    prediction_preference = optional(string, \"Balanced\")\n  })",
+        "required": false
+      },
+      {
+        "name": "diagnostic_settings",
+        "type": "map(object({\n    name                                     = optional(string, null)\n    log_categories                           = optional(set(string), [])\n    log_groups                               = optional(set(string), [\"allLogs\"])\n    metric_categories                        = optional(set(string), [\"AllMetrics\"])\n    log_analytics_destination_type           = optional(string, \"Dedicated\")\n    workspace_resource_id                    = optional(string, null)\n    storage_account_resource_id              = optional(string, null)\n    event_hub_authorization_rule_resource_id = optional(string, null)\n    event_hub_name                           = optional(string, null)\n    marketplace_partner_resource_id          = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "subnet_id",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "subscription_id",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "agent_profile_resource_prediction_profile",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "agent_profile_resource_prediction_profile_manual",
+        "type": "object({\n    kind = string\n  })",
+        "required": false
+      },
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "lock",
+        "type": "object({\n    kind = string\n    name = optional(string, null)\n  })",
+        "required": false
+      },
+      {
+        "name": "organization_profile",
+        "type": "object({\n    kind = optional(string, \"AzureDevOps\")\n    organizations = list(object({\n      name        = string\n      projects    = optional(list(string), []) # List of all Projects names this agent should run on, if empty, it will run on all projects.\n      parallelism = optional(number)           # If multiple organizations are specified, this value needs to be set, otherwise it will use the maximum_concurrency value.\n    }))\n    permission_profile = optional(object({\n      kind   = optional(string, \"CreatorOnly\")\n      users  = optional(list(string), null)\n      groups = optional(list(string), null)\n      }), {\n      kind = \"CreatorOnly\"\n    })\n  })",
+        "required": false
+      },
+      {
+        "name": "agent_profile_max_agent_lifetime",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "version_control_system_project_names",
+        "type": "set(string)",
+        "required": false
+      },
+      {
+        "name": "location",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "managed_devops_pool_retry_on_error",
+        "type": "list(string)",
+        "required": false
+      },
+      {
+        "name": "managed_devops_pool_timeouts",
+        "type": "object({\n    create = optional(string, \"30m\")\n    update = optional(string, \"30m\")\n    read   = optional(string, \"30m\")\n    delete = optional(string, \"30m\")\n  })",
+        "required": false
+      },
+      {
+        "name": "version_control_system_type",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "resource_group_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "agent_profile_kind",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "dev_center_project_resource_id",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "agent_profile_grace_period_time_span",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "fabric_profile_sku_name",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "managed_identities",
+        "type": "object({\n    system_assigned            = optional(bool, false)\n    user_assigned_resource_ids = optional(set(string), [])\n  })",
+        "required": false
+      },
+      {
+        "name": "agent_profile_resource_predictions_manual",
+        "type": "object({\n    time_zone = optional(string, \"UTC\")\n    days_data = optional(list(map(number)))\n  })",
+        "required": false
+      },
+      {
+        "name": "fabric_profile_images",
+        "type": "list(object({\n    resource_id           = optional(string)\n    well_known_image_name = optional(string)\n    buffer                = optional(string, \"*\")\n    aliases               = optional(list(string))\n  }))",
+        "required": false
+      },
+      {
+        "name": "fabric_profile_os_disk_storage_account_type",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "maximum_concurrency",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "role_assignments",
+        "type": "map(object({\n    role_definition_id_or_name             = string\n    principal_id                           = string\n    description                            = optional(string, null)\n    skip_service_principal_aad_check       = optional(bool, false)\n    condition                              = optional(string, null)\n    condition_version                      = optional(string, null)\n    delegated_managed_identity_resource_id = optional(string, null)\n    principal_type                         = optional(string, null)\n  }))",
+        "required": false
+      }
+    ],
+    "outputs": [
+      {
+        "name": "name",
+        "description": "The name of the Managed DevOps Pool.",
+        "sensitive": false
+      },
+      {
+        "name": "resource",
+        "description": "This is the full output for the Managed DevOps Pool.",
+        "sensitive": false
+      },
+      {
+        "name": "resource_id",
+        "description": "The resource if of the Managed DevOps Pool.",
+        "sensitive": false
+      }
+    ]
+  }
+}

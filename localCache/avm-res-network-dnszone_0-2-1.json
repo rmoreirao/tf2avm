@@ -1,0 +1,160 @@
+{
+  "module": {
+    "name": "avm-res-network-dnszone",
+    "display_name": "avm-res-network-dnszone",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-network-dnszone/azurerm/0.2.1",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-network-dnszone",
+    "version": "0.2.1",
+    "description": "AVM Terraform Module for DNS Zone",
+    "resources": [
+      "azurerm_dns_a_record",
+      "azurerm_dns_aaaa_record",
+      "azurerm_dns_caa_record",
+      "azurerm_dns_cname_record",
+      "azurerm_dns_mx_record",
+      "azurerm_dns_ns_record",
+      "azurerm_dns_ptr_record",
+      "azurerm_dns_srv_record",
+      "azurerm_dns_txt_record",
+      "azurerm_dns_zone",
+      "modtm_telemetry",
+      "random_uuid",
+      "azurerm_client_config",
+      "modtm_module_source"
+    ],
+    "inputs": [
+      {
+        "name": "cname_records",
+        "type": "map(object({\n    name                = string\n    resource_group_name = string\n    zone_name           = string\n    ttl                 = number\n    record              = string\n    tags                = optional(map(string), null)\n    target_resource_id  = optional(string)\n  }))",
+        "required": false
+      },
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "srv_records",
+        "type": "map(object({\n    name                = string\n    resource_group_name = string\n    zone_name           = string\n    ttl                 = number\n    records = map(object({\n      priority = number\n      weight   = number\n      port     = number\n      target   = string\n    }))\n    tags = optional(map(string), null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "resource_group_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "a_records",
+        "type": "map(object({\n    name                = string\n    resource_group_name = string\n    zone_name           = string\n    ttl                 = number\n    records             = optional(list(string))\n    target_resource_id  = optional(string)\n    tags                = optional(map(string), null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "aaaa_records",
+        "type": "map(object({\n    name                = string\n    resource_group_name = string\n    zone_name           = string\n    ttl                 = number\n    records             = optional(list(string))\n    target_resource_id  = optional(string)\n    tags                = optional(map(string), null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "caa_records",
+        "type": "map(object({\n    name                = string\n    resource_group_name = string\n    zone_name           = string\n    ttl                 = number\n    record = map(object({\n      flags = string\n      tag   = string\n      value = string\n    }))\n    tags = optional(map(string), null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "mx_records",
+        "type": "map(object({\n    name                = optional(string, \"@\")\n    resource_group_name = string\n    zone_name           = string\n    ttl                 = number\n    records = map(object({\n      preference = number\n      exchange   = string\n    }))\n    tags = optional(map(string), null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "ns_records",
+        "type": "map(object({\n    name                = string\n    resource_group_name = string\n    zone_name           = string\n    ttl                 = number\n    records             = list(string)\n    tags                = optional(map(string), null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "ptr_records",
+        "type": "map(object({\n    name                = string\n    resource_group_name = string\n    zone_name           = string\n    ttl                 = number\n    records             = list(string)\n    tags                = optional(map(string), null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "txt_records",
+        "type": "map(object({\n    name                = string\n    resource_group_name = string\n    zone_name           = string\n    ttl                 = number\n    records = map(object({\n      value = string\n    }))\n    tags = optional(map(string), null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "required": true
+      }
+    ],
+    "outputs": [
+      {
+        "name": "a_record_outputs",
+        "description": "The a record output",
+        "sensitive": false
+      },
+      {
+        "name": "max_number_of_record_sets",
+        "description": "Maximum number of Records in Zone output",
+        "sensitive": false
+      },
+      {
+        "name": "mx_record_outputs",
+        "description": "The mx record output",
+        "sensitive": false
+      },
+      {
+        "name": "number_of_record_sets",
+        "description": "Number of records in DNS Zone",
+        "sensitive": false
+      },
+      {
+        "name": "resource_id",
+        "description": "Id of dns zone",
+        "sensitive": false
+      },
+      {
+        "name": "srv_record_outputs",
+        "description": "The srv record output",
+        "sensitive": false
+      },
+      {
+        "name": "txt_record_outputs",
+        "description": "The txt record output",
+        "sensitive": false
+      },
+      {
+        "name": "aaaa_record_outputs",
+        "description": "The aaaa record output",
+        "sensitive": false
+      },
+      {
+        "name": "caa_record_outputs",
+        "description": "The caa record output",
+        "sensitive": false
+      },
+      {
+        "name": "cname_record_outputs",
+        "description": "The cname record output",
+        "sensitive": false
+      },
+      {
+        "name": "name_servers",
+        "description": "List of values that make up NS Record for Zone",
+        "sensitive": false
+      },
+      {
+        "name": "ns_record_outputs",
+        "description": "The ns record output",
+        "sensitive": false
+      },
+      {
+        "name": "ptr_record_outputs",
+        "description": "The ptr record output",
+        "sensitive": false
+      }
+    ]
+  }
+}

@@ -1,0 +1,119 @@
+{
+  "module": {
+    "name": "avm-res-network-privateendpoint",
+    "display_name": "AVM Resource Network Private Endpoint",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-network-privateendpoint/azurerm/0.2.0",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-network-privateendpoint",
+    "version": "0.2.0",
+    "description": "AVM Terraform module for private endpoint",
+    "resources": [
+      "azurerm_management_lock.this",
+      "azurerm_private_endpoint.this",
+      "azurerm_private_endpoint_application_security_group_association.this",
+      "azurerm_role_assignment.this",
+      "modtm_telemetry.telemetry",
+      "random_uuid.telemetry",
+      "azurerm_client_config.telemetry",
+      "modtm_module_source.telemetry"
+    ],
+    "inputs": [
+      {
+        "name": "network_interface_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "subnet_resource_id",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "application_security_group_association_ids",
+        "type": "set(string)",
+        "required": false
+      },
+      {
+        "name": "lock",
+        "type": "object({\n    name = optional(string, null)\n    kind = string\n  })",
+        "required": false
+      },
+      {
+        "name": "role_assignments",
+        "type": "map(object({\n    role_definition_id_or_name             = string\n    principal_id                           = string\n    description                            = optional(string, null)\n    skip_service_principal_aad_check       = optional(bool, false)\n    condition                              = optional(string, null)\n    condition_version                      = optional(string, null)\n    delegated_managed_identity_resource_id = optional(string, null)\n    principal_type                         = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "subresource_names",
+        "type": "list(string)",
+        "required": false
+      },
+      {
+        "name": "location",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "private_connection_resource_id",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "resource_group_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "ip_configurations",
+        "type": "map(object({\n    name               = string\n    private_ip_address = string\n    subresource_name   = string\n    member_name        = optional(string, \"default\")\n  }))",
+        "required": false
+      },
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "private_dns_zone_group_name",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "private_dns_zone_resource_ids",
+        "type": "list(string)",
+        "required": false
+      },
+      {
+        "name": "private_service_connection_name",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "tags",
+        "type": "map(string)",
+        "required": false
+      }
+    ],
+    "outputs": [
+      {
+        "name": "name",
+        "description": "Name of the resource.",
+        "sensitive": false
+      },
+      {
+        "name": "resource",
+        "description": "Output of the resource.",
+        "sensitive": false
+      },
+      {
+        "name": "resource_id",
+        "description": "ID of the resource.",
+        "sensitive": false
+      }
+    ]
+  }
+}

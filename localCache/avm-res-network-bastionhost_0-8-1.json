@@ -1,0 +1,154 @@
+{
+  "module": {
+    "name": "avm-res-network-bastionhost",
+    "display_name": "Azure Verified Module for Azure Bastion",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-network-bastionhost/azurerm/0.8.1",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-network-bastionhost",
+    "version": "0.8.1",
+    "description": "Terraform Azure Verified Resource Module for Bastion Host\n\nThis module provides a generic way to create and manage a Azure Bastion resource supporting Developer, Basic, Standard, and Premium SKUs, including features like telemetry, session recording, tunneling, and role assignments.",
+    "resources": [
+      "azapi_resource.bastion",
+      "azapi_resource.bastion_developer",
+      "azurerm_management_lock.pip",
+      "azurerm_management_lock.this",
+      "azurerm_monitor_diagnostic_setting.this",
+      "azurerm_role_assignment.pip",
+      "azurerm_role_assignment.this",
+      "modtm_telemetry.telemetry",
+      "random_uuid.telemetry",
+      "azurerm_client_config.telemetry",
+      "azurerm_public_ip.this",
+      "azurerm_subscription.current",
+      "modtm_module_source.telemetry"
+    ],
+    "inputs": [
+      {
+        "name": "diagnostic_settings",
+        "type": "map(object({\r\n    name                                     = optional(string, null)\r\n    log_categories                           = optional(set(string), [])\r\n    log_groups                               = optional(set(string), [\"allLogs\"])\r\n    metric_categories                        = optional(set(string), [\"AllMetrics\"])\r\n    log_analytics_destination_type           = optional(string, \"Dedicated\")\r\n    workspace_resource_id                    = optional(string, null)\r\n    storage_account_resource_id              = optional(string, null)\r\n    event_hub_authorization_rule_resource_id = optional(string, null)\r\n    event_hub_name                           = optional(string, null)\r\n    marketplace_partner_resource_id          = optional(string, null)\r\n  }))",
+        "required": false
+      },
+      {
+        "name": "location",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "resource_group_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "copy_paste_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "ip_configuration",
+        "type": "object({\r\n    name                             = optional(string)\r\n    subnet_id                        = string\r\n    create_public_ip                 = optional(bool, true)\r\n    public_ip_tags                   = optional(map(string), null)\r\n    public_ip_merge_with_module_tags = optional(bool, true)\r\n    public_ip_address_name           = optional(string, null)\r\n    public_ip_address_id             = optional(string, null)\r\n  })",
+        "required": false
+      },
+      {
+        "name": "ip_connect_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "kerberos_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "file_copy_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "private_only_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "session_recording_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "shareable_link_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "virtual_network_id",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "zones",
+        "type": "set(string)",
+        "required": false
+      },
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "lock",
+        "type": "object({\r\n    kind = string\r\n    name = optional(string, null)\r\n  })",
+        "required": false
+      },
+      {
+        "name": "scale_units",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "sku",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "role_assignments",
+        "type": "map(object({\r\n    role_definition_id_or_name             = string\r\n    principal_id                           = string\r\n    description                            = optional(string, null)\r\n    skip_service_principal_aad_check       = optional(bool, false)\r\n    condition                              = optional(string, null)\r\n    condition_version                      = optional(string, null)\r\n    delegated_managed_identity_resource_id = optional(string, null)\r\n    principal_type                         = optional(string, null)\r\n  }))",
+        "required": false
+      },
+      {
+        "name": "tunneling_enabled",
+        "type": "bool",
+        "required": false
+      }
+    ],
+    "outputs": [
+      {
+        "name": "name",
+        "description": "The name of the Azure Bastion resource",
+        "sensitive": false
+      },
+      {
+        "name": "resource",
+        "description": "The Azure Bastion resource",
+        "sensitive": false
+      },
+      {
+        "name": "resource_id",
+        "description": "The ID of the Azure Bastion resource",
+        "sensitive": false
+      },
+      {
+        "name": "dns_name",
+        "description": "The FQDN of the Azure Bastion resource",
+        "sensitive": false
+      }
+    ]
+  }
+}

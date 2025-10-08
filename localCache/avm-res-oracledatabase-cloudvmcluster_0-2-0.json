@@ -1,0 +1,242 @@
+{
+  "module": {
+    "name": "avm-res-oracledatabase-cloudvmcluster",
+    "display_name": "AVM Resource Oracle Database Cloud VM Cluster",
+    "version": "0.2.0",
+    "description": "Terraform Azure Verified Resource Module for Oracle VM cluster. This module provisions scalable Oracle Cloud VM clusters in an enterprise-ready configuration on Microsoft Azure.",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-oracledatabase-cloudvmcluster/azurerm/0.2.0",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-oracledatabase-cloudvmcluster",
+    "resources": [
+      "azapi_resource.odaa_vm_cluster",
+      "modtm_telemetry.telemetry",
+      "random_uuid.telemetry",
+      "azapi_client_config.telemetry",
+      "azapi_resource_list.list_dbservers_by_cloudexadata_infrastructure",
+      "modtm_module_source.telemetry"
+    ],
+    "inputs": [
+      {
+        "name": "cpu_core_count",
+        "type": "number",
+        "required": true
+      },
+      {
+        "name": "location",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "is_diagnostic_events_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "scan_listener_port_tcp_ssl",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "memory_size_in_gbs",
+        "type": "number",
+        "required": true
+      },
+      {
+        "name": "subnet_id",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "is_health_monitoring_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "nsg_cidrs",
+        "type": "set(object({ source = string; destination_port_range = object({ min = string; max = string; }) }))",
+        "required": false
+      },
+      {
+        "name": "time_zone",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "ocpu_count",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "file_system_configuration_details",
+        "type": "list(object({ fileSystemSizeGb = number; mountPoint = string }))",
+        "required": false
+      },
+      {
+        "name": "backup_subnet_cidr",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "ssh_public_keys",
+        "type": "list(string)",
+        "required": true
+      },
+      {
+        "name": "customer_managed_key",
+        "type": "object({ key_vault_resource_id = string; key_name = string; key_version = optional(string, null); user_assigned_identity = optional(object({ resource_id = string }), null) })",
+        "required": false
+      },
+      {
+        "name": "data_storage_percentage",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "db_servers",
+        "type": "list(string)",
+        "required": false
+      },
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "license_model",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "private_endpoints_manage_dns_zone_group",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "cloud_exadata_infrastructure_id",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "cluster_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "domain",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "is_local_backup_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "vnet_id",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "lock",
+        "type": "object({ kind = string; name = optional(string, null) })",
+        "required": false
+      },
+      {
+        "name": "storage_size_in_gbs",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "zone_id",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "hostname",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "is_sparse_diskgroup_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "role_assignments",
+        "type": "map(object({ role_definition_id_or_name = string; principal_id = string; description = optional(string, null); skip_service_principal_aad_check = optional(bool, false); condition = optional(string, null); condition_version = optional(string, null); delegated_managed_identity_resource_id = optional(string, null); principal_type = optional(string, null) }))",
+        "required": false
+      },
+      {
+        "name": "data_storage_size_in_tbs",
+        "type": "number",
+        "required": true
+      },
+      {
+        "name": "dbnode_storage_size_in_gbs",
+        "type": "number",
+        "required": true
+      },
+      {
+        "name": "resource_group_id",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "diagnostic_settings",
+        "type": "map(object({ name = optional(string, null); log_categories = optional(set(string), []); log_groups = optional(set(string), [\"allLogs\"]); metric_categories = optional(set(string), [\"AllMetrics\"]); log_analytics_destination_type = optional(string, \"Dedicated\"); workspace_resource_id = optional(string, null); storage_account_resource_id = optional(string, null); event_hub_authorization_rule_resource_id = optional(string, null); event_hub_name = optional(string, null); marketplace_partner_resource_id = optional(string, null) }))",
+        "required": false
+      },
+      {
+        "name": "gi_version",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "managed_identities",
+        "type": "object({ system_assigned = optional(bool, false); user_assigned_resource_ids = optional(set(string), []) })",
+        "required": false
+      },
+      {
+        "name": "system_version",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "is_incident_logs_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "private_endpoints",
+        "type": "map(object({ name = optional(string, null); role_assignments = optional(map(object({ role_definition_id_or_name = string; principal_id = string; description = optional(string, null); skip_service_principal_aad_check = optional(bool, false); condition = optional(string, null); condition_version = optional(string, null); delegated_managed_identity_resource_id = optional(string, null); principal_type = optional(string, null) })), {}); lock = optional(object({ kind = string; name = optional(string, null) }), null); tags = optional(map(string), null); subnet_resource_id = string; subresource_name = string; private_dns_zone_group_name = optional(string, \"default\"); private_dns_zone_resource_ids = optional(set(string), []); application_security_group_associations = optional(map(string), {}); private_service_connection_name = optional(string, null); network_interface_name = optional(string, null); location = optional(string, null); resource_group_name = optional(string, null); ip_configurations = optional(map(object({ name = string; private_ip_address = string })), {}) }))",
+        "required": false
+      },
+      {
+        "name": "scan_listener_port_tcp",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "tags",
+        "type": "map(string)",
+        "required": false
+      }
+    ],
+    "outputs": [
+      {
+        "name": "resource_id",
+        "description": "Resource ID of the ODAA VM Cluster",
+        "sensitive": false
+      },
+      {
+        "name": "vm_cluster_ocid",
+        "description": "Value of the OCID of the ODAA VM Cluster",
+        "sensitive": false
+      },
+      {
+        "name": "resource",
+        "description": "This is the full output for the resource.",
+        "sensitive": false
+      }
+    ]
+  }
+}

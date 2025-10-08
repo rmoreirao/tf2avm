@@ -1,0 +1,104 @@
+{
+  "module": {
+    "name": "avm-res-network-networkmanager",
+    "display_name": "Azure Network Manager AVM Module",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-network-networkmanager/azurerm/0.2.1",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-network-networkmanager",
+    "version": "0.2.1",
+    "description": "Azure Network Manager AVM Module",
+    "resources": [
+      "azurerm_network_manager_static_member",
+      "azurerm_management_lock",
+      "azurerm_role_assignment",
+      "azurerm_monitor_diagnostic_setting",
+      "random_uuid",
+      "modtm_telemetry",
+      "azurerm_network_manager",
+      "azurerm_network_manager_network_group"
+    ],
+    "inputs": [
+      {
+        "name": "lock",
+        "type": "object({\n    kind = string\n    name = optional(string, null)\n  })",
+        "required": false
+      },
+      {
+        "name": "network_manager_network_groups",
+        "type": "map(object({\n    name        = string\n    description = optional(string)\n    static_members = optional(list(object({\n      name                      = string\n      target_virtual_network_id = string\n    })))\n  }))",
+        "required": false
+      },
+      {
+        "name": "network_manager_timeouts",
+        "type": "object({\n    create = optional(string)\n    delete = optional(string)\n    read   = optional(string)\n    update = optional(string)\n  })",
+        "required": false
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "network_manager_scope",
+        "type": "object({\n    management_group_ids = optional(list(string))\n    subscription_ids     = optional(list(string))\n  })",
+        "required": true
+      },
+      {
+        "name": "resource_group_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "diagnostic_settings",
+        "type": "map(object({\n    name                                     = optional(string, null)\n    log_categories                           = optional(set(string), [])\n    log_groups                               = optional(set(string), [\"allLogs\"])\n    metric_categories                        = optional(set(string), [\"AllMetrics\"])\n    log_analytics_destination_type           = optional(string, \"Dedicated\")\n    workspace_resource_id                    = optional(string, null)\n    storage_account_resource_id              = optional(string, null)\n    event_hub_authorization_rule_resource_id = optional(string, null)\n    event_hub_name                           = optional(string, null)\n    marketplace_partner_resource_id          = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "role_assignments",
+        "type": "map(object({\n    role_definition_id_or_name             = string\n    principal_id                           = string\n    description                            = optional(string, null)\n    skip_service_principal_aad_check       = optional(bool, false)\n    condition                              = optional(string, null)\n    condition_version                      = optional(string, null)\n    delegated_managed_identity_resource_id = optional(string, null)\n    principal_type                         = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "location",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "network_manager_scope_accesses",
+        "type": "list(string)",
+        "required": true
+      },
+      {
+        "name": "network_manager_description",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "tags",
+        "type": "map(string)",
+        "required": false
+      }
+    ],
+    "outputs": [
+      {
+        "name": "name",
+        "description": "The name of the Network Manager.",
+        "sensitive": false
+      },
+      {
+        "name": "resource",
+        "description": "This is the full output for the resource.",
+        "sensitive": false
+      },
+      {
+        "name": "resource_id",
+        "description": "This is the full output for the resource.",
+        "sensitive": false
+      }
+    ]
+  }
+}

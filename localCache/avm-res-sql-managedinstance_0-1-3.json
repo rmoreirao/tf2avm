@@ -1,0 +1,244 @@
+{
+  "module": {
+    "name": "avm-res-sql-managedinstance",
+    "display_name": "AVM Azure SQL Managed Instance",
+    "version": "0.1.3",
+    "description": "Terraform Azure Verified Resource Module for SQL Managed Instance. Supports advanced threat protection, security access policies, vulnerability assessment, failover group configuration, and mapping of databases.",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-sql-managedinstance/azurerm/0.1.3",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-sql-managedinstance",
+    "resources": [
+      "azurerm_role_assignment.sqlmi_system_assigned",
+      "azurerm_management_lock.this",
+      "azurerm_private_endpoint.this_managed_dns_zone_groups",
+      "azurerm_private_endpoint_application_security_group_association.this",
+      "random_uuid.telemetry",
+      "modtm_telemetry.telemetry",
+      "azurerm_mssql_managed_instance_active_directory_administrator.this",
+      "azapi_resource_action.sql_advanced_threat_protection",
+      "azurerm_mssql_managed_instance.this",
+      "azurerm_mssql_managed_instance_transparent_data_encryption.this",
+      "azapi_resource_action.mssql_managed_instance_vulnerability_assessment",
+      "azurerm_role_assignment.this",
+      "azapi_resource_action.mssql_managed_instance_security_alert_policy",
+      "azurerm_mssql_managed_database.this",
+      "azurerm_mssql_managed_instance_failover_group.this",
+      "azurerm_private_endpoint.this_unmanaged_dns_zone_groups",
+      "azurerm_monitor_diagnostic_setting.this",
+      "azapi_resource_action.sql_managed_instance_patch_identities"
+    ],
+    "inputs": [
+      {
+        "name": "databases",
+        "type": "map(object({\n    name                      = string\n    short_term_retention_days = optional(number)\n    tags                      = optional(map(string))\n    long_term_retention_policy = optional(object({\n      monthly_retention = optional(string)\n      week_of_year      = optional(number)\n      weekly_retention  = optional(string)\n      yearly_retention  = optional(string)\n    }))\n    point_in_time_restore = optional(object({\n      restore_point_in_time = string\n      source_database_id    = string\n    }))\n    timeouts = optional(object({\n      create = optional(string)\n      delete = optional(string)\n      read   = optional(string)\n      update = optional(string)\n    }))\n  }))",
+        "required": false
+      },
+      {
+        "name": "storage_size_in_gb",
+        "type": "number",
+        "required": true
+      },
+      {
+        "name": "maintenance_configuration_name",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "minimum_tls_version",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "storage_account_resource_id",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "storage_account_type",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "lock",
+        "type": "object({\n    kind = string\n    name = optional(string, null)\n  })",
+        "required": false
+      },
+      {
+        "name": "timeout",
+        "type": "object({\n    mssql_managed_instance_security_alert_policy = optional(object({\n      create = optional(string)\n      delete = optional(string)\n      read   = optional(string)\n      update = optional(string)\n    }), {})\n    sql_managed_instance_patch_identities = optional(object({\n      create = optional(string)\n      delete = optional(string)\n      read   = optional(string)\n      update = optional(string)\n    }), {})\n    sql_advanced_threat_protection = optional(object({\n      create = optional(string)\n      delete = optional(string)\n      read   = optional(string)\n      update = optional(string)\n    }), {})\n  })",
+        "required": false
+      },
+      {
+        "name": "failover_group",
+        "type": "map(object({\n    location                                  = optional(string)\n    name                                      = optional(string)\n    partner_managed_instance_id               = optional(string)\n    readonly_endpoint_failover_policy_enabled = optional(bool)\n    read_write_endpoint_failover_policy = optional(object({\n      grace_minutes = optional(number)\n      mode          = optional(string)\n    }))\n    timeouts = optional(object({\n      create = optional(string)\n      delete = optional(string)\n      read   = optional(string)\n      update = optional(string)\n    }))\n  }))",
+        "required": false
+      },
+      {
+        "name": "license_type",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "subnet_id",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "dns_zone_partner_id",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "location",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "active_directory_administrator",
+        "type": "object({\n    azuread_authentication_only = optional(bool)\n    login_username              = optional(string)\n    object_id                   = optional(string)\n    tenant_id                   = optional(string)\n    timeouts = optional(object({\n      create = optional(string)\n      delete = optional(string)\n      read   = optional(string)\n      update = optional(string)\n    }))\n  })",
+        "required": false
+      },
+      {
+        "name": "collation",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "public_data_endpoint_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "zone_redundant_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "administrator_login",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "security_alert_policy",
+        "type": "object({\n    disabled_alerts              = optional(set(string))\n    email_account_admins_enabled = optional(bool)\n    email_addresses              = optional(set(string))\n    enabled                      = optional(bool)\n    retention_days               = optional(number)\n    storage_account_access_key   = optional(string)\n    storage_endpoint             = optional(string)\n    timeouts = optional(object({\n      create = optional(string)\n      delete = optional(string)\n      read   = optional(string)\n      update = optional(string)\n    }))\n  })",
+        "required": false
+      },
+      {
+        "name": "private_endpoints_manage_dns_zone_group",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "role_assignments",
+        "type": "map(object({\n    role_definition_id_or_name             = string\n    principal_id                           = string\n    description                            = optional(string, null)\n    skip_service_principal_aad_check       = optional(bool, false)\n    condition                              = optional(string, null)\n    condition_version                      = optional(string, null)\n    delegated_managed_identity_resource_id = optional(string, null)\n    principal_type                         = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "advanced_threat_protection_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "private_endpoints",
+        "type": "map(object({\n    name = optional(string, null)\n    role_assignments = optional(map(object({\n      role_definition_id_or_name             = string\n      principal_id                           = string\n      description                            = optional(string, null)\n      skip_service_principal_aad_check       = optional(bool, false)\n      condition                              = optional(string, null)\n      condition_version                      = optional(string, null)\n      delegated_managed_identity_resource_id = optional(string, null)\n      principal_type                         = optional(string, null)\n    })), {})\n    lock = optional(object({\n      kind = string\n      name = optional(string, null)\n    }), null)\n    tags                                    = optional(map(string), null)\n    subnet_resource_id                      = string\n    private_dns_zone_group_name             = optional(string, \"default\")\n    private_dns_zone_resource_ids           = optional(set(string), [])\n    application_security_group_associations = optional(map(string), {})\n    private_service_connection_name         = optional(string, null)\n    network_interface_name                  = optional(string, null)\n    location                                = optional(string, null)\n    resource_group_name                     = optional(string, null)\n    ip_configurations = optional(map(object({\n      name               = string\n      private_ip_address = string\n    })), {})\n  }))",
+        "required": false
+      },
+      {
+        "name": "timezone_id",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "resource_group_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "diagnostic_settings",
+        "type": "map(object({\n    name                                     = optional(string, null)\n    log_categories                           = optional(set(string), [])\n    log_groups                               = optional(set(string), [\"allLogs\"])\n    metric_categories                        = optional(set(string), [\"AllMetrics\"])\n    log_analytics_destination_type           = optional(string, \"Dedicated\")\n    workspace_resource_id                    = optional(string, null)\n    storage_account_resource_id              = optional(string, null)\n    event_hub_authorization_rule_resource_id = optional(string, null)\n    event_hub_name                           = optional(string, null)\n    marketplace_partner_resource_id          = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "managed_identities",
+        "type": "object({\n    system_assigned            = optional(bool, false)\n    user_assigned_resource_ids = optional(set(string), [])\n  })",
+        "required": false
+      },
+      {
+        "name": "retry",
+        "type": "object({\n    mssql_managed_instance_security_alert_policy = optional(object({\n      error_message_regex = optional(list(string), [\n        \"SqlServerAlertPolicyInProgress\", # see #54\n      ])\n      interval_seconds     = optional(number)\n      max_interval_seconds = optional(number)\n    }), null)\n    sql_managed_instance_patch_identities = optional(object({\n      error_message_regex = optional(list(string), [\n        \"ConflictingServerOperation\", # see #54\n      ])\n      interval_seconds     = optional(number)\n      max_interval_seconds = optional(number)\n    }), null)\n    sql_advanced_threat_protection = optional(object({\n      error_message_regex  = optional(list(string))\n      interval_seconds     = optional(number)\n      max_interval_seconds = optional(number)\n    }), null)\n  })",
+        "required": false
+      },
+      {
+        "name": "administrator_login_password",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "vcores",
+        "type": "number",
+        "required": true
+      },
+      {
+        "name": "timeouts",
+        "type": "object({\n    create = optional(string)\n    delete = optional(string)\n    read   = optional(string)\n    update = optional(string)\n  })",
+        "required": false
+      },
+      {
+        "name": "vulnerability_assessment",
+        "type": "object({\n    storage_account_access_key = optional(string)\n    storage_container_path     = optional(string)\n    storage_container_sas_key  = optional(string)\n    recurring_scans = optional(object({\n      email_subscription_admins = optional(bool)\n      emails                    = optional(list(string))\n      enabled                   = optional(bool)\n    }))\n    timeouts = optional(object({\n      create = optional(string)\n      delete = optional(string)\n      read   = optional(string)\n      update = optional(string)\n    }))\n  })",
+        "required": false
+      },
+      {
+        "name": "sku_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "proxy_override",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "transparent_data_encryption",
+        "type": "object({\n    auto_rotation_enabled = optional(bool)\n    key_vault_key_id      = optional(string)\n    timeouts = optional(object({\n      create = optional(string)\n      delete = optional(string)\n      read   = optional(string)\n      update = optional(string)\n    }))\n  })",
+        "required": false
+      }
+    ],
+    "outputs": [
+      {
+        "name": "identity",
+        "description": "Managed identities for the SQL MI instance.  This is not available from the `resource` output because AzureRM doesn't yet support adding both User and System Assigned identities.",
+        "sensitive": false
+      },
+      {
+        "name": "private_endpoints",
+        "description": "A map of the private endpoints created.",
+        "sensitive": false
+      },
+      {
+        "name": "resource",
+        "description": "This is the full output for the resource.",
+        "sensitive": false
+      },
+      {
+        "name": "resource_id",
+        "description": "This is the resource ID of the resource.",
+        "sensitive": false
+      }
+    ]
+  }
+}

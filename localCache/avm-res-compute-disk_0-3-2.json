@@ -1,0 +1,256 @@
+{
+  "module": {
+    "name": "avm-res-compute-disk",
+    "display_name": "AVM Compute Disk",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-compute-disk/azurerm/0.3.2",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-compute-disk",
+    "version": "0.3.2",
+    "description": "Azure Verified Module for Azure Disk",
+    "resources": [
+      "azurerm_managed_disk.this",
+      "azurerm_management_lock.this",
+      "azurerm_private_endpoint.this_managed_dns_zone_groups",
+      "azurerm_private_endpoint.this_unmanaged_dns_zone_groups",
+      "azurerm_private_endpoint_application_security_group_association.this",
+      "azurerm_role_assignment.this",
+      "modtm_telemetry.telemetry",
+      "random_uuid.telemetry",
+      "azurerm_client_config.telemetry",
+      "modtm_module_source.telemetry"
+    ],
+    "inputs": [
+      {
+        "name": "create_option",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "image_reference_id",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "network_access_policy",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "storage_account_id",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "private_endpoints_manage_dns_zone_group",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "secure_vm_disk_encryption_set_id",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "trusted_launch_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "zone",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "disk_access_id",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "disk_encryption_set_id",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "disk_iops_read_only",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "disk_mbps_read_only",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "edge_zone",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "hyper_v_generation",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "private_endpoints",
+        "type": "map(object)",
+        "required": false
+      },
+      {
+        "name": "location",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "disk_size_gb",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "performance_plus_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "public_network_access_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "source_uri",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "storage_account_type",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "on_demand_bursting_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "disk_mbps_read_write",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "lock",
+        "type": "object",
+        "required": false
+      },
+      {
+        "name": "logical_sector_size",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "tier",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "disk_iops_read_write",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "encryption_settings",
+        "type": "object",
+        "required": false
+      },
+      {
+        "name": "max_shares",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "optimized_frequent_attach_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "os_type",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "role_assignments",
+        "type": "map(object)",
+        "required": false
+      },
+      {
+        "name": "security_type",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "resource_group_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "customer_managed_key",
+        "type": "object",
+        "required": false
+      },
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "gallery_image_reference_id",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "source_resource_id",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "upload_size_bytes",
+        "type": "number",
+        "required": false
+      }
+    ],
+    "outputs": [
+      {
+        "name": "resource",
+        "description": "This is the full output for the resource.",
+        "sensitive": false
+      },
+      {
+        "name": "resource_group_name",
+        "description": "The name of the Resource Group.",
+        "sensitive": false
+      },
+      {
+        "name": "resource_id",
+        "description": "This is the full output for the resource.",
+        "sensitive": false
+      },
+      {
+        "name": "location",
+        "description": "The deployment region.",
+        "sensitive": false
+      },
+      {
+        "name": "private_endpoints",
+        "description": "A map of the private endpoints created.",
+        "sensitive": false
+      }
+    ]
+  }
+}

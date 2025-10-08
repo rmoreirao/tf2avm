@@ -1,0 +1,97 @@
+{
+  "module": {
+    "name": "avm-res-desktopvirtualization-workspace",
+    "display_name": "avm-res-desktopvirtualization-workspace",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-desktopvirtualization-workspace/azurerm/0.2.2",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-desktopvirtualization-workspace",
+    "version": "0.2.2",
+    "description": "AVM Terraform Module for Desktop Virtualization Workspace",
+    "resources": [
+      "random_uuid.telemetry",
+      "modtm_telemetry.telemetry",
+      "azurerm_virtual_desktop_workspace.this",
+      "azurerm_monitor_diagnostic_setting.this",
+      "azurerm_client_config.telemetry",
+      "modtm_module_source.telemetry"
+    ],
+    "inputs": [
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "tracing_tags_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "tracing_tags_prefix",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "virtual_desktop_workspace_description",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "virtual_desktop_workspace_timeouts",
+        "type": "object({\n    create = optional(string)\n    delete = optional(string)\n    read   = optional(string)\n    update = optional(string)\n  })",
+        "required": false
+      },
+      {
+        "name": "virtual_desktop_workspace_location",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "virtual_desktop_workspace_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "diagnostic_settings",
+        "type": "map(object({\n    name                                     = optional(string, null)\n    log_categories                           = optional(set(string), [])\n    log_groups                               = optional(set(string), [\"allLogs\"])\n    metric_categories                        = optional(set(string), [\"AllMetrics\"])\n    log_analytics_destination_type           = optional(string, \"Dedicated\")\n    workspace_resource_id                    = optional(string, null)\n    storage_account_resource_id              = optional(string, null)\n    event_hub_authorization_rule_resource_id = optional(string, null)\n    event_hub_name                           = optional(string, null)\n    marketplace_partner_resource_id          = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "lock",
+        "type": "object({\n    kind = string\n    name = optional(string, null)\n  })",
+        "required": false
+      },
+      {
+        "name": "public_network_access_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "virtual_desktop_workspace_friendly_name",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "virtual_desktop_workspace_tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "virtual_desktop_workspace_resource_group_name",
+        "type": "string",
+        "required": true
+      }
+    ],
+    "outputs": [
+      {
+        "name": "resource",
+        "description": "This output is the full output for the resource to allow flexibility to reference all possible values for the resource. Example usage: module.<modulename>.resource.id",
+        "sensitive": false
+      },
+      {
+        "name": "resource_id",
+        "description": "This output is the full output for the resource to allow flexibility to reference all possible values for the resource. Example usage: module.<modulename>.resource.id",
+        "sensitive": false
+      }
+    ]
+  }
+}

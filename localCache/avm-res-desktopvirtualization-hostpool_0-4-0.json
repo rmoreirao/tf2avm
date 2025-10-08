@@ -1,0 +1,180 @@
+{
+  "module": {
+    "name": "avm-res-desktopvirtualization-hostpool",
+    "display_name": "AVM for Desktop Virtualization Hostpools",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-desktopvirtualization-hostpool/azurerm/0.4.0",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-desktopvirtualization-hostpool",
+    "version": "0.4.0",
+    "description": "Module to deploy Azure Virtual Desktop Host Pool and associated resources.\n\nFeatures:\n- Azure Virtual Desktop Host Pool\n  - RDP Properties\n  - Properties\n  - Scheduled agent updates\n  - Optional Private Endpoint",
+    "resources": [
+      "azurerm_monitor_diagnostic_setting.this",
+      "azurerm_private_endpoint.this",
+      "azurerm_private_endpoint_application_security_group_association.this",
+      "azurerm_virtual_desktop_host_pool.this",
+      "azurerm_virtual_desktop_host_pool_registration_info.registrationinfo",
+      "modtm_telemetry.telemetry",
+      "random_uuid.telemetry",
+      "azurerm_client_config.telemetry",
+      "modtm_module_source.telemetry"
+    ],
+    "inputs": [
+      {
+        "name": "virtual_desktop_host_pool_vm_template",
+        "type": "object({\n    type = string\n    custom_image = optional(object({\n      resource_id = string\n    }))\n    gallery_image_reference = optional(object({\n      offer     = string\n      publisher = string\n      sku       = string\n      version   = string\n    }))\n    osDisktype = string\n  })",
+        "required": false
+      },
+      {
+        "name": "resource_group_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "virtual_desktop_host_pool_type",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "private_endpoints",
+        "type": "map(object({\n    name = optional(string, null)\n    role_assignments = optional(map(object({\n      role_definition_id_or_name             = string\n      principal_id                           = string\n      description                            = optional(string, null)\n      skip_service_principal_aad_check       = optional(bool, false)\n      condition                              = optional(string, null)\n      condition_version                      = optional(string, null)\n      delegated_managed_identity_resource_id = optional(string, null)\n      principal_type                         = optional(string, null)\n    })), {})\n    lock = optional(object({\n      name = optional(string, null)\n      kind = string\n    }), null)\n    tags                                    = optional(map(string), null)\n    subnet_resource_id                      = string\n    private_dns_zone_group_name             = optional(string, \"default\")\n    private_dns_zone_resource_ids           = optional(set(string), [])\n    application_security_group_associations = optional(map(string), {})\n    private_service_connection_name         = optional(string, null)\n    network_interface_name                  = optional(string, null)\n    location                                = optional(string, null)\n    resource_group_name                     = optional(string, null)\n    ip_configurations = optional(map(object({\n      name               = string\n      private_ip_address = string\n    })), {})\n  }))",
+        "required": false
+      },
+      {
+        "name": "virtual_desktop_host_pool_maximum_sessions_allowed",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "virtual_desktop_host_pool_start_vm_on_connect",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "virtual_desktop_host_pool_tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "virtual_desktop_host_pool_timeouts",
+        "type": "object({\n    create = optional(string)\n    delete = optional(string)\n    read   = optional(string)\n    update = optional(string)\n  })",
+        "required": false
+      },
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "lock",
+        "type": "object({\n    kind = string\n    name = optional(string, null)\n  })",
+        "required": false
+      },
+      {
+        "name": "virtual_desktop_host_pool_description",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "virtual_desktop_host_pool_friendly_name",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "virtual_desktop_host_pool_location",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "virtual_desktop_host_pool_resource_group_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "registration_expiration_period",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "tracing_tags_prefix",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "virtual_desktop_host_pool_custom_rdp_properties",
+        "type": "object({\n    drivestoredirect     = optional(string, \"*\")\n    audiomode            = optional(number, 0)\n    videoplaybackmode    = optional(number, 1)\n    redirectclipboard    = optional(number, 1)\n    redirectprinters     = optional(number, 1)\n    devicestoredirect    = optional(string, \"*\")\n    redirectcomports     = optional(number, 1)\n    redirectsmartcards   = optional(number, 1)\n    usbdevicestoredirect = optional(string, \"*\")\n    enablecredsspsupport = optional(number, 1)\n    use_multimon         = optional(number, 0)\n    custom_properties    = optional(map(string), {})\n  })",
+        "required": false
+      },
+      {
+        "name": "virtual_desktop_host_pool_personal_desktop_assignment_type",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "virtual_desktop_host_pool_preferred_app_group_type",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "virtual_desktop_host_pool_load_balancer_type",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "virtual_desktop_host_pool_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "diagnostic_settings",
+        "type": "map(object({\n    name                                     = optional(string, null)\n    log_categories                           = optional(set(string), [])\n    log_groups                               = optional(set(string), [\"allLogs\"])\n    metric_categories                        = optional(set(string), [\"AllMetrics\"])\n    log_analytics_destination_type           = optional(string, \"Dedicated\")\n    workspace_resource_id                    = optional(string, null)\n    storage_account_resource_id              = optional(string, null)\n    event_hub_authorization_rule_resource_id = optional(string, null)\n    event_hub_name                           = optional(string, null)\n    marketplace_partner_resource_id          = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "role_assignments",
+        "type": "map(object({\n    role_definition_id_or_name             = string\n    principal_id                           = string\n    description                            = optional(string, null)\n    skip_service_principal_aad_check       = optional(bool, false)\n    condition                              = optional(string, null)\n    condition_version                      = optional(string, null)\n    delegated_managed_identity_resource_id = optional(string, null)\n    principal_type                         = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "tracing_tags_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "virtual_desktop_host_pool_scheduled_agent_updates",
+        "type": "object({\n    enabled                   = optional(bool)\n    timezone                  = optional(string)\n    use_session_host_timezone = optional(bool)\n    schedule = optional(list(object({\n      day_of_week = string\n      hour_of_day = number\n    })))\n  })",
+        "required": false
+      },
+      {
+        "name": "virtual_desktop_host_pool_validate_environment",
+        "type": "bool",
+        "required": false
+      }
+    ],
+    "outputs": [
+      {
+        "name": "private_endpoints",
+        "description": "A map of private endpoints. The map key is the supplied input to var.private_endpoints. The map value is the entire azurerm_private_endpoint resource.",
+        "sensitive": false
+      },
+      {
+        "name": "registrationinfo_token",
+        "description": "The token for the host pool registration.",
+        "sensitive": false
+      },
+      {
+        "name": "resource",
+        "description": "This output is the full output for the resource to allow flexibility to reference all possible values for the resource. Example usage: module.<modulename>.resource.id",
+        "sensitive": false
+      },
+      {
+        "name": "resource_id",
+        "description": "Resource ID of `azurerm_virtual_desktop_host_pool` resource created by this module.",
+        "sensitive": false
+      }
+    ]
+  }
+}

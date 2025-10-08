@@ -1,0 +1,192 @@
+{
+  "module": {
+    "name": "avm-res-recoveryservices-vault",
+    "display_name": "AVM Recovery Services Vault",
+    "version": "0.3.2",
+    "description": "Terraform Azure Verified Resource Module for Recovery Services Vault",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-recoveryservices-vault/azurerm/0.3.2",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-recoveryservices-vault",
+    "resources": [
+      "azurerm_management_lock.this",
+      "azurerm_monitor_diagnostic_setting.this",
+      "azurerm_private_endpoint.this_managed_dns_zone_groups",
+      "azurerm_private_endpoint.this_unmanaged_dns_zone_groups",
+      "azurerm_private_endpoint_application_security_group_association.this",
+      "azurerm_recovery_services_vault.this",
+      "azurerm_role_assignment.this",
+      "modtm_telemetry.telemetry",
+      "random_uuid.telemetry",
+      "azapi_client_config.telemetry",
+      "modtm_module_source.telemetry"
+    ],
+    "inputs": [
+      {
+        "name": "public_network_access_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "location",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "backup_protected_vm",
+        "type": "map(object({\r\n    source_vm_id          = string\r\n    vm_backup_policy_name = string\r\n    sleep_timer           = optional(string, \"60s\")\r\n  }))",
+        "required": false
+      },
+      {
+        "name": "cross_region_restore_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "lock",
+        "type": "object({\r\n    name = optional(string, null)\r\n    kind = string\r\n  })",
+        "required": false
+      },
+      {
+        "name": "private_endpoints_manage_dns_zone_group",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "role_assignments",
+        "type": "map(object({\r\n    role_definition_id_or_name             = string\r\n    principal_id                           = string\r\n    description                            = optional(string, null)\r\n    skip_service_principal_aad_check       = optional(bool, false)\r\n    condition                              = optional(string, null)\r\n    condition_version                      = optional(string, null)\r\n    delegated_managed_identity_resource_id = optional(string, null)\r\n    principal_type                         = optional(string, null)\r\n  }))",
+        "required": false
+      },
+      {
+        "name": "soft_delete_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "immutability",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "storage_mode_type",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "vm_backup_policy",
+        "type": "map(object({\r\n    name                           = string\r\n    timezone                       = string\r\n    instant_restore_retention_days = optional(number, null)\r\n    instant_restore_resource_group = optional(map(object({\r\n      prefix = optional(string, null)\r\n      suffix = optional(string, null)\r\n    })), {})\r\n    policy_type = string\r\n    frequency   = string\r\n\r\n    retention_daily = optional(number, null)\r\n\r\n    backup = object({\r\n      time          = string\r\n      hour_interval = optional(number, null)\r\n      hour_duration = optional(number, null)\r\n      weekdays      = optional(list(string), [])\r\n    })\r\n\r\n    retention_weekly = optional(object({\r\n      count    = optional(number, 7)\r\n      weekdays = optional(list(string), [])\r\n    }), {})\r\n\r\n    retention_monthly = optional(object({\r\n      count             = optional(number, 0)\r\n      weekdays          = optional(list(string), [])\r\n      weeks             = optional(list(string), [])\r\n      days              = optional(list(number), [])\r\n      include_last_days = optional(bool, false)\r\n    }), {})\r\n\r\n    retention_yearly = optional(object({\r\n      count             = optional(number, 0)\r\n      months            = optional(list(string), [])\r\n      weekdays          = optional(list(string), [])\r\n      weeks             = optional(list(string), [])\r\n      days              = optional(list(number), [])\r\n      include_last_days = optional(bool, false)\r\n    }), {})\r\n  }))",
+        "required": false
+      },
+      {
+        "name": "workload_backup_policy",
+        "type": "map(object({\r\n    name          = string\r\n    workload_type = string\r\n    settings = object({\r\n      time_zone           = string\r\n      compression_enabled = bool\r\n    })\r\n\r\n    backup_frequency = string\r\n    protection_policy = map(object({\r\n      policy_type           = string # description = \"(required) Specify policy type. Full, Differential, Logs\"\r\n      retention_daily_count = number\r\n      retention_weekly = optional(object({\r\n        count    = optional(number, null)\r\n        weekdays = optional(set(string), null)\r\n      }), null)\r\n      # retention_daily = optional(number, null) # (Required) The count that is used to count retention duration with duration type Days. Possible values are between 7 and 35.\r\n      backup = optional(object({\r\n        time                 = optional(string)\r\n        frequency_in_minutes = optional(number)\r\n        weekdays             = optional(set(string))\r\n      }), null)\r\n\r\n      retention_monthly = optional(object({\r\n        count             = optional(number, null)\r\n        weekdays          = optional(set(string), null)\r\n        weeks             = optional(set(string), null)\r\n        monthdays         = optional(set(number), null)\r\n        include_last_days = optional(bool, false)\r\n      }), null)\r\n\r\n      retention_yearly = optional(object({\r\n        count             = optional(number, null)\r\n        months            = optional(set(string), null)\r\n        weekdays          = optional(set(string), null)\r\n        weeks             = optional(set(string), null)\r\n        monthdays         = optional(set(number), null)\r\n        include_last_days = optional(bool, false)\r\n      }), null)\r\n\r\n    }))\r\n  }))",
+        "required": false
+      },
+      {
+        "name": "backup_protected_file_share",
+        "type": "map(object({\r\n    source_storage_account_id     = string\r\n    backup_file_share_policy_name = string\r\n    source_file_share_name        = string\r\n    disable_registration          = optional(bool, false)\r\n    sleep_timer                   = optional(string, \"60s\")\r\n\r\n  }))",
+        "required": false
+      },
+      {
+        "name": "classic_vmware_replication_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "customer_managed_key",
+        "type": "object({\r\n    key_vault_resource_id = string\r\n    key_name              = string\r\n    key_version           = optional(string, null)\r\n    user_assigned_identity = optional(object({\r\n      resource_id = string\r\n    }), null)\r\n  })",
+        "required": false
+      },
+      {
+        "name": "private_endpoints",
+        "type": "map(object({\r\n    name = optional(string, null)\r\n    role_assignments = optional(map(object({\r\n      role_definition_id_or_name             = string\r\n      principal_id                           = string\r\n      description                            = optional(string, null)\r\n      skip_service_principal_aad_check       = optional(bool, false)\r\n      condition                              = optional(string, null)\r\n      condition_version                      = optional(string, null)\r\n      delegated_managed_identity_resource_id = optional(string, null)\r\n      principal_type                         = optional(string, null)\r\n    })), {}) # see https://azure.github.io/Azure-Verified-Modules/Azure-Verified-Modules/specs/shared/interfaces/#role-assignments\r\n    lock = optional(object({\r\n      kind = string\r\n      name = optional(string, null)\r\n    }), null)                                        # see https://azure.github.io/Azure-Verified-Modules/Azure-Verified-Modules/specs/shared/interfaces/#resource-locks\r\n    tags               = optional(map(string), null) # see https://azure.github.io/Azure-Verified-Modules/Azure-Verified-Modules/specs/shared/interfaces/#tags\r\n    subnet_resource_id = string\r\n    ## You only need to expose the subresource_name if there are multiple underlying services, e.g. storage.\r\n    ## Which has blob, file, etc.\r\n    ## If there is only one then leave this out and hardcode the value in the module.\r\n    subresource_name                        = string\r\n    private_dns_zone_group_name             = optional(string, \"default\")\r\n    private_dns_zone_resource_ids           = optional(set(string), [])\r\n    application_security_group_associations = optional(map(string), {})\r\n    private_service_connection_name         = optional(string, null)\r\n    network_interface_name                  = optional(string, null)\r\n    location                                = optional(string, null)\r\n    resource_group_name                     = optional(string, null)\r\n    ip_configurations = optional(map(object({\r\n      name               = string\r\n      private_ip_address = string\r\n    })), {})\r\n  }))",
+        "required": false
+      },
+      {
+        "name": "tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "resource_group_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "sku",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "alerts_for_all_job_failures_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "alerts_for_critical_operation_failures_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "diagnostic_settings",
+        "type": "map(object({\r\n    name                                     = optional(string, null)\r\n    log_categories                           = optional(set(string), [])\r\n    log_groups                               = optional(set(string), [\"allLogs\"])\r\n    metric_categories                        = optional(set(string), [\"AllMetrics\"])\r\n    log_analytics_destination_type           = optional(string, \"Dedicated\")\r\n    workspace_resource_id                    = optional(string, null)\r\n    storage_account_resource_id              = optional(string, null)\r\n    event_hub_authorization_rule_resource_id = optional(string, null)\r\n    event_hub_name                           = optional(string, null)\r\n    marketplace_partner_resource_id          = optional(string, null)\r\n  }))",
+        "required": false
+      },
+      {
+        "name": "file_share_backup_policy",
+        "type": "map(object({\r\n    name     = string\r\n    timezone = string\r\n\r\n    frequency = string\r\n\r\n    retention_daily = optional(number, null)\r\n\r\n    backup = object({\r\n      time = string\r\n      hourly = optional(object({\r\n        interval        = number\r\n        start_time      = string\r\n        window_duration = number\r\n      }))\r\n    })\r\n\r\n    retention_weekly = optional(object({\r\n      count    = optional(number, 7)\r\n      weekdays = optional(list(string), [])\r\n    }), {})\r\n\r\n    retention_monthly = optional(object({\r\n      count             = optional(number, 0)\r\n      weekdays          = optional(list(string), [])\r\n      weeks             = optional(list(string), [])\r\n      days              = optional(list(number), [])\r\n      include_last_days = optional(bool, false)\r\n    }), {})\r\n\r\n    retention_yearly = optional(object({\r\n      count             = optional(number, 0)\r\n      months            = optional(list(string), [])\r\n      weekdays          = optional(list(string), [])\r\n      weeks             = optional(list(string), [])\r\n      days              = optional(list(number), [])\r\n      include_last_days = optional(bool, false)\r\n    }), {})\r\n  }))",
+        "required": false
+      },
+      {
+        "name": "managed_identities",
+        "type": "object({\r\n    system_assigned            = optional(bool, false)\r\n    user_assigned_resource_ids = optional(set(string), [])\r\n  })",
+        "required": false
+      }
+    ],
+    "outputs": [
+      {
+        "name": "resource",
+        "description": "resource Id output",
+        "sensitive": false
+      },
+      {
+        "name": "resource_id",
+        "description": "resource Id output",
+        "sensitive": false
+      },
+      {
+        "name": "backup_protected_vm",
+        "description": "Resource ID of the workload backup policy",
+        "sensitive": false
+      },
+      {
+        "name": "private_endpoints",
+        "description": "A map of private endpoints. The map key is the supplied input to var.private_endpoints. The map value is the entire azurerm_private_endpoint resource.",
+        "sensitive": false
+      },
+      {
+        "name": "recovery_services_vault_file_share_policy",
+        "description": "Resource ID of the file share backup policy",
+        "sensitive": false
+      },
+      {
+        "name": "recovery_services_vault_vm_policy",
+        "description": "Resource ID of the VM backup policy",
+        "sensitive": false
+      },
+      {
+        "name": "recovery_workload_policy",
+        "description": "Resource ID of the VM backup policy",
+        "sensitive": false
+      }
+    ]
+  }
+}

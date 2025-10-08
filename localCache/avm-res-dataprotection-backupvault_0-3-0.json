@@ -1,0 +1,332 @@
+{
+  "module": {
+    "name": "avm-res-dataprotection-backupvault",
+    "display_name": "Azure Verified Module for Azure Data Protection Backup Vault",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-dataprotection-backupvault/azurerm/0.3.0",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-dataprotection-backupvault",
+    "version": "0.3.0",
+    "description": "Terraform Azure Verified Resource Module for Data Protection Backup Vault",
+    "resources": [
+      "azapi_resource.vault_resource_guard_association",
+      "azurerm_data_protection_backup_instance_blob_storage.this",
+      "azurerm_data_protection_backup_instance_disk.this",
+      "azurerm_data_protection_backup_instance_kubernetes_cluster.this",
+      "azurerm_data_protection_backup_instance_postgresql.this",
+      "azurerm_data_protection_backup_instance_postgresql_flexible_server.this",
+      "azurerm_data_protection_backup_policy_blob_storage.this",
+      "azurerm_data_protection_backup_policy_disk.this",
+      "azurerm_data_protection_backup_policy_kubernetes_cluster.this",
+      "azurerm_data_protection_backup_policy_postgresql.this",
+      "azurerm_data_protection_backup_policy_postgresql_flexible_server.this",
+      "azurerm_data_protection_backup_vault.this",
+      "azurerm_data_protection_backup_vault_customer_managed_key.this",
+      "azurerm_data_protection_resource_guard.this",
+      "azurerm_management_lock.this",
+      "azurerm_monitor_diagnostic_setting.this",
+      "azurerm_role_assignment.this",
+      "modtm_telemetry.telemetry",
+      "random_uuid.telemetry",
+      "azapi_client_config.telemetry",
+      "modtm_module_source.telemetry"
+    ],
+    "inputs": [
+      {
+        "name": "datastore_type",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "backup_datasource_parameters",
+        "type": "object({\n    excluded_namespaces              = optional(list(string), [])\n    included_namespaces              = optional(list(string), [])\n    excluded_resource_types          = optional(list(string), [])\n    included_resource_types          = optional(list(string), [])\n    label_selectors                  = optional(list(string), [])\n    cluster_scoped_resources_enabled = optional(bool, false)\n    volume_snapshot_enabled          = optional(bool, false)\n  })",
+        "required": false
+      },
+      {
+        "name": "timeout_delete",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "role_assignments",
+        "type": "map(object({\n    role_definition_id_or_name             = string\n    principal_id                           = string\n    scope                                  = optional(string)\n    description                            = optional(string, null)\n    skip_service_principal_aad_check       = optional(bool, false)\n    condition                              = optional(string, null)\n    condition_version                      = optional(string, null)\n    delegated_managed_identity_resource_id = optional(string, null)\n    principal_type                         = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "resource_guard_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "vault_critical_operation_exclusion_list",
+        "type": "list(string)",
+        "required": false
+      },
+      {
+        "name": "location",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "timeout_create",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "timeout_update",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "resource_group_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "backup_repeating_time_intervals",
+        "type": "list(string)",
+        "required": false
+      },
+      {
+        "name": "cross_region_restore_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "immutability",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "redundancy",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "backup_policies",
+        "type": "map(object({\n    type = string # \"disk\", \"blob\", \"kubernetes\", \"postgresql\", \"postgresql_flexible\"\n    name = string\n\n    # Common policy settings\n    backup_repeating_time_intervals = optional(list(string), [])\n    default_retention_duration      = optional(string, \"P30D\")\n    time_zone                       = optional(string, \"UTC\")\n\n    # Disk-specific settings\n    # (all settings are shared with other types for consistency)\n\n    # Blob-specific settings\n    operational_default_retention_duration = optional(string)\n    vault_default_retention_duration       = optional(string)\n\n    # AKS-specific settings\n    default_retention_life_cycle = optional(object({\n      data_store_type = optional(string, \"OperationalStore\")\n      duration        = optional(string, \"P14D\")\n    }))\n\n    # Retention rules (common to all types)\n    retention_rules = optional(list(object({\n      name     = string\n      priority = number\n      duration = optional(string, \"P30D\")\n      criteria = list(object({\n        absolute_criteria      = optional(string)\n        days_of_month          = optional(list(number))\n        days_of_week           = optional(list(string))\n        months_of_year         = optional(list(string))\n        scheduled_backup_times = optional(list(string))\n        weeks_of_month         = optional(list(string))\n      }))\n      # Life cycle (for blob policies)\n      life_cycle = optional(list(object({\n        data_store_type = string\n        duration        = string\n      })), [])\n    })), [])\n  }))",
+        "required": false
+      },
+      {
+        "name": "kubernetes_cluster_id",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "resource_guard_name",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "backup_instances",
+        "type": "map(object({\n    type              = string # \"disk\", \"blob\", \"kubernetes\", \"postgresql\", \"postgresql_flexible\"\n    name              = string\n    backup_policy_key = string # References key from backup_policies map\n\n    # Disk-specific settings\n    disk_id                      = optional(string)\n    snapshot_resource_group_name = optional(string)\n\n    # Blob-specific settings\n    storage_account_id              = optional(string)\n    storage_account_container_names = optional(list(string), [])\n\n    # AKS-specific settings\n    kubernetes_cluster_id = optional(string)\n    backup_datasource_parameters = optional(object({\n      excluded_namespaces              = optional(list(string), [])\n      included_namespaces              = optional(list(string), [])\n      excluded_resource_types          = optional(list(string), [])\n      included_resource_types          = optional(list(string), [])\n      label_selectors                  = optional(list(string), [])\n      cluster_scoped_resources_enabled = optional(bool, false)\n      volume_snapshot_enabled          = optional(bool, false)\n    }))\n\n    # PostgreSQL-specific settings\n    postgresql_server_id           = optional(string)\n    postgresql_database_id         = optional(string)\n    postgresql_key_vault_secret_id = optional(string)\n\n    # PostgreSQL Flexible-specific settings\n    postgresql_flexible_server_id           = optional(string)\n    postgresql_flexible_database_id         = optional(string)\n    postgresql_flexible_key_vault_secret_id = optional(string)\n  }))",
+        "required": false
+      },
+      {
+        "name": "default_retention_life_cycle",
+        "type": "object({\n    data_store_type = optional(string, \"OperationalStore\")\n    duration        = optional(string, \"P14D\")\n  })",
+        "required": false
+      },
+      {
+        "name": "kubernetes_backup_instance_name",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "managed_identities",
+        "type": "object({\n    system_assigned            = optional(bool, false)\n    user_assigned_resource_ids = optional(set(string), [])\n  })",
+        "required": false
+      },
+      {
+        "name": "retention_duration_in_days",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "diagnostic_settings",
+        "type": "map(object({\n    name                                     = optional(string, null)\n    log_categories                           = optional(set(string), [])\n    log_groups                               = optional(set(string), [\"allLogs\"])\n    metric_categories                        = optional(set(string), [\"AllMetrics\"])\n    log_analytics_destination_type           = optional(string, \"Dedicated\")\n    workspace_resource_id                    = optional(string, null)\n    storage_account_resource_id              = optional(string, null)\n    event_hub_authorization_rule_resource_id = optional(string, null)\n    event_hub_name                           = optional(string, null)\n    marketplace_partner_resource_id          = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "kubernetes_retention_rules",
+        "type": "list(object({\n    name              = string\n    priority          = number\n    absolute_criteria = optional(string)\n    days_of_week      = optional(list(string))\n    months_of_year    = optional(list(string))\n    weeks_of_month    = optional(list(string))\n    data_store_type   = optional(string, \"OperationalStore\")\n    duration          = string\n  }))",
+        "required": false
+      },
+      {
+        "name": "lock",
+        "type": "object({\n    kind = string\n    name = optional(string, null)\n  })",
+        "required": false
+      },
+      {
+        "name": "snapshot_resource_group_name",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "soft_delete",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "time_zone",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "timeout_read",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "customer_managed_key",
+        "type": "object({\n    key_vault_resource_id = string\n    key_name              = string\n    key_version           = optional(string, null)\n    user_assigned_identity = optional(object({\n      resource_id = string\n    }), null)\n  })",
+        "required": false
+      },
+      {
+        "name": "kubernetes_backup_policy_name",
+        "type": "string",
+        "required": false
+      }
+    ],
+    "outputs": [
+      {
+        "name": "disk_backup_policy_ids",
+        "description": "Map of disk backup policy IDs by policy key.",
+        "sensitive": false
+      },
+      {
+        "name": "identity_principal_id",
+        "description": "The Principal ID for the Service Principal associated with the Identity of this Backup Vault.",
+        "sensitive": false
+      },
+      {
+        "name": "lock_id",
+        "description": "The resource ID of the management lock (if created)",
+        "sensitive": false
+      },
+      {
+        "name": "postgresql_backup_instance_ids",
+        "description": "Map of PostgreSQL backup instance IDs by instance key.",
+        "sensitive": false
+      },
+      {
+        "name": "postgresql_flexible_backup_instance_ids",
+        "description": "Map of PostgreSQL Flexible backup instance IDs by instance key.",
+        "sensitive": false
+      },
+      {
+        "name": "postgresql_flexible_backup_policy_ids",
+        "description": "Map of PostgreSQL Flexible backup policy IDs by policy key.",
+        "sensitive": false
+      },
+      {
+        "name": "blob_backup_instance_id",
+        "description": "(DEPRECATED) The ID of the Blob Backup Instance. Use backup_instance_ids instead.",
+        "sensitive": false
+      },
+      {
+        "name": "disk_backup_instance_ids",
+        "description": "Map of disk backup instance IDs by instance key.",
+        "sensitive": false
+      },
+      {
+        "name": "identity_tenant_id",
+        "description": "The Tenant ID for the Service Principal associated with the Identity of this Backup Vault.",
+        "sensitive": false
+      },
+      {
+        "name": "postgresql_backup_policy_ids",
+        "description": "Map of PostgreSQL backup policy IDs by policy key.",
+        "sensitive": false
+      },
+      {
+        "name": "postgresql_flexible_backup_instance_id",
+        "description": "(DEPRECATED) The ID of the created PostgreSQL Flexible Server Backup Instance. Use backup_instance_ids instead.",
+        "sensitive": false
+      },
+      {
+        "name": "resource_id",
+        "description": "The ID of the Backup Vault",
+        "sensitive": false
+      },
+      {
+        "name": "backup_policy_ids",
+        "description": "Map of backup policy IDs by policy key.",
+        "sensitive": false
+      },
+      {
+        "name": "backup_vault_id",
+        "description": "The ID of the Backup Vault.",
+        "sensitive": false
+      },
+      {
+        "name": "backup_vault_name",
+        "description": "The name of the Backup Vault.",
+        "sensitive": false
+      },
+      {
+        "name": "blob_backup_policy_ids",
+        "description": "Map of blob backup policy IDs by policy key.",
+        "sensitive": false
+      },
+      {
+        "name": "postgresql_flexible_backup_policy_id",
+        "description": "(DEPRECATED) The ID of the created PostgreSQL Flexible Server Backup Policy. Use backup_policy_ids instead.",
+        "sensitive": false
+      },
+      {
+        "name": "resource_guard_name",
+        "description": "The name of the Resource Guard (if enabled)",
+        "sensitive": false
+      },
+      {
+        "name": "vault_id",
+        "description": "The resource ID of the Backup Vault",
+        "sensitive": false
+      },
+      {
+        "name": "blob_backup_instance_ids",
+        "description": "Map of blob backup instance IDs by instance key.",
+        "sensitive": false
+      },
+      {
+        "name": "kubernetes_backup_instance_ids",
+        "description": "Map of Kubernetes backup instance IDs by instance key.",
+        "sensitive": false
+      },
+      {
+        "name": "kubernetes_backup_policy_ids",
+        "description": "Map of Kubernetes backup policy IDs by policy key.",
+        "sensitive": false
+      },
+      {
+        "name": "resource_guard_id",
+        "description": "The ID of the Resource Guard (if enabled)",
+        "sensitive": false
+      },
+      {
+        "name": "backup_instance_ids",
+        "description": "Map of backup instance IDs by instance key.",
+        "sensitive": false
+      },
+      {
+        "name": "customer_managed_key_id",
+        "description": "The ID of the Customer Managed Key configuration (if enabled)",
+        "sensitive": false
+      }
+    ]
+  }
+}

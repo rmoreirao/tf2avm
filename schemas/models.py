@@ -47,6 +47,7 @@ class AVMModuleDetailed(AVMModule):
     """Represents an AVM module with full details."""
     terraform_registry_url: str = Field(default=None, description="URL to the Terraform registry entry")
     source_code_url: str = Field(default=None, description="URL to the source code repository")
+    requirements: Optional[List[str]] = Field(default=None, description="List of software requirements for the module. For ex.: azurerm (>= 4.0, < 5.0)")
     resources: Optional[List[str]] = Field(default=None, description="List of Terraform resources managed by this module")
     inputs: List[AVMModuleInput] = Field(description="List of input parameters for the module")
     outputs: List[AVMModuleOutput] = Field(description="List of output values from the module")

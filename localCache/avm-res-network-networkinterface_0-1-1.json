@@ -1,0 +1,132 @@
+{
+  "module": {
+    "name": "avm-res-network-networkinterface",
+    "display_name": "Azure Network Interface Module",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-network-networkinterface/azurerm/0.1.1",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-network-networkinterface",
+    "version": "0.1.1",
+    "description": "Terraform Azure Verified Resource Module for Network Interface\n\nThis module is used to create and manage Azure Network Interfaces (NICs) and associate them with various resources, including load balancers, application gateways, and network security groups.\n\nThis module includes the following functionalities:\n\n- Creating Network Interfaces (NICs) and associating them with various Azure resources.\n- Configuring settings such as IPv4 and IPv6 addressing, security groups, and load balancer associations.",
+    "resources": [
+      "azurerm_management_lock.this",
+      "azurerm_network_interface.this",
+      "azurerm_network_interface_application_gateway_backend_address_pool_association.this",
+      "azurerm_network_interface_application_security_group_association.this",
+      "azurerm_network_interface_backend_address_pool_association.this",
+      "azurerm_network_interface_nat_rule_association.this",
+      "azurerm_network_interface_security_group_association.this",
+      "modtm_telemetry.telemetry",
+      "random_uuid.telemetry",
+      "azapi_client_config.telemetry",
+      "modtm_module_source.telemetry"
+    ],
+    "inputs": [
+      {
+        "name": "ip_configurations",
+        "type": "map(object({\n    name                                               = string\n    gateway_load_balancer_frontend_ip_configuration_id = optional(string, null)\n    subnet_id                                          = string\n    private_ip_address_version                         = optional(string, \"IPv4\")\n    private_ip_address_allocation                      = optional(string, \"Dynamic\")\n    public_ip_address_id                               = optional(string, null)\n    primary                                            = optional(bool, null)\n    private_ip_address                                 = optional(string, null)\n  }))",
+        "required": true
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "application_gateway_backend_address_pool_association",
+        "type": "object({\n    application_gateway_backend_address_pool_id = string\n    ip_configuration_name                       = string\n  })",
+        "required": false
+      },
+      {
+        "name": "internal_dns_name_label",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "ip_forwarding_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "location",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "dns_servers",
+        "type": "list(string)",
+        "required": false
+      },
+      {
+        "name": "edge_zone",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "network_security_group_ids",
+        "type": "list(string)",
+        "required": false
+      },
+      {
+        "name": "resource_group_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "accelerated_networking_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "application_security_group_ids",
+        "type": "list(string)",
+        "required": false
+      },
+      {
+        "name": "load_balancer_backend_address_pool_association",
+        "type": "map(object({\n    load_balancer_backend_address_pool_id = string\n    ip_configuration_name                 = string\n  }))",
+        "required": false
+      },
+      {
+        "name": "lock",
+        "type": "object({\n    kind = string\n    name = optional(string, null)\n  })",
+        "required": false
+      },
+      {
+        "name": "nat_rule_association",
+        "type": "map(object({\n    nat_rule_id           = string\n    ip_configuration_name = string\n  }))",
+        "required": false
+      }
+    ],
+    "outputs": [
+      {
+        "name": "resource",
+        "description": "This is the full output for the resource.",
+        "sensitive": false
+      },
+      {
+        "name": "resource_group_name",
+        "description": "The name of the resource group.",
+        "sensitive": false
+      },
+      {
+        "name": "resource_id",
+        "description": "This id of the resource.",
+        "sensitive": false
+      },
+      {
+        "name": "location",
+        "description": "The Azure deployment region.",
+        "sensitive": false
+      }
+    ]
+  }
+}

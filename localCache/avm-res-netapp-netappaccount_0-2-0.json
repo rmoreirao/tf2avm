@@ -1,0 +1,139 @@
+{
+  "module": {
+    "name": "avm-res-netapp-netappaccount",
+    "display_name": "AVM resource module for Azure NetApp Files",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-netapp-netappaccount/azurerm/0.2.0",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-netapp-netappaccount",
+    "version": "0.2.0",
+    "description": "The AVM resource module for Azure NetApp Files",
+    "resources": [
+      "azapi_resource.anf_account",
+      "azapi_resource.anf_account_lock",
+      "azapi_resource.name",
+      "random_uuid.telemetry",
+      "modtm_telemetry.telemetry",
+      "azapi_client_config.telemetry",
+      "azapi_client_config.this",
+      "modtm_module_source.telemetry"
+    ],
+    "inputs": [
+      {
+        "name": "role_assignments",
+        "type": "map(object({\n    role_definition_id                     = string\n    principal_id                           = string\n    principal_type                         = string\n    description                            = optional(string)\n    condition                              = optional(string)\n    condition_version                      = optional(string)\n    delegated_managed_identity_resource_id = optional(string)\n  }))",
+        "required": false
+      },
+      {
+        "name": "managed_identities",
+        "type": "object({\n    system_assigned            = optional(bool, false)\n    user_assigned_resource_ids = optional(set(string), [])\n  })",
+        "required": false
+      },
+      {
+        "name": "snapshot_policies",
+        "type": "map(object({\n    name    = string\n    tags    = optional(map(string))\n    enabled = optional(bool, true)\n    hourly_schedule = optional(object({\n      snapshots_to_keep = number\n      minute            = number\n    }))\n    daily_schedule = optional(object({\n      snapshots_to_keep = number\n      hour              = number\n      minute            = number\n    }))\n    weekly_schedule = optional(object({\n      snapshots_to_keep = number\n      day               = set(string)\n      minute            = number\n      hour              = number\n    }))\n    monthly_schedule = optional(object({\n      snapshots_to_keep = number\n      days_of_month     = set(number)\n      hour              = number\n      minute            = number\n    }))\n  }))",
+        "required": false
+      },
+      {
+        "name": "tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "active_directories",
+        "type": "map(object({\n    adds_domain                       = string\n    dns_servers                       = set(string)\n    adds_site_name                    = string\n    adds_admin_user_name              = string\n    adds_admin_password               = string\n    smb_server_name                   = string\n    adds_ou                           = optional(string, \"CN=Computers\")\n    kerberos_ad_server_name           = optional(string)\n    kerberos_kdc_ip                   = optional(string)\n    aes_encryption_enabled            = optional(bool, false)\n    local_nfs_users_with_ldap_allowed = optional(bool, false)\n    ldap_over_tls_enabled             = optional(bool, false)\n    server_root_ca_certificate        = optional(string)\n    ldap_signing_enabled              = optional(bool, false)\n    administrators                    = optional(set(string))\n    backup_operators                  = optional(set(string))\n    security_operators                = optional(set(string))\n    ldap_search_scope = optional(object({\n      user_dn                 = string\n      group_dn                = string\n      group_membership_filter = optional(string)\n    }))\n  }))",
+        "required": false
+      },
+      {
+        "name": "backup_vaults",
+        "type": "map(object({\n    name = string\n    tags = optional(map(string))\n  }))",
+        "required": false
+      },
+      {
+        "name": "location",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "capacity_pools",
+        "type": "map(object({\n    name            = string\n    cool_access     = optional(bool, false)\n    encryption_type = optional(string, \"Single\")\n    size            = number\n    qos_type        = optional(string, \"Auto\")\n    service_level   = optional(string)\n    tags            = optional(map(string), null)\n    timeouts = optional(object({\n      create = optional(string)\n      delete = optional(string)\n      read   = optional(string)\n      update = optional(string)\n    }))\n    role_assignments = optional(map(object({\n      role_definition_id_or_name             = string\n      principal_id                           = string\n      description                            = optional(string, null)\n      skip_service_principal_aad_check       = optional(bool, false)\n      condition                              = optional(string, null)\n      condition_version                      = optional(string, null)\n      delegated_managed_identity_resource_id = optional(string, null)\n      principal_type                         = optional(string, null)\n    })))\n  }))",
+        "required": false
+      },
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "subscription_id",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "volumes",
+        "type": "map(object({\n    name                         = string\n    capacity_pool_map_key        = string\n    subnet_resource_id           = string\n    tags                         = optional(map(string))\n    avs_data_store               = optional(bool)\n    backup_policy_map_key        = optional(string)\n    backup_vault_map_key         = optional(string)\n    backup_policy_enforced       = optional(bool)\n    cool_access                  = optional(bool, false)\n    cool_access_retrieval_policy = optional(string)\n    coolness_period              = optional(number)\n    creation_token               = optional(string)\n    default_quota_enabled        = optional(bool, false)\n    default_group_quota_in_kibs  = optional(number, 0)\n    default_user_quota_in_kibs   = optional(number, 0)\n    delete_base_snapshot         = optional(bool)\n    enable_sub_volumes           = optional(bool)\n    encryption_key_source        = optional(string, \"Microsoft.NetApp\")\n    export_policy_rules = optional(map(object({\n      rule_index      = number\n      allowed_clients = list(string)\n      chown_mode      = optional(string)\n      cifs            = optional(bool)\n      nfsv3           = optional(bool)\n      nfsv41          = optional(bool)\n      has_root_access = optional(bool)\n      kerberos5i_ro   = optional(bool)\n      kerberos5i_rw   = optional(bool)\n      kerberos5p_ro   = optional(bool)\n      kerberos5p_rw   = optional(bool)\n      kerberos5_ro    = optional(bool)\n      kerberos5_rw    = optional(bool)\n      unix_ro         = optional(bool)\n      unix_rw         = optional(bool)\n    })))\n    key_vault_private_endpoint_resource_id = optional(string)\n    is_large_volume                        = optional(bool, false)\n    kerberos_enabled                       = optional(bool, false)\n    ldap_enabled                           = optional(bool, false)\n    network_features                       = optional(string, \"Standard\")\n    protocol_types                         = optional(set(string), [\"NFSv3\"])\n    proximity_placement_group_resource_id  = optional(string)\n    security_style                         = optional(string)\n    service_level                          = optional(string, \"Standard\")\n    smb_access_based_enumeration_enabled   = optional(bool)\n    smb_continuously_available             = optional(bool, false)\n    smb_encryption                         = optional(bool, false)\n    smb_non_browsable                      = optional(bool)\n    snapshot_directory_visible             = optional(bool, true)\n    snapshot_policy_map_key                = optional(string)\n    throughput_mibps                       = optional(number)\n    unix_permissions                       = optional(string, \"0770\")\n    volume_size_in_gib                     = optional(number, 50)\n    volume_spec_name                       = optional(string)\n    volume_type                            = optional(string, \"\")\n    zone                                   = optional(number)\n  }))",
+        "required": false
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "resource_group_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "backup_policies",
+        "type": "map(object({\n    name                    = string\n    tags                    = optional(map(string))\n    enabled                 = optional(bool, true)\n    daily_backups_to_keep   = optional(number, 2)\n    weekly_backups_to_keep  = optional(number, 1)\n    monthly_backups_to_keep = optional(number, 1)\n  }))",
+        "required": false
+      },
+      {
+        "name": "customer_managed_key",
+        "type": "object({\n    key_vault_resource_id = string\n    key_name              = string\n    key_version           = optional(string)\n    key_source            = optional(string)\n    user_assigned_identity = optional(object({\n      resource_id = string\n    }))\n  })",
+        "required": false
+      },
+      {
+        "name": "inherit_tags_from_parent_resource",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "lock",
+        "type": "object({\n    kind = string\n    name = optional(string, null)\n  })",
+        "required": false
+      }
+    ],
+    "outputs": [
+      {
+        "name": "backup_vaults_resource_ids",
+        "description": "The Resource IDs of the Azure Netapp Files Account Backup Vaults in a map alongside the map key specified in `var.backup_vaults`",
+        "sensitive": false
+      },
+      {
+        "name": "name",
+        "description": "The name of the Azure Netapp Files Account",
+        "sensitive": false
+      },
+      {
+        "name": "resource_id",
+        "description": "The Resource ID of the Azure Netapp Files Account",
+        "sensitive": false
+      },
+      {
+        "name": "snapshot_policies_resource_ids",
+        "description": "The Resource IDs of the Azure Netapp Files Account Snapshot Policies in a map alongside the map key specified in `var.snapshot_policies`",
+        "sensitive": false
+      },
+      {
+        "name": "volumes_resource_ids",
+        "description": "The Resource IDs of the Azure Netapp Files Volumes in a map alongside the map key specified in `var.volumes`",
+        "sensitive": false
+      },
+      {
+        "name": "backup_policies_resource_ids",
+        "description": "The Resource IDs of the Azure Netapp Files Account Backup Policies in a map alongside the map key specified in `var.backup_policies`",
+        "sensitive": false
+      }
+    ]
+  }
+}

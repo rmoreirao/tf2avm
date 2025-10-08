@@ -1,0 +1,109 @@
+{
+  "module": {
+    "name": "avm-res-desktopvirtualization-scalingplan",
+    "display_name": "AVM for Desktop Virtualization Scaling Plans",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-desktopvirtualization-scalingplan/azurerm/0.2.1",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-desktopvirtualization-scalingplan",
+    "version": "0.2.1",
+    "description": "AVM for Desktop Virtualization Scaling Plans",
+    "resources": [
+      "azurerm_virtual_desktop_scaling_plan.this",
+      "azurerm_role_assignment.this",
+      "azurerm_monitor_diagnostic_setting.this",
+      "azurerm_management_lock.this",
+      "modtm_telemetry.telemetry",
+      "random_uuid.telemetry",
+      "azurerm_client_config.telemetry",
+      "modtm_module_source.telemetry"
+    ],
+    "inputs": [
+      {
+        "name": "virtual_desktop_scaling_plan_schedule",
+        "type": "list(object({\n    days_of_week                         = set(string)\n    name                                 = string\n    off_peak_load_balancing_algorithm    = string\n    off_peak_start_time                  = string\n    peak_load_balancing_algorithm        = string\n    peak_start_time                      = string\n    ramp_down_capacity_threshold_percent = number\n    ramp_down_force_logoff_users         = bool\n    ramp_down_load_balancing_algorithm   = string\n    ramp_down_minimum_hosts_percent      = number\n    ramp_down_notification_message       = string\n    ramp_down_start_time                 = string\n    ramp_down_stop_hosts_when            = string\n    ramp_down_wait_time_minutes          = number\n    ramp_up_capacity_threshold_percent   = optional(number)\n    ramp_up_load_balancing_algorithm     = string\n    ramp_up_minimum_hosts_percent        = optional(number)\n    ramp_up_start_time                   = string\n  }))",
+        "required": true
+      },
+      {
+        "name": "virtual_desktop_scaling_plan_time_zone",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "virtual_desktop_scaling_plan_location",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "diagnostic_settings",
+        "type": "map(object({\n    name                                     = optional(string, null)\n    log_categories                           = optional(set(string), [])\n    log_groups                               = optional(set(string), [\"allLogs\"])\n    metric_categories                        = optional(set(string), [\"AllMetrics\"])\n    log_analytics_destination_type           = optional(string, \"Dedicated\")\n    workspace_resource_id                    = optional(string, null)\n    storage_account_resource_id              = optional(string, null)\n    event_hub_authorization_rule_resource_id = optional(string, null)\n    event_hub_name                           = optional(string, null)\n    marketplace_partner_resource_id          = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "lock",
+        "type": "object({\n    kind = string\n    name = optional(string, null)\n  })",
+        "required": false
+      },
+      {
+        "name": "virtual_desktop_scaling_plan_description",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "virtual_desktop_scaling_plan_exclusion_tag",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "virtual_desktop_scaling_plan_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "role_assignments",
+        "type": "map(object({\n    role_definition_id_or_name             = string\n    principal_id                           = string\n    description                            = optional(string, null)\n    skip_service_principal_aad_check       = optional(bool, false)\n    condition                              = optional(string, null)\n    condition_version                      = optional(string, null)\n    delegated_managed_identity_resource_id = optional(string, null)\n    principal_type                         = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "virtual_desktop_scaling_plan_friendly_name",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "virtual_desktop_scaling_plan_host_pool",
+        "type": "list(object({\n    hostpool_id          = string\n    scaling_plan_enabled = bool\n  }))",
+        "required": false
+      },
+      {
+        "name": "virtual_desktop_scaling_plan_resource_group_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "virtual_desktop_scaling_plan_tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "virtual_desktop_scaling_plan_timeouts",
+        "type": "object({\n    create = optional(string)\n    delete = optional(string)\n    read   = optional(string)\n    update = optional(string)\n  })",
+        "required": false
+      }
+    ],
+    "outputs": [
+      {
+        "name": "resource",
+        "description": "This output is the full output for the resource to allow flexibility to reference all possible values for the resource. Example usage: module.<modulename>.resource.id",
+        "sensitive": false
+      },
+      {
+        "name": "resource_id",
+        "description": "This output is the full output for the resource to allow flexibility to reference all possible values for the resource. Example usage: module.<modulename>.resource.id",
+        "sensitive": false
+      }
+    ]
+  }
+}

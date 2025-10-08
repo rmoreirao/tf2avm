@@ -1,0 +1,204 @@
+{
+  "module": {
+    "name": "avm-res-datafactory-factory",
+    "display_name": "avm-res-datafactory-factory",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-datafactory-factory/azurerm/0.1.0",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-datafactory-factory",
+    "version": "0.1.0",
+    "description": "",
+    "resources": [
+      "azurerm_data_factory_linked_service_azure_blob_storage.this",
+      "azurerm_data_factory_linked_service_azure_databricks.this",
+      "azurerm_data_factory_linked_service_data_lake_storage_gen2.this",
+      "azurerm_private_endpoint_application_security_group_association.this",
+      "azurerm_data_factory.this",
+      "azurerm_data_factory_integration_runtime_self_hosted.this",
+      "azurerm_data_factory_linked_service_azure_file_storage.this",
+      "random_uuid.telemetry",
+      "azurerm_data_factory_credential_service_principal.this",
+      "azurerm_data_factory_linked_service_key_vault.this",
+      "azurerm_private_endpoint.this_managed_dns_zone_groups",
+      "modtm_telemetry.telemetry",
+      "azurerm_management_lock.this",
+      "azurerm_data_factory_credential_user_managed_identity.this",
+      "azurerm_monitor_diagnostic_setting.this",
+      "azurerm_data_factory_linked_service_azure_sql_database.this",
+      "azurerm_private_endpoint.this_unmanaged_dns_zone_groups",
+      "azurerm_role_assignment.this"
+    ],
+    "inputs": [
+      {
+        "name": "resource_group_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "credential_user_managed_identity",
+        "type": "map(object({\n    name            = string\n    data_factory_id = optional(string)\n    identity_id     = string\n    annotations     = optional(list(string), null)\n    description     = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "customer_managed_key_id",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "lock",
+        "type": "object({\n    kind = string\n    name = optional(string, null)\n  })",
+        "required": false
+      },
+      {
+        "name": "public_network_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "role_assignments",
+        "type": "map(object({\n    role_definition_id_or_name             = string\n    principal_id                           = string\n    description                            = optional(string, null)\n    skip_service_principal_aad_check       = optional(bool, false)\n    condition                              = optional(string, null)\n    condition_version                      = optional(string, null)\n    delegated_managed_identity_resource_id = optional(string, null)\n    principal_type                         = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "vsts_configuration",
+        "type": "object({\n    account_name       = string\n    branch_name        = string\n    project_name       = string\n    repository_name    = string\n    root_folder        = string\n    tenant_id          = string\n    publishing_enabled = optional(bool, true)\n  })",
+        "required": false
+      },
+      {
+        "name": "customer_managed_key_identity_id",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "github_configuration",
+        "type": "object({\n    account_name       = string\n    branch_name        = string\n    git_url            = optional(string, null)\n    repository_name    = string\n    root_folder        = string\n    publishing_enabled = optional(bool, true)\n  })",
+        "required": false
+      },
+      {
+        "name": "global_parameters",
+        "type": "list(object({\n    name  = string\n    type  = string\n    value = any\n  }))",
+        "required": false
+      },
+      {
+        "name": "integration_runtime_self_hosted",
+        "type": "map(object({\n    data_factory_id                              = optional(string)\n    name                                         = string\n    description                                  = optional(string, null)\n    self_contained_interactive_authoring_enabled = optional(bool, null)\n    rbac_authorization = optional(object({\n      resource_id = string\n    }), null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "linked_service_azure_blob_storage",
+        "type": "map(object({\n    name                       = string\n    description                = optional(string, null)\n    integration_runtime_name   = optional(string, null)\n    annotations                = optional(list(string), null)\n    parameters                 = optional(map(string), null)\n    additional_properties      = optional(map(string), null)\n    connection_string          = optional(string, null)\n    connection_string_insecure = optional(string, null)\n    sas_uri                    = optional(string, null)\n    service_endpoint           = optional(string, null)\n    use_managed_identity       = optional(bool, null)\n    service_principal_id       = optional(string, null)\n    service_principal_key      = optional(string, null)\n    storage_kind               = optional(string, null)\n    tenant_id                  = optional(string, null)\n\n    key_vault_sas_token = optional(object({\n      linked_service_name = string\n      secret_name         = string\n    }), null)\n\n    service_principal_linked_key_vault_key = optional(object({\n      linked_service_name = string\n      secret_name         = string\n    }), null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "linked_service_azure_file_storage",
+        "type": "map(object({\n    name                     = string\n    data_factory_id          = optional(string)\n    description              = optional(string, null)\n    host                     = optional(string, null)\n    integration_runtime_name = optional(string, null)\n    annotations              = optional(list(string), null)\n    parameters               = optional(map(string), null)\n    password                 = optional(string, null)\n    user_id                  = optional(string, null)\n    additional_properties    = optional(map(string), null)\n    connection_string        = string\n    file_share               = optional(string, null)\n\n    key_vault_password = optional(object({\n      linked_service_name = string\n      secret_name         = string\n    }), null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "linked_service_azure_sql_database",
+        "type": "map(object({\n    name                     = string\n    data_factory_id          = optional(string)\n    connection_string        = optional(string, null)\n    use_managed_identity     = optional(bool, null)\n    service_principal_id     = optional(string, null)\n    service_principal_key    = optional(string, null)\n    tenant_id                = optional(string, null)\n    description              = optional(string, null)\n    integration_runtime_name = optional(string, null)\n    annotations              = optional(list(string), null)\n    parameters               = optional(map(string), null)\n    additional_properties    = optional(map(string), null)\n    credential_name          = optional(string, null)\n\n    key_vault_connection_string = optional(object({\n      linked_service_name = string\n      secret_name         = string\n    }), null)\n\n    key_vault_password = optional(object({\n      linked_service_name = string\n      secret_name         = string\n    }), null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "linked_service_data_lake_storage_gen2",
+        "type": "map(object({\n    name                     = string\n    data_factory_id          = optional(string)\n    description              = optional(string, null)\n    integration_runtime_name = optional(string, null)\n    annotations              = optional(list(string), null)\n    parameters               = optional(map(string), null)\n    additional_properties    = optional(map(string), null)\n    url                      = string\n    storage_account_key      = optional(string, null)\n    use_managed_identity     = optional(bool, null)\n    service_principal_id     = optional(string, null)\n    service_principal_key    = optional(string, null)\n    tenant                   = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "linked_service_databricks",
+        "type": "map(object({\n    adb_domain                 = string\n    data_factory_id            = optional(string)\n    name                       = string\n    additional_properties      = optional(map(string), null)\n    annotations                = optional(list(string), null)\n    description                = optional(string, null)\n    integration_runtime_name   = optional(string, null)\n    parameters                 = optional(map(string), null)\n    access_token               = optional(string, null)\n    msi_work_space_resource_id = optional(string, null)\n    key_vault_password = optional(object({\n      linked_service_name = string\n      secret_name         = string\n    }), null)\n    existing_cluster_id = optional(string, null)\n    instance_pool = optional(object({\n      instance_pool_id      = string\n      cluster_version       = string\n      min_number_of_workers = optional(number, 1)\n      max_number_of_workers = optional(number, null)\n    }), null)\n    new_cluster_config = optional(object({\n      cluster_version             = string\n      node_type                   = string\n      driver_node_type            = optional(string, null)\n      max_number_of_workers       = optional(number, null)\n      min_number_of_workers       = optional(number, 1)\n      spark_config                = optional(map(string), null)\n      spark_environment_variables = optional(map(string), null)\n      custom_tags                 = optional(map(string), null)\n      init_scripts                = optional(list(string), null)\n      log_destination             = optional(string, null)\n    }), null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "linked_service_key_vault",
+        "type": "map(object({\n    name                     = string\n    data_factory_id          = optional(string)\n    key_vault_id             = string\n    description              = optional(string, null)\n    integration_runtime_name = optional(string, null)\n    annotations              = optional(list(string), null)\n    parameters               = optional(map(string), null)\n    additional_properties    = optional(map(string), null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "managed_identities",
+        "type": "object({\n    system_assigned            = optional(bool, false)\n    user_assigned_resource_ids = optional(set(string), [])\n  })",
+        "required": false
+      },
+      {
+        "name": "managed_virtual_network_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "location",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "credential_service_principal",
+        "type": "map(object({\n    name                 = string\n    data_factory_id      = optional(string)\n    tenant_id            = string\n    service_principal_id = string\n    annotations          = optional(list(string), null)\n    description          = optional(string, null)\n\n    service_principal_key = optional(object({\n      linked_service_name = string\n      secret_name         = string\n      secret_version      = optional(string, null)\n    }), null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "private_endpoints",
+        "type": "map(object({\n    name = optional(string, null)\n    role_assignments = optional(map(object({\n      role_definition_id_or_name             = string\n      principal_id                           = string\n      description                            = optional(string, null)\n      skip_service_principal_aad_check       = optional(bool, false)\n      condition                              = optional(string, null)\n      condition_version                      = optional(string, null)\n      delegated_managed_identity_resource_id = optional(string, null)\n      principal_type                         = optional(string, null)\n    })), {})\n    lock = optional(object({\n      kind = string\n      name = optional(string, null)\n    }), null)\n    tags                                    = optional(map(string), null)\n    subnet_resource_id                      = string\n    private_dns_zone_group_name             = optional(string, ",
+        "required": false
+      },
+      {
+        "name": "private_dns_zone_resource_ids",
+        "type": "array",
+        "required": false
+      },
+      {
+        "name": "application_security_group_resource_ids",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "private_service_connection_name",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "network_interface_name",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "location",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "resource_group_name",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "ip_configurations",
+        "type": "map(object({\n      name               = string\n      private_ip_address = string\n    }))",
+        "required": false
+      }
+    ],
+    "outputs": [
+      {
+        "name": "resource",
+        "description": "This is the full output for the resource.",
+        "sensitive": false
+      },
+      {
+        "name": "resource_id",
+        "description": "The resource id of the Data Factory resource.",
+        "sensitive": false
+      },
+      {
+        "name": "name",
+        "description": "The name of the Data Factory resource",
+        "sensitive": false
+      },
+      {
+        "name": "private_endpoints",
+        "description": "A map of private endpoints. The map key is the supplied input to var.private_endpoints. The map value is the entire azurerm_private_endpoint resource.",
+        "sensitive": false
+      }
+    ]
+  }
+}

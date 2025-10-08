@@ -1,0 +1,144 @@
+{
+  "module": {
+    "name": "avm-res-oracledatabase-cloudexadatainfrastructure",
+    "display_name": "AVM Resource - Oracle Database Cloud Exadata Infrastructure",
+    "version": "0.2.0",
+    "description": "Terraform Azure Verified Resource Module for Oracle Exadata Infrastructure. Deploys scalable Oracle Cloud Exadata Infrastructure in an enterprise-ready configuration on Microsoft Azure.",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-oracledatabase-cloudexadatainfrastructure/azurerm/0.2.0",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-oracledatabase-cloudexadatainfrastructure",
+    "resources": [
+      "azapi_resource.odaa_infra",
+      "modtm_telemetry.telemetry",
+      "random_uuid.telemetry"
+    ],
+    "inputs": [
+      {
+        "name": "maintenance_window_preference",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "role_assignments",
+        "type": "map(object({ role_definition_id_or_name=string, principal_id=string, description=optional(string,null), skip_service_principal_aad_check=optional(bool,false), condition=optional(string,null), condition_version=optional(string,null), delegated_managed_identity_resource_id=optional(string,null), principal_type=optional(string,null) }))",
+        "required": false
+      },
+      {
+        "name": "maintenance_window_weeks_of_month",
+        "type": "list(number)",
+        "required": false
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "maintenance_window_leadtime_in_weeks",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "database_server_type",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "storage_server_type",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "is_custom_action_timeout_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "customer_contacts",
+        "type": "list(object({email=string}))",
+        "required": false
+      },
+      {
+        "name": "compute_count",
+        "type": "number",
+        "required": true
+      },
+      {
+        "name": "shape",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "maintenance_window_hours_of_day",
+        "type": "list(number)",
+        "required": false
+      },
+      {
+        "name": "maintenance_window_days_of_week",
+        "type": "list(object({name=string}))",
+        "required": false
+      },
+      {
+        "name": "maintenance_window_months",
+        "type": "list(object({name=string}))",
+        "required": false
+      },
+      {
+        "name": "location",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "zone",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "maintenance_window_patching_mode",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "custom_action_timeout_in_mins",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "display_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "resource_group_id",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "storage_count",
+        "type": "number",
+        "required": true
+      }
+    ],
+    "outputs": [
+      {
+        "name": "resource",
+        "description": "This is the full output for the resource.",
+        "sensitive": false
+      },
+      {
+        "name": "resource_id",
+        "description": "This is the ID of the resource.",
+        "sensitive": false
+      }
+    ]
+  }
+}

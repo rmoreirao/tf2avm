@@ -1,0 +1,160 @@
+{
+  "module": {
+    "name": "avm-res-eventhub-namespace",
+    "display_name": "EventHub Namespace AVM Module",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-eventhub-namespace/azurerm/0.1.0",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-eventhub-namespace",
+    "version": "0.1.0",
+    "description": "This is a Terraform AVM module for Event Hub resources in Azure.",
+    "resources": [
+      "azurerm_eventhub.this",
+      "azurerm_eventhub_namespace.this",
+      "azurerm_management_lock.this",
+      "azurerm_private_endpoint.this",
+      "azurerm_private_endpoint.this_unmanaged_dns_zone_groups",
+      "azurerm_private_endpoint_application_security_group_association.this",
+      "azurerm_role_assignment.event_hubs",
+      "azurerm_role_assignment.this",
+      "modtm_telemetry.telemetry",
+      "random_uuid.telemetry",
+      "azurerm_client_config.telemetry",
+      "azurerm_eventhub_namespace.this",
+      "azurerm_resource_group.parent",
+      "modtm_module_source.telemetry"
+    ],
+    "inputs": [
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "private_endpoints",
+        "type": "map(object({\n    name = optional(string, null)\n    role_assignments = optional(map(object({\n      role_definition_id_or_name             = string\n      principal_id                           = string\n      description                            = optional(string, null)\n      skip_service_principal_aad_check       = optional(bool, false)\n      condition                              = optional(string, null)\n      condition_version                      = optional(string, null)\n      delegated_managed_identity_resource_id = optional(string, null)\n      principal_type                         = optional(string, null)\n    })), {})\n    lock = optional(object({\n      kind = string\n      name = optional(string, null)\n    }), null)\n    tags                                    = optional(map(string), null)\n    subnet_resource_id                      = string\n    subresource_name                        = string # NOTE: `subresource_name` can be excluded if the resource does not support multiple sub resource types (e.g. storage account supports blob, queue, etc)\n    private_dns_zone_group_name             = optional(string, \"default\")\n    private_dns_zone_resource_ids           = optional(set(string), [])\n    application_security_group_associations = optional(map(string), {})\n    private_service_connection_name         = optional(string, null)\n    network_interface_name                  = optional(string, null)\n    location                                = optional(string, null)\n    resource_group_name                     = optional(string, null)\n    ip_configurations = optional(map(object({\n      name               = string\n      private_ip_address = string\n    })), {})\n  }))",
+        "required": false
+      },
+      {
+        "name": "role_assignments",
+        "type": "map(object({\n    role_definition_id_or_name             = string\n    principal_id                           = string\n    description                            = optional(string, null)\n    skip_service_principal_aad_check       = optional(bool, false)\n    condition                              = optional(string, null)\n    condition_version                      = optional(string, null)\n    delegated_managed_identity_resource_id = optional(string, null)\n    principal_type                         = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "sku",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "maximum_throughput_units",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "lock",
+        "type": "object({\n    kind = string\n    name = optional(string, null)\n  })",
+        "required": false
+      },
+      {
+        "name": "public_network_access_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "network_rulesets",
+        "type": "object({\n    default_action                 = optional(string, \"Deny\")\n    public_network_access_enabled  = bool\n    trusted_service_access_enabled = bool\n    ip_rule = optional(list(object({\n      # since the `action` property only permits `Allow`, this is hard-coded.\n      action  = optional(string, \"Allow\")\n      ip_mask = string\n    })), [])\n    virtual_network_rule = optional(list(object({\n      # since the `action` property only permits `Allow`, this is hard-coded.\n      ignore_missing_virtual_network_service_endpoint = optional(bool)\n      subnet_id                                       = string\n    })), [])\n  })",
+        "required": false
+      },
+      {
+        "name": "event_hubs",
+        "type": "map(object({\r\n    namespace_name      = string\r\n    resource_group_name = string\r\n    partition_count     = number\r\n    message_retention   = number\r\n    capture_description = optional(object({\r\n      enabled             = bool\r\n      encoding            = string\r\n      interval_in_seconds = optional(number)\r\n      size_limit_in_bytes = optional(number)\r\n      skip_empty_archives = optional(bool)\r\n      destination = object({\r\n        name                = optional(string, \"EventHubArchive.AzureBlockBlob\")\r\n        archive_name_format = string\r\n        blob_container_name = string\r\n        storage_account_id  = string\r\n      })\r\n    }))\r\n    status = optional(string)\r\n    role_assignments = optional(map(object({\r\n      role_definition_id_or_name             = string\r\n      principal_id                           = string\r\n      description                            = optional(string, null)\r\n      skip_service_principal_aad_check       = optional(bool, false)\r\n      condition                              = optional(string, null)\r\n      condition_version                      = optional(string, null)\r\n      delegated_managed_identity_resource_id = optional(string, null)\r\n    })), {})\r\n  }))",
+        "required": false
+      },
+      {
+        "name": "customer_managed_key",
+        "type": "object({\n    key_vault_resource_id = string\n    key_name              = string\n    key_version           = optional(string, null)\n    user_assigned_identity = optional(object({\n      resource_id = string\n    }), null)\n  })",
+        "required": false
+      },
+      {
+        "name": "managed_identities",
+        "type": "object({\n    system_assigned            = optional(bool, false)\n    user_assigned_resource_ids = optional(set(string), [])\n  })",
+        "required": false
+      },
+      {
+        "name": "capacity",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "dedicated_cluster_id",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "resource_group_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "diagnostic_settings",
+        "type": "map(object({\n    name                                     = optional(string, null)\n    log_categories                           = optional(set(string), [])\n    log_groups                               = optional(set(string), [\"allLogs\"])\n    metric_categories                        = optional(set(string), [\"AllMetrics\"])\n    log_analytics_destination_type           = optional(string, \"Dedicated\")\n    workspace_resource_id                    = optional(string, null)\n    storage_account_resource_id              = optional(string, null)\n    event_hub_authorization_rule_resource_id = optional(string, null)\n    event_hub_name                           = optional(string, null)\n    marketplace_partner_resource_id          = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "existing_parent_resource",
+        "type": "object({\n    name = string\n  })",
+        "required": false
+      },
+      {
+        "name": "private_endpoints_manage_dns_zone_group",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "auto_inflate_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "local_authentication_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "location",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "required": true
+      }
+    ],
+    "outputs": [
+      {
+        "name": "private_endpoints",
+        "description": "  A map of the private endpoints created.",
+        "sensitive": false
+      },
+      {
+        "name": "resource",
+        "description": "This is the full output for the resource.",
+        "sensitive": false
+      },
+      {
+        "name": "resource_eventhubs",
+        "description": "A map of event hubs.  The map key is the supplied input to var.event_hubs. The map value is the entire azurerm_event_hubs resource.",
+        "sensitive": false
+      },
+      {
+        "name": "resource_id",
+        "description": "This is the full output for the resource.",
+        "sensitive": false
+      }
+    ]
+  }
+}

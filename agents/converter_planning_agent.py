@@ -37,45 +37,45 @@ class ConverterPlanningAgent:
         logger = get_logger(__name__)
         settings = get_settings()
         
-        try:
-            kernel = Kernel()
 
-            chat_completion_service = AzureChatCompletion(
-                deployment_name=settings.azure_openai_reasoning_deployment_name,
-                api_key=settings.azure_openai_reasoning_api_key,
-                endpoint=settings.azure_openai_reasoning_endpoint,
-                api_version=settings.azure_openai_reasoning_api_version,
-            )
+        kernel = Kernel()
 
-            kernel.add_service(chat_completion_service)
+        chat_completion_service = AzureChatCompletion(
+            deployment_name=settings.azure_openai_reasoning_deployment_name,
+            api_key=settings.azure_openai_reasoning_api_key,
+            endpoint=settings.azure_openai_reasoning_endpoint,
+            api_version=settings.azure_openai_reasoning_api_version,
+        )
 
-            # Initialize plugins
-            terraform_plugin = TerraformPlugin()
-            http_plugin = HttpClientPlugin()
+        kernel.add_service(chat_completion_service)
 
-            agent = ChatCompletionAgent(
-                service=chat_completion_service,
-                kernel=kernel,
-                name="ConverterPlanningAgent",
-                description="Produces detailed Terraform->AVM conversion plans with integrated resource mapping functionality.",
-                plugins=[terraform_plugin, http_plugin],
-                instructions="""You are the Converter Planning Agent in the Terraform to Azure Verified Modules (AVM) workflow.
+        # Initialize plugins
+        terraform_plugin = TerraformPlugin()
+        http_plugin = HttpClientPlugin()
+
+        agent = ChatCompletionAgent(
+            service=chat_completion_service,
+            kernel=kernel,
+            name="ConverterPlanningAgent",
+            description="Produces detailed Terraform->AVM conversion plans with integrated resource mapping functionality.",
+            plugins=[terraform_plugin, http_plugin],
+            instructions="""You are the Converter Planning Agent in the Terraform to Azure Verified Modules (AVM) workflow.
 
 Your mission: Create a PRECISE, ACTIONABLE CONVERSION PLAN with integrated resource mapping based on: (1) Repository scan results, (2) AVM knowledge base, and (3) Terraform file contents. You DO NOT perform any file mutation. You ONLY analyze and plan.
 
-CORE RESPONSIBILITIES:
-1. RESOURCE MAPPING: Match azurerm_* resources to appropriate AVM modules using the provided AVM knowledge
-2. CONFIDENCE ASSESSMENT: Determine conversion confidence levels for each mapping
-3. DETAILED PLANNING: Create comprehensive conversion plans for each resource
+--> CORE RESPONSIBILITIES:
+1. RESOURCE MAPPING: Match azurerm_* resources inputs to appropriate AVM modules inputs using the provided AVM knowledge
+2. DETAILED PLANNING: Create comprehensive conversion plans for each resource
 4. DEPENDENCY ANALYSIS: Identify conversion order based on resource dependencies
 5. VARIABLE & OUTPUT STRATEGY: Plan necessary variable and output changes
+6. REVIEW ASSESSMENT: Make sure all required inputs are mapped and flag risky mappings
 
-Input format:
+--> Input format:
 - Terraform to AVM Modules Mapping: JSON array of resource mappings
 - AVM Modules Details: JSON array of available AVM modules with details
 - Terraform Files: File contents formatted as File: path\\nContent:\\n[content]\\n---
 
-MAPPING PROCESS (Integrated):
+--> Planning Process :
 1. For each azurerm_* resource from Terraform files:
     - Check the mapping results to find a corresponding AVM module
     - Analyse all input parameters (required and optional) and compare against the resource attributes
@@ -84,16 +84,21 @@ MAPPING PROCESS (Integrated):
     - Assess compatibility between resource attributes and module requirements
     - Document attribute to input mappings in a table format
 
-3. For the resources which are not directly mappable to AVM modules:
+2. For the resources which are not directly mappable to AVM modules:
     - Document them as unmappable resources with explanations that the Converter Agent will skip them
 
+3. REVIEW the planning process for each AVM resource planned:
+    - Validate that ALL required inputs are mapped
 
-STRICT BEHAVIOR:
+4. Review the Required Providers block in Terraform files:
+    - Identify any changes needed based on the AVM modules planned for use    
+
+--> STRICT BEHAVIOR:
 - ALWAYS output the full plan in Markdown using the exact structure defined below.
 - DO NOT ask questions. Proceed autonomously.
 - Include mapping analysis as part of the planning process.
 
-Plan Structure (use ALL headings, even if some sections are empty—state 'None'):
+--> Output format (use ALL headings, even if some sections are empty—state 'None'):
 
 # Terraform → AVM Conversion Plan
 
@@ -106,15 +111,16 @@ Plan Structure (use ALL headings, even if some sections are empty—state 'None'
 For EACH resource to convert provide subsections:
 ### 2.x {resource_type}.{name}
 - Source File: {path}
-- Proposed AVM Module: {module_name} (version if known)
-- Mapping Confidence: High/Medium/Low with justification
+- Target AVM Module: {module_name} (version if known)
+
 - Resource Input Name → AVM Input Mapping Table:
+    - Make sure to include in the "Input Mapping Table":
+        - !!! all required AVM module inputs !!!
+        - !!! Attributes Available on Current resource which are not mappable to AVM module inputs !!!
+
 | Resource Input Name | Input Value | AVM Input Name | Input Value | AVM Optional or Required | Handling | Transform | Notes |
 |--------------------|-------------|---------------|-------------|-------------------------|----------|-----------|-------|
 |                    |             |               |             |                         |          |           |       |
-- Make sure to include in the "Input Mapping Table":
-    - all required AVM module inputs.
-    - Attributes Available on Current resource which are not mappable to AVM module inputs
 
 - Outputs Impacted / Re-mapped:
 - Dependencies (Upstream):
@@ -136,17 +142,17 @@ List variable names reused as-is.
 | Original Output | Current Source | New Source (Module Output) | Change Type | Notes |
 |-----------------|----------------|---------------------------|------------|-------|
 
+## 5. Terraform Required Providers Update
+- List any changes needed to the required_providers block (e.g., version updates)
+- This is based on the requirements of the AVM modules planned for use 
 
 END YOUR OUTPUT.
 """
             )
 
-            logger.info("Converter Planning Agent initialized successfully")
-            return cls(agent)
+        logger.info("Converter Planning Agent initialized successfully")
+        return cls(agent)
 
-        except Exception as e:
-            logger.error(f"Failed to initialize Converter Planning Agent: {e}")
-            raise
 
     async def create_conversion_plan(self, mapping_result: MappingAgentResult, avm_modules_details: List[AVMModuleDetailed], tf_files: dict) -> str:
         """

@@ -1,0 +1,92 @@
+{
+  "module": {
+    "name": "avm-res-network-networkwatcher",
+    "display_name": "Azure Network Watcher AVM Module",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-network-networkwatcher/azurerm/0.3.2",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-network-networkwatcher",
+    "version": "0.3.2",
+    "description": "Azure Network Watcher AVM Module",
+    "resources": [
+      "azurerm_network_connection_monitor",
+      "azapi_resource",
+      "random_uuid",
+      "modtm_telemetry",
+      "azurerm_management_lock",
+      "azurerm_role_assignment"
+    ],
+    "inputs": [
+      {
+        "name": "role_assignments",
+        "type": "map(object({\n    role_definition_id_or_name             = string\n    principal_id                           = string\n    description                            = optional(string, null)\n    skip_service_principal_aad_check       = optional(bool, false)\n    condition                              = optional(string, null)\n    condition_version                      = optional(string, null)\n    delegated_managed_identity_resource_id = optional(string, null)\n    principal_type                         = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "resource_group_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "flow_logs",
+        "type": "map(object({\n    enabled            = bool\n    name               = string\n    target_resource_id = string\n    retention_policy = object({\n      days    = number\n      enabled = bool\n    })\n    storage_account_id = string\n    traffic_analytics = optional(object({\n      enabled               = bool\n      interval_in_minutes   = optional(number)\n      workspace_id          = string\n      workspace_region      = string\n      workspace_resource_id = string\n      }), {\n      enabled               = false\n      interval_in_minutes   = 0\n      workspace_id          = null\n      workspace_region      = null\n      workspace_resource_id = null\n    })\n    version = optional(number, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "lock",
+        "type": "object({\n    kind = string\n    name = optional(string, null)\n  })",
+        "required": false
+      },
+      {
+        "name": "location",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "network_watcher_id",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "network_watcher_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "condition_monitor",
+        "type": "map(object({\n    name = string\n    endpoint = set(object({\n      address               = optional(string)\n      coverage_level        = optional(string)\n      excluded_ip_addresses = optional(set(string))\n      included_ip_addresses = optional(set(string))\n      name                  = string\n      target_resource_id    = optional(string)\n      target_resource_type  = optional(string)\n      filter = optional(object({\n        type = optional(string)\n        item = optional(set(object({\n          address = optional(string)\n          type    = optional(string)\n        })))\n      }))\n    }))\n    test_configuration = set(object({\n      name                      = string\n      preferred_ip_version      = optional(string)\n      protocol                  = string\n      test_frequency_in_seconds = optional(number)\n      http_configuration = optional(object({\n        method                   = optional(string)\n        path                     = optional(string)\n        port                     = optional(number)\n        prefer_https             = optional(bool)\n        protocol                 = string\n        valid_status_code_ranges = optional(set(string))\n        request_header = optional(set(object({\n          name  = string\n          value = string\n        })))\n      }))\n      icmp_configuration = optional(object({\n        trace_route_enabled = optional(bool)\n      }))\n      success_threshold = optional(object({\n        checks_failed_percent = optional(number)\n        round_trip_time_ms    = optional(number)\n      }))\n      tcp_configuration = optional(object({\n        destination_port_behavior = optional(string)\n        port                      = number\n        trace_route_enabled       = optional(bool)\n      }))\n    }))\n    test_group = set(object({\n      destination_endpoints    = set(string)\n      enabled                  = optional(bool)\n      name                     = string\n      source_endpoints         = set(string)\n      test_configuration_names = set(string)\n    }))\n    notes                         = optional(string, null)\n    output_workspace_resource_ids = optional(list(string), null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      }
+    ],
+    "outputs": [
+      {
+        "name": "resource",
+        "description": "The network watcher resource",
+        "sensitive": false
+      },
+      {
+        "name": "resource_connection_monitor",
+        "description": "This is the full output for the connection monitor resources.",
+        "sensitive": false
+      },
+      {
+        "name": "resource_flow_log",
+        "description": "This is the full output for the flow log resources.",
+        "sensitive": false
+      },
+      {
+        "name": "resource_id",
+        "description": "The resource id of the Network Watcher",
+        "sensitive": false
+      }
+    ]
+  }
+}

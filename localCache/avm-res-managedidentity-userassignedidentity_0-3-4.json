@@ -1,0 +1,82 @@
+{
+  "module": {
+    "name": "avm-res-managedidentity-userassignedidentity",
+    "display_name": "avm-res-managedidentity-userassignedidentity",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-managedidentity-userassignedidentity/azurerm/0.3.4",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-managedidentity-userassignedidentity",
+    "version": "0.3.4",
+    "description": "To gain access, please finish setting up this repository now at: ",
+    "resources": [
+      "azurerm_management_lock.this",
+      "azurerm_user_assigned_identity.this",
+      "modtm_telemetry.telemetry",
+      "random_uuid.telemetry",
+      "azurerm_client_config.telemetry",
+      "modtm_module_source.telemetry"
+    ],
+    "inputs": [
+      {
+        "name": "resource_group_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "lock",
+        "type": "object({\n    kind = string\n    name = optional(string, null)\n  })",
+        "required": false
+      },
+      {
+        "name": "tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "location",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "required": true
+      }
+    ],
+    "outputs": [
+      {
+        "name": "client_id",
+        "description": "This is the client id for the user assigned identity.",
+        "sensitive": false
+      },
+      {
+        "name": "principal_id",
+        "description": "This is the principal id for the user assigned identity.",
+        "sensitive": false
+      },
+      {
+        "name": "resource",
+        "description": "The object of type User Assigned Identity that was created.",
+        "sensitive": false
+      },
+      {
+        "name": "resource_id",
+        "description": "This is the full output for the resource.",
+        "sensitive": false
+      },
+      {
+        "name": "resource_name",
+        "description": "The name of the User Assigned Identity that was created.",
+        "sensitive": false
+      },
+      {
+        "name": "tenant_id",
+        "description": "The ID of the Tenant which the Identity belongs to.",
+        "sensitive": false
+      }
+    ]
+  }
+}

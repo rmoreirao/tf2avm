@@ -1,0 +1,74 @@
+{
+  "module": {
+    "name": "avm-res-network-ipgroup",
+    "display_name": "Azure Verified Resource Module for IP Groups",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-network-ipgroup/azurerm/0.1.0",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-network-ipgroup",
+    "version": "0.1.0",
+    "description": "Terraform Azure Verified Resource Module for IP Groups",
+    "resources": [
+      "azapi_resource.this",
+      "azurerm_management_lock.this",
+      "azurerm_role_assignment.this",
+      "modtm_telemetry.telemetry",
+      "random_uuid.telemetry",
+      "azapi_client_config.this",
+      "azurerm_client_config.telemetry",
+      "modtm_module_source.telemetry"
+    ],
+    "inputs": [
+      {
+        "name": "name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "resource_group_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "lock",
+        "type": "object({\n    kind = string\n    name = optional(string, null)\n  })",
+        "required": false
+      },
+      {
+        "name": "role_assignments",
+        "type": "map(object({\n    role_definition_id_or_name             = string\n    principal_id                           = string\n    description                            = optional(string, null)\n    skip_service_principal_aad_check       = optional(bool, false)\n    condition                              = optional(string, null)\n    condition_version                      = optional(string, null)\n    delegated_managed_identity_resource_id = optional(string, null)\n    principal_type                         = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "ip_addresses",
+        "type": "set(string)",
+        "required": true
+      },
+      {
+        "name": "location",
+        "type": "string",
+        "required": true
+      }
+    ],
+    "outputs": [
+      {
+        "name": "name",
+        "description": "  The Name of Ip Group.",
+        "sensitive": false
+      },
+      {
+        "name": "resource_id",
+        "description": "  The ID of created Ip Group.",
+        "sensitive": false
+      }
+    ]
+  }
+}
