@@ -1,3 +1,5 @@
+import json
+from typing import List
 from semantic_kernel.agents import ChatCompletionAgent
 from semantic_kernel.connectors.ai.open_ai import AzureChatCompletion
 from semantic_kernel import Kernel
@@ -5,6 +7,7 @@ from config.settings import get_settings
 from config.logging import get_logger
 from plugins.terraform_plugin import TerraformPlugin
 from plugins.http_plugin import HttpClientPlugin
+from schemas.models import AVMKnowledgeAgentResult, AVMModuleDetailed, MappingAgentResult
 
 
 class ConverterPlanningAgent:
@@ -68,18 +71,13 @@ CORE RESPONSIBILITIES:
 5. VARIABLE & OUTPUT STRATEGY: Plan necessary variable and output changes
 
 Input format:
-- Repository Scan Results: Structured analysis of Terraform resources
-- AVM Knowledge: JSON array of available AVM modules with display names and module names
+- Terraform to AVM Modules Mapping: JSON array of resource mappings
+- AVM Modules Details: JSON array of available AVM modules with details
 - Terraform Files: File contents formatted as File: path\\nContent:\\n[content]\\n---
 
 MAPPING PROCESS (Integrated):
-1. For each azurerm_* resource from repository scan match to an AVM module from the AVM knowledge:
-    - Match resource type to available AVM modules using displayName mappings
-    - Assign confidence score: High (90-100%), Medium (60-89%), Low (30-59%), None (0-29%)
-    - Document mappings, limitations and alternative approaches
-   
-2. Resource parameters mapping and analysis:
-    - For each AVM module match, use the get_avm_module_inputs tool to retrieve input parameters for the module
+1. For each azurerm_* resource from Terraform files:
+    - Check the mapping results to find a corresponding AVM module
     - Analyse all input parameters (required and optional) and compare against the resource attributes
     - Make sure all required inputs can be satisfied by existing attributes or variables
     - If required inputs cannot be satisfied, document what is missing and propose solution
@@ -87,16 +85,8 @@ MAPPING PROCESS (Integrated):
     - Document attribute to input mappings in a table format
 
 3. For the resources which are not directly mappable to AVM modules:
-    - If the resource is a child resource of a mappable resource:
-        - In many cases, child resources are managed within the context of their parent resources in AVM modules.
-        - Check if these child resources are being handled as inputs or configurations within the parent AVM module.
-        - Use the input parameters retrieved for parent AVM module to check if they include the child resources.
-        - Try to match the child resource attributes to the parent module inputs.
-        - If they are, document how they are managed within the parent module and propose the migration strategy accordingly.
-        - If they are not, document them as unmappable resources with explanations that "Child resources are not mappable to parent module inputs."
+    - Document them as unmappable resources with explanations that the Converter Agent will skip them
 
-Available tools:
-- get_avm_module_inputs: Retrieve input parameters for a specific AVM module
 
 STRICT BEHAVIOR:
 - ALWAYS output the full plan in Markdown using the exact structure defined below.
@@ -158,12 +148,12 @@ END YOUR OUTPUT.
             logger.error(f"Failed to initialize Converter Planning Agent: {e}")
             raise
 
-    async def create_conversion_plan(self, repo_scan_result: str, avm_knowledge: str, tf_files: dict) -> str:
+    async def create_conversion_plan(self, mapping_result: MappingAgentResult, avm_modules_details: List[AVMModuleDetailed], tf_files: dict) -> str:
         """
         Create a detailed conversion plan with integrated resource mapping based on repository scan, AVM knowledge, and Terraform file contents.
         
         Args:
-            repo_scan_result: Repository scan results from TFMetadataAgent
+            mapping_result: Mapping results from MappingAgent
             avm_knowledge: AVM module knowledge from AVMKnowledgeAgent
             tf_files: Dictionary mapping relative file paths to file contents
                      e.g., {'main.tf': 'content...', 'variables.tf': 'content...'}
@@ -174,11 +164,12 @@ END YOUR OUTPUT.
         
         # Format tf_files for the agent
         files_summary = "\n".join([f"File: {path}\nContent:\n{content}\n---" for path, content in tf_files.items()])
-        
+        avm_details_json = json.dumps([module.model_dump() for module in avm_modules_details], indent=2)
+
         message = (
             "Create a detailed Terraform to AVM conversion plan with integrated resource mapping.\n\n"
-            f"Repository Scan Results:\n{repo_scan_result}\n\n"
-            f"AVM Knowledge Base:\n{avm_knowledge}\n\n"
+            f"Mapping Result JSON:\n{mapping_result.model_dump_json()}\n\n"
+            f"AVM Modules Details JSON:\n{avm_details_json}\n\n"
             f"Terraform Files:\n{files_summary}"
         )
         return await self.agent.get_response(message)

@@ -10,7 +10,7 @@ from plugins.terraform_plugin import TerraformPlugin
 from semantic_kernel.connectors.ai.open_ai import OpenAIChatCompletion, OpenAIChatPromptExecutionSettings
 from semantic_kernel.functions import KernelArguments
 
-from schemas.models import AVMKnowledgeAgentResult, AVMModule, AVMResourceDetailsAgentResult, MappingAgentResult, TerraformMetadataAgentResult
+from schemas.models import AVMKnowledgeAgentResult, AVMModule, AVMModuleDetailed, AVMResourceDetailsAgentResult, MappingAgentResult, TerraformMetadataAgentResult
 
 
 class MappingAgent:
@@ -116,7 +116,7 @@ NEVER ask questions or wait for user input. Always proceed autonomously and hand
         result = MappingAgentResult.model_validate(json.loads(response.message.content))
         return result
 
-    async def review_mappings(self, repo_scan_result: TerraformMetadataAgentResult, avm_knowledge: AVMKnowledgeAgentResult, previous_mapping_result: MappingAgentResult, avm_modules_details: List[AVMModule]) -> MappingAgentResult:
+    async def review_mappings(self, repo_scan_result: TerraformMetadataAgentResult, avm_knowledge: AVMKnowledgeAgentResult, previous_mapping_result: MappingAgentResult, avm_modules_details: List[AVMModuleDetailed]) -> MappingAgentResult:
         """
         Review and improve existing resource mappings using detailed AVM module information.
         

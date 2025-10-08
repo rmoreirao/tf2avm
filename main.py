@@ -177,19 +177,35 @@ class TerraformAVMOrchestrator:
             mapping_result : MappingAgentResult = await mapping_agent.review_mappings(tf_metadata_agent_output, knowledge_result, mapping_result, modules_details)
             self._log_agent_response("MappingAgent", mapping_result)
 
-            with open(f"{output_dir}/03_retry_mappings.json", "w", encoding="utf-8") as f:
+            with open(f"{output_dir}/04_01_retry_mappings.json", "w", encoding="utf-8") as f:
                 f.write(mapping_result.model_dump_json(indent=2))
+
         
-        exit()
+        # filter all mappings where target_module is not None
+        valid_mappings = [m for m in mapping_result.mappings if m.target_module is not None]
+        # store the module detail in dictionary: module_name -> details
+        modules_details: List[AVMResourceDetailsAgentResult] = []
 
-        self.logger.info("Step 4: Running Converter Planning Agent (with integrated mapping)")
+        for mapping in valid_mappings:
+            self.logger.info(f"Fetching details for AVM module: {mapping.target_module.name}, version: {mapping.target_module.version}")
+
+            module_detail = await self.avm_service.fetch_avm_resource_details(
+                module_name=mapping.target_module.name, 
+                module_version=mapping.target_module.version, 
+                use_cache=True
+            )
+            modules_details.append(module_detail)
+            # self._log_agent_response(f"AVMResourceDetailsAgent - {mapping.target_module.name} {mapping.target_module.version}", modules_details)
+
+        with open(f"{output_dir}/05_avm_module_details.json", "w", encoding="utf-8") as f:
+            f.write(json.dumps([v.model_dump() for v in modules_details], indent=2))
+        
+        self.logger.info("Step 5: Running Converter Planning Agent (with integrated mapping)")
         planning_agent = await ConverterPlanningAgent.create()
-        planning_result = await planning_agent.create_conversion_plan(str(tf_metadata_agent_output), str(knowledge_result), tf_files)
+        planning_result = await planning_agent.create_conversion_plan(mapping_result, modules_details, tf_files)
         self._log_agent_response("ConverterPlanningAgent", planning_result)
-        with open(f"{output_dir}/conversion_plan.md", "w", encoding="utf-8") as f:
+        with open(f"{output_dir}/05_conversion_plan.md", "w", encoding="utf-8") as f:
             f.write(str(planning_result))
-
-        exit()
 
         # # Ask user for approval to proceed
         # approved = await self._prompt_user_approval()
@@ -206,6 +222,8 @@ class TerraformAVMOrchestrator:
         converter_agent = await ConverterAgent.create()
         converter_result = await converter_agent.run_conversion(planning_result, migrated_output_dir, tf_files)
         self._log_agent_response("ConverterAgent", converter_result)
+
+        exit()
 
         # Step 5: Validator Agent
         self.logger.info("Step 5: Running Validator Agent")
