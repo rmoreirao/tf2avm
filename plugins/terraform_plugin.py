@@ -72,10 +72,13 @@ class TerraformPlugin:
         # do not use the mcp plugin here
         # fetch the module details from url https://registry.terraform.io/v1/modules/Azure/{module name}/azurerm/{module version}
 
-        # log
-        print(f"Fetching input parameters for module: {module_name}, version: {module_version}")
+        
 
         module_details_url = f"https://registry.terraform.io/v1/modules/Azure/{module_name}/azurerm/{module_version}"
+
+        # log
+        print(f"Fetching input parameters for module: {module_name}, version: {module_version}. URL: {module_details_url}")
+
         async with aiohttp.ClientSession() as session:
             async with session.get(module_details_url) as response:
                 if response.status == 200:
@@ -87,5 +90,27 @@ class TerraformPlugin:
                     if not ret_inputs or len(ret_inputs) == 0:
                         raise ValueError(f"No inputs found for {module_name} version {module_version}. HTTP Status: {response.status}")
                     return ret_inputs
+                else:
+                    raise ValueError(f"Failed to retrieve module details for {module_name} version {module_version}. HTTP Status: {response.status}")
+
+
+    
+    # Retrieve AVM module details
+    @kernel_function(
+        description="Retrieve AVM module details in JSON format. Inputs: module_name, module_version",
+        name="get_avm_module_details",
+    )
+    async def get_avm_module_details(self, module_name: str, module_version: str) -> str:
+        # do not use the mcp plugin here
+        # fetch the module details from url https://registry.terraform.io/v1/modules/Azure/{module name}/azurerm/{module version}
+
+        # log
+        print(f"Fetching AVM module details for module: {module_name}, version: {module_version}")
+
+        module_details_url = f"https://registry.terraform.io/v1/modules/Azure/{module_name}/azurerm/{module_version}"
+        async with aiohttp.ClientSession() as session:
+            async with session.get(module_details_url) as response:
+                if response.status == 200:
+                    return await json.dumps(response, indent=2)
                 else:
                     raise ValueError(f"Failed to retrieve module details for {module_name} version {module_version}. HTTP Status: {response.status}")

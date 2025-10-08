@@ -1,9 +1,15 @@
+import json
 from semantic_kernel.agents import ChatCompletionAgent
 from semantic_kernel.connectors.ai.open_ai import AzureChatCompletion
 from semantic_kernel import Kernel
 from config.settings import get_settings
 from config.logging import get_logger
 from plugins.terraform_plugin import TerraformPlugin
+
+from semantic_kernel.connectors.ai.open_ai import OpenAIChatCompletion, OpenAIChatPromptExecutionSettings
+from semantic_kernel.functions import KernelArguments
+
+from schemas.models import MappingAgentResult
 
 
 class MappingAgent:
@@ -14,7 +20,7 @@ class MappingAgent:
     - Match azurerm_* resources to AVM modules
     - Determine conversion confidence levels
     - Identify unmappable resources
-    - Plan required variable mappings
+    
     """
     
     def __init__(self, agent: ChatCompletionAgent):
@@ -40,9 +46,8 @@ class MappingAgent:
             )
             
             kernel.add_service(chat_completion_service)
-            
-            # Initialize plugins
-            terraform_plugin = TerraformPlugin()
+
+            execution_settings = OpenAIChatPromptExecutionSettings(response_format=MappingAgentResult)
             
             # Create the agent
             agent = ChatCompletionAgent(
@@ -50,15 +55,14 @@ class MappingAgent:
                 kernel=kernel,
                 name="MappingAgent",
                 description="A specialist agent that maps Terraform resources to Azure Verified Modules.",
-                plugins=[terraform_plugin],
+                arguments=KernelArguments(execution_settings),
                 instructions="""You are the Mapping Agent for Terraform to Azure Verified Modules (AVM) conversion.
 
 Your responsibilities:
-1. Analyze the azurerm_* resources identified by the Repository Scanner
-2. Match each resource to appropriate AVM modules using the knowledge from AVM Knowledge Agent
+1. Analyze the azurerm_* resources identified from the repository scan
+2. Match each resource to appropriate AVM modules using the knowledge from AVM knowledge base
 3. Determine conversion confidence levels for each mapping
-4. Identify resources that cannot be mapped to AVM modules
-5. Plan variable and output mappings between original and AVM implementations
+4. Identify resources that does not have a direct mapping to AVM modules
 
 Input from previous agents:
 - Repository scan results with azurerm_* resources
@@ -68,45 +72,13 @@ Mapping process:
 1. For each azurerm_* resource found in the repository:
    - Match the resource type to available AVM modules
    - Assess compatibility between resource attributes and module inputs
-   - Assign a confidence score (High/Medium/Low)
+   - Assign a confidence score
    - Document any mapping limitations or concerns
 
-2. Confidence scoring criteria:
-   - High (90-100%): Direct 1:1 mapping available, all attributes supported
-   - Medium (60-89%): Good mapping available, some attributes may need adjustment
-   - Low (30-59%): Partial mapping possible, significant changes required
-   - None (0-29%): No suitable AVM module available
-
-3. For mappable resources:
-   - Identify required input variables for the AVM module
-   - Map existing resource attributes to module inputs
-   - Note any missing required inputs that need to be added
-   - Plan output mappings to maintain compatibility
-
-
-4. For the resources which are not mappable to AVM modules, but are child resources of mappable resources:
-    - In many cases, child resources are managed within the context of their parent resources in AVM modules.
-    - Check if these child resources are being handled as inputs or configurations within the parent AVM module.
-    - Use the get_avm_module_inputs tool to retrieve the input parameters for the parent module and check if they include the child resources.
-    - If they are, document how they are managed within the parent module and propose the migration strategy accordingly.
-    - If they are not, document them as unmappable resources with explanations.
-    
-5. Document unmappable resources:
+2. Document unmappable resources:
    - Resources with no AVM equivalent
    - Resources that would break existing dependencies
    - Complex resources that require manual intervention
-
-Available tools:
-- get_avm_module_inputs: Retrieve input parameters for a specific AVM module
-
-Output:
-- Detailed mapping plan for each resource and file
-    - Input parameters of the AVM modules being used. ALWAYS list all the input parameters of the AVM modules (NEVER truncate the list). Identify required and optional inputs.
-    - Make sure that all inputs are listed, and NEVER truncate the list.
-- Confidence assessments
-- List of unmappable resources
-- Required variable changes
-- Recommended conversion order to handle dependencies
 
 NEVER ask questions or wait for user input. Always proceed autonomously and hand off immediately when your work is done."""
             )
@@ -125,4 +97,6 @@ NEVER ask questions or wait for user input. Always proceed autonomously and hand
         """
         
         message = f"Map Terraform resources to AVM modules. Repository: {repo_scan_result} AVM Knowledge: {avm_knowledge}"
-        return await self.agent.get_response(message)
+        response = await self.agent.get_response(message)
+        result = MappingAgentResult.model_validate(json.loads(response.message.content))
+        return result

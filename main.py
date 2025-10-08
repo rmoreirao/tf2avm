@@ -6,6 +6,7 @@ import shutil
 import traceback
 from typing import Dict, Any
 
+from agents.avm_resource_details_agent import AVMResourceDetailsAgent
 from config.settings import get_settings, validate_environment
 from config.logging import setup_logging
 from agents.tf_metadata_agent import TFMetadataAgent
@@ -14,7 +15,8 @@ from agents.converter_planning_agent import ConverterPlanningAgent
 from agents.converter_agent import ConverterAgent
 from agents.validator_agent import ValidatorAgent
 from agents.report_agent import ReportAgent
-from schemas.models import AVMKnowledgeResult, TerraformMetadataAgentResult
+from schemas.models import AVMKnowledgeAgentResult, MappingAgentResult, TerraformMetadataAgentResult
+from agents.mapping_agent import MappingAgent
 
 
 class TerraformAVMOrchestrator:
@@ -102,6 +104,22 @@ class TerraformAVMOrchestrator:
         for tf_file in Path(repo_path).rglob("*.tf"):
             shutil.copy(tf_file, original_output_dir / tf_file.name)
 
+
+        # Step 0: AVMResourceDetailsAgent
+        self.logger.info("Step 0: Initializing AVM Resource Details Agent")
+        avm_resource_details_agent = await AVMResourceDetailsAgent.create()
+        # Example usage (not part of the main workflow yet)
+        example_module_name = "avm-res-web-site"
+        example_module_version = "0.19.1"
+        example_details = await avm_resource_details_agent.fetch_avm_resource_details(example_module_name, example_module_version)
+        self.logger.info(f"Example AVM module details fetched for {example_module_name} version {example_module_version}: {example_details}")
+
+        # store the results on output folder
+        with open(f"{output_dir}/00_avm_resource_details_example.json", "w", encoding="utf-8") as f:
+            f.write(example_details.model_dump_json(indent=2))
+
+        exit()
+
         # Step 1: Repository Scanner Agent
         self.logger.info("Step 1: Running Repository Scanner Agent")
         tf_metadata_agent = await TFMetadataAgent.create()
@@ -115,17 +133,27 @@ class TerraformAVMOrchestrator:
         # Step 2: AVM Knowledge Agent
         self.logger.info("Step 2: Running AVM Knowledge Agent")
         knowledge_agent = await AVMKnowledgeAgent.create()
-        knowledge_result : AVMKnowledgeResult = await knowledge_agent.fetch_avm_knowledge()
+        knowledge_result : AVMKnowledgeAgentResult = await knowledge_agent.fetch_avm_knowledge()
         self._log_agent_response("AVMKnowledgeAgent", knowledge_result)
 
         # store the results on output folder
         with open(f"{output_dir}/02_avm_knowledge.json", "w", encoding="utf-8") as f:
             f.write(knowledge_result.model_dump_json(indent=2))
 
+        # Step 3: Mapping Agent
+        self.logger.info("Step 3: Running Mapping Agent")
+        mapping_agent = await MappingAgent.create()
+        mapping_result : MappingAgentResult = await mapping_agent.create_mappings(str(tf_metadata_agent_output), str(knowledge_result))
+        self._log_agent_response("MappingAgent", mapping_result)
+
+        # store the results on output folder
+        with open(f"{output_dir}/03_mappings.json", "w", encoding="utf-8") as f:
+            f.write(mapping_result.model_dump_json(indent=2))
+
         exit()
 
-        # Step 3: Converter Planning Agent (now includes mapping functionality)
-        self.logger.info("Step 3: Running Converter Planning Agent (with integrated mapping)")
+        # Step 4: Converter Planning Agent (now includes mapping functionality)
+        self.logger.info("Step 4: Running Converter Planning Agent (with integrated mapping)")
         planning_agent = await ConverterPlanningAgent.create()
         planning_result = await planning_agent.create_conversion_plan(str(tf_metadata_agent_output), str(knowledge_result), tf_files)
         self._log_agent_response("ConverterPlanningAgent", planning_result)

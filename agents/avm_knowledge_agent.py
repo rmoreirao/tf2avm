@@ -8,7 +8,7 @@ from plugins.http_plugin import HttpClientPlugin
 from semantic_kernel.connectors.ai.open_ai import OpenAIChatCompletion, OpenAIChatPromptExecutionSettings
 from semantic_kernel.functions import KernelArguments
 
-from schemas.models import AVMKnowledgeResult
+from schemas.models import AVMKnowledgeAgentResult
 
 
 class AVMKnowledgeAgent:
@@ -45,11 +45,10 @@ class AVMKnowledgeAgent:
             
             kernel.add_service(chat_completion_service)
             
-            execution_settings = OpenAIChatPromptExecutionSettings(response_format=AVMKnowledgeResult)
+            execution_settings = OpenAIChatPromptExecutionSettings(response_format=AVMKnowledgeAgentResult)
 
             # Initialize plugins
             http_plugin = HttpClientPlugin()
-            await http_plugin.fetch_url("https://azure.github.io/Azure-Verified-Modules/indexes/terraform/tf-resource-modules/")
             
             # Create the agent
             agent = ChatCompletionAgent(
@@ -102,5 +101,5 @@ Only output the JSON mapping format. Output the full list and never truncate it.
         
         message = "Gather AVM module knowledge from official sources."
         response = await self.agent.get_response(message)
-        result = AVMKnowledgeResult.model_validate(json.loads(response.message.content))
+        result = AVMKnowledgeAgentResult.model_validate(json.loads(response.message.content))
         return result

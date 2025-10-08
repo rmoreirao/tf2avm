@@ -45,26 +45,26 @@ class AVMModule(BaseModel):
     inputs: Optional[List[AVMModuleInput]] = Field(default=None, description="List of input parameters for the module")
     outputs: Optional[List[AVMModuleOutput]] = Field(default=None, description="List of output values from the module")
 
-class AVMKnowledgeResult(BaseModel):
+class AVMKnowledgeAgentResult(BaseModel):
     """Result of AVM knowledge gathering."""
     modules: List[AVMModule] = Field(description="List of available AVM modules")
+
+class AVMResourceDetailsAgentResult(BaseModel):
+    """Result of AVM resource details gathering."""
+    module: AVMModule = Field(description="AVM module details")
 
 
 class ResourceMapping(BaseModel):
     """Mapping between Terraform resource and AVM module."""
-    source_resource: TerraformResource
-    target_module: Optional[AVMModule] = None
-    confidence_score: float
-    mapping_reason: str
-    is_convertible: bool
+    source_resource: TerraformResource = Field(description="The original Terraform resource to be mapped")
+    target_module: Optional[AVMModule] = Field(default=None, description="The AVM module that replaces the Terraform resource")
+    confidence_score: str = Field(description="Confidence level of the mapping: High (100pct), Medium (99pct - 50pct), Low (49pct - 20pct) or None if unmappable")
+    mapping_reason: str = Field(description="Explanation of why this mapping was suggested")
 
 
-class MappingResult(BaseModel):
+class MappingAgentResult(BaseModel):
     """Result of resource mapping process."""
-    mappings: List[ResourceMapping]
-    convertible_count: int
-    unconvertible_count: int
-    mapping_timestamp: str
+    mappings: List[ResourceMapping] = Field(description="List of resource-to-module mappings")
 
 
 class ConvertedFile(BaseModel):
@@ -107,8 +107,7 @@ class ConversionReport(BaseModel):
     repo_path: str
     output_directory: str
     # scan_result: RepoScanResult
-    avm_knowledge: AVMKnowledgeResult
-    mapping_result: MappingResult
+    avm_knowledge: AVMKnowledgeAgentResult
     conversion_result: ConversionResult
     validation_result: ValidationResult
     report_timestamp: str
@@ -121,8 +120,7 @@ class WorkflowState(BaseModel):
     output_directory: str
     current_agent: str
     # scan_result: Optional[RepoScanResult] = None
-    avm_knowledge: Optional[AVMKnowledgeResult] = None
-    mapping_result: Optional[MappingResult] = None
+    avm_knowledge: Optional[AVMKnowledgeAgentResult] = None
     conversion_result: Optional[ConversionResult] = None
     validation_result: Optional[ValidationResult] = None
     report: Optional[ConversionReport] = None
