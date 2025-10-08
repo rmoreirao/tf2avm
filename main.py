@@ -141,7 +141,7 @@ class TerraformAVMOrchestrator:
 
         self.logger.info("Step 3: Running Mapping Agent")
         mapping_agent = await MappingAgent.create()
-        mapping_result : MappingAgentResult = await mapping_agent.create_mappings(str(tf_metadata_agent_output), str(knowledge_result))
+        mapping_result : MappingAgentResult = await mapping_agent.create_mappings(tf_metadata_agent_output, knowledge_result)
         self._log_agent_response("MappingAgent", mapping_result)
 
         with open(f"{output_dir}/03_mappings.json", "w", encoding="utf-8") as f:
@@ -174,7 +174,7 @@ class TerraformAVMOrchestrator:
         if len(valid_mappings) < len(mapping_result.mappings):
             self.logger.info("Some resources do not have mappings. Re-running planning with AVM resource details integrated.")
 
-            mapping_result : MappingAgentResult = await mapping_agent.review_mappings( str(tf_metadata_agent_output), str(knowledge_result), mapping_result, modules_details)
+            mapping_result : MappingAgentResult = await mapping_agent.review_mappings(tf_metadata_agent_output, knowledge_result, mapping_result, modules_details)
             self._log_agent_response("MappingAgent", mapping_result)
 
             with open(f"{output_dir}/03_retry_mappings.json", "w", encoding="utf-8") as f:

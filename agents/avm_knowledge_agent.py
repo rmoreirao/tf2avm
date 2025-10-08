@@ -37,10 +37,10 @@ class AVMKnowledgeAgent:
             kernel = Kernel()
             
             chat_completion_service = AzureChatCompletion(
-                deployment_name=settings.azure_openai_fast_deployment_name,
-                api_key=settings.azure_openai_fast_api_key,
-                endpoint=settings.azure_openai_fast_endpoint,
-                api_version=settings.azure_openai_fast_api_version,
+                deployment_name=settings.azure_openai_deployment_name,
+                api_key=settings.azure_openai_api_key,
+                endpoint=settings.azure_openai_endpoint,
+                api_version=settings.azure_openai_api_version,
             )
             
             kernel.add_service(chat_completion_service)
@@ -69,6 +69,7 @@ Process:
 Output:
 Fill in only the fields on the JSON output: name, display_name, terraform_registry_url, source_code_url, version
 
+IMPORTAT!!! ALAWYS OUTPUT ALL THE MODULES YOU FOUND IN FROM HTML PAGE !!!!! NEVER TRUNCATE THE LIST !!!!!!
 
 Only output the JSON mapping format. Output the full list and never truncate it. NEVER ask questions or wait for user input. Always proceed autonomously.
 """
@@ -81,7 +82,7 @@ Only output the JSON mapping format. Output the full list and never truncate it.
             logger.error(f"Failed to initialize AVM Knowledge Agent: {e}")
             raise
             
-    async def fetch_avm_knowledge(self) -> str:
+    async def fetch_avm_knowledge(self) -> AVMKnowledgeAgentResult:
         """
         Fetch AVM module knowledge from official sources.
         Returns JSON mapping of AVM modules.

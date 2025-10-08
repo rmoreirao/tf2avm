@@ -40,22 +40,24 @@ class AVMModule(BaseModel):
     """Represents an Azure Verified Module."""
     name: str = Field(description="The module name")
     display_name: str = Field(description="Human-readable display name of the module")
-    terraform_registry_url: str = Field(default=None, description="URL to the Terraform registry entry")
-    source_code_url: str = Field(default=None, description="URL to the source code repository")
     version: str = Field(default=None, description="Version of the module")
     description: Optional[str] = Field(default=None, description="Description of what the module does")
+
+class AVMModuleDetailed(AVMModule):
+    """Represents an AVM module with full details."""
+    terraform_registry_url: str = Field(default=None, description="URL to the Terraform registry entry")
+    source_code_url: str = Field(default=None, description="URL to the source code repository")
     resources: Optional[List[str]] = Field(default=None, description="List of Terraform resources managed by this module")
-    inputs: Optional[List[AVMModuleInput]] = Field(default=None, description="List of input parameters for the module")
-    outputs: Optional[List[AVMModuleOutput]] = Field(default=None, description="List of output values from the module")
+    inputs: List[AVMModuleInput] = Field(description="List of input parameters for the module")
+    outputs: List[AVMModuleOutput] = Field(description="List of output values from the module")
 
 class AVMKnowledgeAgentResult(BaseModel):
     """Result of AVM knowledge gathering."""
-    modules: List[AVMModule] = Field(description="List of available AVM modules")
+    modules: List[AVMModuleDetailed] = Field(description="List of available AVM modules")
 
 class AVMResourceDetailsAgentResult(BaseModel):
     """Result of AVM resource details gathering."""
-    module: AVMModule = Field(description="AVM module details")
-
+    module: AVMModuleDetailed = Field(description="AVM module details")
 
 class ResourceMapping(BaseModel):
     """Mapping between Terraform resource and AVM module."""

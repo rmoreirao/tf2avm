@@ -161,8 +161,14 @@ class AVMService:
         # Cache miss or disabled - fetch from agent
         self.logger.info("Fetching AVM knowledge from agent")
         agent = await self._get_avm_knowledge_agent()
-        result = await agent.fetch_avm_knowledge()
-        
+        result: AVMKnowledgeAgentResult = await agent.fetch_avm_knowledge()
+
+        # enrich each module with detailed info
+        for module in result.modules:
+            detail: AVMResourceDetailsAgentResult = await self.fetch_avm_resource_details(module.name, module.version, use_cache=True)  # Pre-fetch and cache each
+            module.description = detail.module.description
+            module.resources = detail.module.resources
+
         # Save to cache if enabled
         if self.cache_enabled:
             self._save_cache(cache_file, result.model_dump())
