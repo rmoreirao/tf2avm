@@ -64,6 +64,7 @@ Process:
 2. Parse the "Published modules" section to extract module information
 3. Create mappings between Display Names (Azure resource types) and Module Names
 4. For each relevant module, note the version information
+5. Trim all the fields of whitespace
 
 Output:
 Fill in only the fields on the JSON output: name, display_name, terraform_registry_url, source_code_url, version

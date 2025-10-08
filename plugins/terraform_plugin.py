@@ -105,16 +105,21 @@ class TerraformPlugin:
         # do not use the mcp plugin here
         # fetch the module details from url https://registry.terraform.io/v1/modules/Azure/{module name}/azurerm/{module version}
 
-        
+        # there are some resources with provider "azure" instead of "azurerm"
+        providers = ["azurerm","azure"]
 
-        module_details_url = f"https://registry.terraform.io/v1/modules/Azure/{module_name}/azurerm/{module_version}"
+        for provider in providers:
+            module_details_url = f"https://registry.terraform.io/v1/modules/Azure/{module_name}/{provider}/{module_version}".strip()
 
-        # log
-        print(f"Fetching AVM module details for module: {module_name}, version: {module_version}. URL: {module_details_url}")
+            # log
+            print(f"Fetching AVM module details for module: {module_name}, version: {module_version}. URL: {module_details_url}")
 
-        async with aiohttp.ClientSession() as session:
-            async with session.get(module_details_url) as response:
-                if response.status == 200:
-                    return await response.json()
-                else:
-                    raise ValueError(f"Failed to retrieve module details for {module_name} version {module_version}. HTTP Status: {response.status}")
+            async with aiohttp.ClientSession() as session:
+                async with session.get(module_details_url) as response:
+                    if response.status == 200:
+                        return await response.json()
+                    elif response.status == 404:
+                        print(f"Module not found with provider {provider}, trying next if available.")
+                        continue
+                    else:
+                        raise ValueError(f"Failed to retrieve module details for {module_name} version {module_version}. URL: {module_details_url}, HTTP Status: {response.status}, Response: {await response.text()}")

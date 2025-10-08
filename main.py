@@ -6,11 +6,10 @@ import shutil
 import traceback
 from typing import Dict, Any, List
 
-from agents.avm_resource_details_agent import AVMResourceDetailsAgent
+from services.avm_service import AVMService
 from config.settings import get_settings, validate_environment
 from config.logging import setup_logging
 from agents.tf_metadata_agent import TFMetadataAgent
-from agents.avm_knowledge_agent import AVMKnowledgeAgent
 from agents.converter_planning_agent import ConverterPlanningAgent
 from agents.converter_agent import ConverterAgent
 from agents.validator_agent import ValidatorAgent
@@ -27,6 +26,7 @@ class TerraformAVMOrchestrator:
     def __init__(self):
         self.logger = setup_logging()
         self.settings = get_settings()
+        self.avm_service = AVMService(cache_enabled=True) 
         
     async def initialize(self):
         """Initialize the orchestrator."""
@@ -88,8 +88,27 @@ class TerraformAVMOrchestrator:
                 "timestamp": datetime.now().isoformat()
             }
     
+    async def _store_avm_cache(self) -> None:
+        self.logger.info("Storing AVM Knowledge Agent into local cache")
+        knowledge_result : AVMKnowledgeAgentResult = await self.avm_service.fetch_avm_knowledge(use_cache=True)
+
+        for module in knowledge_result.modules:
+            try:
+                await self.avm_service.fetch_avm_resource_details(
+                    module_name=module.name,
+                    module_version=module.version,
+                    use_cache=True
+                )
+            except Exception as e:
+                self.logger.warning(f"Failed to fetch details for module {module.name} version {module.version}: {e}")
+                continue
+
+
+
     async def _run_sequential_workflow(self, repo_path: str, output_dir: str) -> str:
         """Run the agents in sequence with an interactive approval gate after planning."""
+
+        # await self._store_avm_cache()
 
         # read all TF files and store in dictionary: relative folder/name -> content
         tf_files = {}
@@ -114,8 +133,7 @@ class TerraformAVMOrchestrator:
             f.write(tf_metadata_agent_output.model_dump_json(indent=2))
                
         self.logger.info("Step 2: Running AVM Knowledge Agent")
-        knowledge_agent = await AVMKnowledgeAgent.create()
-        knowledge_result : AVMKnowledgeAgentResult = await knowledge_agent.fetch_avm_knowledge()
+        knowledge_result : AVMKnowledgeAgentResult = await self.avm_service.fetch_avm_knowledge(use_cache=True)
         self._log_agent_response("AVMKnowledgeAgent", knowledge_result)
 
         with open(f"{output_dir}/02_avm_knowledge.json", "w", encoding="utf-8") as f:
@@ -131,7 +149,6 @@ class TerraformAVMOrchestrator:
 
 
         self.logger.info("Step 4: Retrieving AVM Resource Details")
-        avm_resource_details_agent = await AVMResourceDetailsAgent.create()
 
         # filter all mappings where target_module is not None
         valid_mappings = [m for m in mapping_result.mappings if m.target_module is not None]
@@ -141,7 +158,11 @@ class TerraformAVMOrchestrator:
         for mapping in valid_mappings:
             self.logger.info(f"Fetching details for AVM module: {mapping.target_module.name}, version: {mapping.target_module.version}")
 
-            module_detail = await avm_resource_details_agent.fetch_avm_resource_details(mapping.target_module.name, mapping.target_module.version)
+            module_detail = await self.avm_service.fetch_avm_resource_details(
+                module_name=mapping.target_module.name, 
+                module_version=mapping.target_module.version, 
+                use_cache=True
+            )
             modules_details.append(module_detail)
             # self._log_agent_response(f"AVMResourceDetailsAgent - {mapping.target_module.name} {mapping.target_module.version}", modules_details)
 

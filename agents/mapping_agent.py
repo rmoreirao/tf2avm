@@ -10,7 +10,7 @@ from plugins.terraform_plugin import TerraformPlugin
 from semantic_kernel.connectors.ai.open_ai import OpenAIChatCompletion, OpenAIChatPromptExecutionSettings
 from semantic_kernel.functions import KernelArguments
 
-from schemas.models import AVMModule, AVMResourceDetailsAgentResult, MappingAgentResult
+from schemas.models import AVMKnowledgeAgentResult, AVMModule, AVMResourceDetailsAgentResult, MappingAgentResult, TerraformMetadataAgentResult
 
 
 class MappingAgent:
@@ -67,11 +67,11 @@ Your responsibilities:
 
 Inputs:
 - Mandatory:
-    - Repository scan results with azurerm_* resources
-    - AVM Index knowledge base with available modules
+    - Repository scan results with azurerm_* resources JSON format
+    - AVM Index knowledge base with available modules JSON format
 - Optional:
-    - Detailed AVM module information for better mapping accuracy
-    - Previous mapping results for review and improvement
+    - Detailed AVM module information for better mapping accuracy JSON format
+    - Previous mapping results for review and improvement JSON format
     
 Mapping process:
 1. For each azurerm_* resource found in the repository:
@@ -105,18 +105,18 @@ NEVER ask questions or wait for user input. Always proceed autonomously and hand
             logger.error(f"Failed to initialize Mapping Agent: {e}")
             raise
             
-    async def create_mappings(self, repo_scan_result: str, avm_knowledge: str) -> str:
+    async def create_mappings(self, repo_scan_result: TerraformMetadataAgentResult, avm_knowledge: AVMKnowledgeAgentResult) -> str:
         """
         Create resource mappings between Terraform resources and AVM modules.
         Returns mapping analysis and conversion plan.
         """
-        
-        message = f"Map Terraform resources to AVM modules. Repository: {repo_scan_result} AVM Knowledge: {avm_knowledge}"
+
+        message = f"Map Terraform resources to AVM modules. Repository Scan JSON: {repo_scan_result.model_dump_json()} AVM Knowledge JSON: {avm_knowledge.model_dump_json()}"
         response = await self.agent.get_response(message)
         result = MappingAgentResult.model_validate(json.loads(response.message.content))
         return result
 
-    async def review_mappings(self, repo_scan_result: str, avm_knowledge: str, previous_mapping_result: MappingAgentResult, avm_modules_details: List[AVMModule]) -> MappingAgentResult:
+    async def review_mappings(self, repo_scan_result: TerraformMetadataAgentResult, avm_knowledge: AVMKnowledgeAgentResult, previous_mapping_result: MappingAgentResult, avm_modules_details: List[AVMModule]) -> MappingAgentResult:
         """
         Review and improve existing resource mappings using detailed AVM module information.
         
@@ -141,13 +141,13 @@ NEVER ask questions or wait for user input. Always proceed autonomously and hand
         # Create comprehensive message for the agent
         message = f"""Review and improve resource mappings using detailed AVM module information.
 
-    Repository Scan Results:
-    {repo_scan_result}
+    Repository Scan Results JSON:
+    {repo_scan_result.model_dump_json()}
 
-    AVM Knowledge Base:
-    {avm_knowledge}
+    AVM Knowledge Base JSON:
+    {avm_knowledge.model_dump_json()}
 
-    Previous Mapping Results:
+    Previous Mapping Results JSON:
     {previous_mapping_json}
 
     Detailed AVM Module Information JSON:
@@ -165,7 +165,5 @@ NEVER ask questions or wait for user input. Always proceed autonomously and hand
         
         # Parse and validate the response
         result = MappingAgentResult.model_validate(json.loads(response.message.content))
-        
-        self.logger.info(f"Mapping review completed. Found {len(result.resource_mappings)} mappings, {len(result.unmapped_resources)} unmapped")
         
         return result

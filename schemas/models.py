@@ -5,18 +5,21 @@ from enum import Enum
 
 
 
+
 class TerraformResource(BaseModel):
     """Represents a Terraform resource."""
     type: str = Field(description="The resource type (e.g., 'azurerm_resource_group')")
     name: str = Field(description="The resource name as defined in Terraform")
     file_path: str = Field(description="Path to the file containing this resource")
-    child_resources: List['TerraformResource'] = Field(default=[], description="List of child resources nested within this resource")
-    parent_resource: Optional['TerraformResource'] = Field(default=None, description="The parent resource if this is a child resource")
 
+class TerraformResourceWithRelations(TerraformResource):
+    """Represents relationships between Terraform resources."""
+    child_resources: Optional[List['TerraformResource']] = Field(default=None, description="List of child resources nested within this resource")
+    parent_resource: Optional['TerraformResource'] = Field(default=None, description="The parent resource if this is a child resource")
 
 class TerraformMetadataAgentResult(BaseModel):
     """Result of repository scanning."""
-    azurerm_resources: List[TerraformResource] = Field(description="List of Azure Resource Manager resources found in the repository")
+    azurerm_resources: List[TerraformResourceWithRelations] = Field(description="List of Azure Resource Manager resources found in the repository")
     
 class AVMModuleInput(BaseModel):
     """Represents a module input parameter."""
@@ -60,7 +63,7 @@ class ResourceMapping(BaseModel):
     target_module: Optional[AVMModule] = Field(default=None, description="The AVM module that replaces the Terraform resource")
     confidence_score: str = Field(description="Confidence level of the mapping: High (100pct), Medium (99pct - 50pct), Low (49pct - 20pct) or None if unmappable")
     mapping_reason: str = Field(description="Explanation of why this mapping was suggested")
-
+    mapping_details: str = Field(description="Detailed mapping analysis and considerations")
 
 class MappingAgentResult(BaseModel):
     """Result of resource mapping process."""

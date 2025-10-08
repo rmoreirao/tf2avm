@@ -209,3 +209,6 @@ __marimo__/
 
 # add /output/ folder to gitignore
 output/
+
+# Local cache directory
+localCache/
