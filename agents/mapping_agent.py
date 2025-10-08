@@ -1,4 +1,5 @@
 import json
+from typing import List
 from semantic_kernel.agents import ChatCompletionAgent
 from semantic_kernel.connectors.ai.open_ai import AzureChatCompletion
 from semantic_kernel import Kernel
@@ -9,7 +10,7 @@ from plugins.terraform_plugin import TerraformPlugin
 from semantic_kernel.connectors.ai.open_ai import OpenAIChatCompletion, OpenAIChatPromptExecutionSettings
 from semantic_kernel.functions import KernelArguments
 
-from schemas.models import MappingAgentResult
+from schemas.models import AVMModule, AVMResourceDetailsAgentResult, MappingAgentResult
 
 
 class MappingAgent:
@@ -64,10 +65,14 @@ Your responsibilities:
 3. Determine conversion confidence levels for each mapping
 4. Identify resources that does not have a direct mapping to AVM modules
 
-Input from previous agents:
-- Repository scan results with azurerm_* resources
-- AVM knowledge base with available modules and mappings
-
+Inputs:
+- Mandatory:
+    - Repository scan results with azurerm_* resources
+    - AVM Index knowledge base with available modules
+- Optional:
+    - Detailed AVM module information for better mapping accuracy
+    - Previous mapping results for review and improvement
+    
 Mapping process:
 1. For each azurerm_* resource found in the repository:
    - Match the resource type to available AVM modules
@@ -79,6 +84,16 @@ Mapping process:
    - Resources with no AVM equivalent
    - Resources that would break existing dependencies
    - Complex resources that require manual intervention
+
+3. Review Mappings (if previous results provided):
+    - Evaluate previous mappings based on the Detailed AVM module information
+    - Compare new mappings with previous results
+    - Adjust confidence scores based on new information
+    - For the Unmapped resources, check if new AVM details provide a possible mapping:
+        - In many cases, the child resources are managed within the context of their parent resources in AVM modules.
+        - Search if the child resources are being handled as inputs or underlying resources within the parent AVM module.
+        - If so, update the mapping to reflect that the child resource is covered by the parent AVM module.
+        - Document the rationale for this mapping decision.
 
 NEVER ask questions or wait for user input. Always proceed autonomously and hand off immediately when your work is done."""
             )
@@ -100,3 +115,6 @@ NEVER ask questions or wait for user input. Always proceed autonomously and hand
         response = await self.agent.get_response(message)
         result = MappingAgentResult.model_validate(json.loads(response.message.content))
         return result
+    
+    async def review_mappings(self, previous_mapping_result: MappingAgentResult, avm_modules_details: List[AVMModule]) -> MappingAgentResult:
+        

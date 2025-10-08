@@ -96,6 +96,7 @@ class TerraformPlugin:
 
     
     # Retrieve AVM module details
+    # docs : https://developer.hashicorp.com/terraform/registry/api-docs#get-a-specific-module
     @kernel_function(
         description="Retrieve AVM module details in JSON format. Inputs: module_name, module_version",
         name="get_avm_module_details",
@@ -104,13 +105,16 @@ class TerraformPlugin:
         # do not use the mcp plugin here
         # fetch the module details from url https://registry.terraform.io/v1/modules/Azure/{module name}/azurerm/{module version}
 
-        # log
-        print(f"Fetching AVM module details for module: {module_name}, version: {module_version}")
+        
 
         module_details_url = f"https://registry.terraform.io/v1/modules/Azure/{module_name}/azurerm/{module_version}"
+
+        # log
+        print(f"Fetching AVM module details for module: {module_name}, version: {module_version}. URL: {module_details_url}")
+
         async with aiohttp.ClientSession() as session:
             async with session.get(module_details_url) as response:
                 if response.status == 200:
-                    return await json.dumps(response, indent=2)
+                    return await response.json()
                 else:
                     raise ValueError(f"Failed to retrieve module details for {module_name} version {module_version}. HTTP Status: {response.status}")

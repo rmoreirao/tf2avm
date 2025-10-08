@@ -9,7 +9,7 @@ from semantic_kernel.connectors.ai.open_ai import OpenAIChatCompletion, OpenAICh
 from semantic_kernel.functions import KernelArguments
 
 from plugins.terraform_plugin import TerraformPlugin
-from schemas.models import AVMKnowledgeAgentResult
+from schemas.models import  AVMResourceDetailsAgentResult
 
 
 class AVMResourceDetailsAgent:
@@ -44,7 +44,7 @@ class AVMResourceDetailsAgent:
             
             kernel.add_service(chat_completion_service)
             
-            execution_settings = OpenAIChatPromptExecutionSettings(response_format=AVMKnowledgeAgentResult)
+            execution_settings = OpenAIChatPromptExecutionSettings(response_format=AVMResourceDetailsAgentResult)
 
             # Create the agent
             agent = ChatCompletionAgent(
@@ -78,7 +78,7 @@ Only output the JSON mapping format. Output the full list and never truncate it.
             logger.error(f"Failed to initialize AVM Resource Details Agent: {e}")
             raise
 
-    async def fetch_avm_resource_details(self, module_name:str,module_version:str) -> str:
+    async def fetch_avm_resource_details(self, module_name:str,module_version:str) -> AVMResourceDetailsAgentResult:
         """
         Fetch AVM module details from Terraform Registry.
         """
@@ -88,5 +88,5 @@ Only output the JSON mapping format. Output the full list and never truncate it.
 
         message = f"Parse the AVM module details. module_name is {module_name}, module_version is {module_version}. Here is the raw JSON data for the AVM module: {raw_avm_module_details_json}"
         response = await self.agent.get_response(message)
-        result = AVMKnowledgeAgentResult.model_validate(json.loads(response.message.content))
+        result = AVMResourceDetailsAgentResult.model_validate(json.loads(response.message.content))
         return result

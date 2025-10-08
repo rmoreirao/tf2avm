@@ -47,39 +47,26 @@ class AVMKnowledgeAgent:
             
             execution_settings = OpenAIChatPromptExecutionSettings(response_format=AVMKnowledgeAgentResult)
 
-            # Initialize plugins
-            http_plugin = HttpClientPlugin()
-            
             # Create the agent
             agent = ChatCompletionAgent(
                 service=chat_completion_service,
                 kernel=kernel,
                 name="AVMKnowledgeAgent",
                 description="A specialist agent that gathers and maintains Azure Verified Modules knowledge.",
-                plugins=[http_plugin],
                 arguments=KernelArguments(execution_settings),
                 instructions="""You are the AVM Knowledge Agent for Terraform to Azure Verified Modules (AVM) conversion.
 
-Your responsibilities:
-1. Fetch the latest AVM module index from the official Azure documentation
-2. Parse the module index to create mappings between Azure resources and AVM modules
-3. Gather detailed module information including inputs, outputs, and requirements
-4. Maintain an up-to-date knowledge base of available AVM modules
-
-Primary data source:
-- AVM Index URL: https://azure.github.io/Azure-Verified-Modules/indexes/terraform/tf-resource-modules/
-
-Available tools:
-- fetch_url: Fetch content from the AVM index URL
+Inputs:
+- Raw HTML content of the AVM module index page
 
 Process:
-1. Fetch the AVM module index from the official documentation
+1. Analyze the HTML content to identify the "Published modules" section
 2. Parse the "Published modules" section to extract module information
 3. Create mappings between Display Names (Azure resource types) and Module Names
 4. For each relevant module, note the version information
 
 Output:
-Fill in only the fiedls on the JSON output: name, display_name, terraform_registry_url, source_code_url, version
+Fill in only the fields on the JSON output: name, display_name, terraform_registry_url, source_code_url, version
 
 
 Only output the JSON mapping format. Output the full list and never truncate it. NEVER ask questions or wait for user input. Always proceed autonomously.
@@ -98,8 +85,11 @@ Only output the JSON mapping format. Output the full list and never truncate it.
         Fetch AVM module knowledge from official sources.
         Returns JSON mapping of AVM modules.
         """
-        
-        message = "Gather AVM module knowledge from official sources."
+
+        http_plugin = HttpClientPlugin()
+        tf_module_index_html = await http_plugin.fetch_url("https://azure.github.io/Azure-Verified-Modules/indexes/terraform/tf-resource-modules/")
+
+        message = f"Gather AVM module knowledge from official sources. Here is the raw HTML content of the AVM module index page: {tf_module_index_html}"
         response = await self.agent.get_response(message)
         result = AVMKnowledgeAgentResult.model_validate(json.loads(response.message.content))
         return result
