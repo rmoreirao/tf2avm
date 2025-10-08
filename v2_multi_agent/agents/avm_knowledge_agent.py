@@ -94,7 +94,7 @@ Only output the JSON mapping format. Output the full list and never truncate it.
             logger.error(f"Failed to initialize AVM Knowledge Agent: {e}")
             raise
             
-    async def fetch_avm_knowledge(self) -> AVMKnowledgeResult:
+    async def fetch_avm_knowledge(self) -> str:
         """
         Fetch AVM module knowledge from official sources.
         Returns JSON mapping of AVM modules.

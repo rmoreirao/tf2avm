@@ -22,10 +22,9 @@ class AVMModuleInput(BaseModel):
     """Represents a module input parameter."""
     name: str = Field(description="Name of the input parameter")
     type: str = Field(description="Type of the input parameter")
-    description: Optional[str] = Field(default=None, description="Description of the input parameter")
     required: bool = Field(default=True, description="Whether the input is required")
-    default: Optional[str] = Field(default=None, description="Default value if any")
-
+    # description: Optional[str] = Field(default=None, description="Description of the input parameter")
+    # default: Optional[str] = Field(default=None, description="Default value if any")
 
 class AVMModuleOutput(BaseModel):
     """Represents a module output value."""
