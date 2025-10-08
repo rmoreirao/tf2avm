@@ -36,10 +36,10 @@ class AVMResourceDetailsAgent:
             kernel = Kernel()
             
             chat_completion_service = AzureChatCompletion(
-                deployment_name=settings.azure_openai_deployment_name,
-                api_key=settings.azure_openai_api_key,
-                endpoint=settings.azure_openai_endpoint,
-                api_version=settings.azure_openai_api_version,
+                deployment_name=settings.azure_openai_fast_deployment_name,
+                api_key=settings.azure_openai_fast_api_key,
+                endpoint=settings.azure_openai_fast_endpoint,
+                api_version=settings.azure_openai_fast_api_version,
             )
             
             kernel.add_service(chat_completion_service)

@@ -133,10 +133,10 @@ NEVER ask questions or wait for user input. Always proceed autonomously and hand
         self.logger.info("Starting mapping review process")
         
         # Prepare the detailed module information for the agent
-        avm_details_summary = self._format_avm_details(avm_modules_details)
+        avm_details_json = json.dumps([module.model_dump() for module in avm_modules_details], indent=2)
         
         # Prepare previous mapping summary for context
-        previous_mapping_summary = self._format_previous_mappings(previous_mapping_result)
+        previous_mapping_json = json.dumps(previous_mapping_result.model_dump(), indent=2)
         
         # Create comprehensive message for the agent
         message = f"""Review and improve resource mappings using detailed AVM module information.
@@ -148,10 +148,10 @@ NEVER ask questions or wait for user input. Always proceed autonomously and hand
     {avm_knowledge}
 
     Previous Mapping Results:
-    {previous_mapping_summary}
+    {previous_mapping_json}
 
-    Detailed AVM Module Information:
-    {avm_details_summary}
+    Detailed AVM Module Information JSON:
+    {avm_details_json}
 
     Please review the previous mappings and:
     1. Validate existing mappings against detailed module specifications
