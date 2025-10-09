@@ -7,7 +7,7 @@ from config.settings import get_settings
 from config.logging import get_logger
 from plugins.terraform_plugin import TerraformPlugin
 from plugins.http_plugin import HttpClientPlugin
-from schemas.models import AVMKnowledgeAgentResult, AVMModuleDetailed, MappingAgentResult, ResourceMapping
+from schemas.models import AVMKnowledgeAgentResult, AVMModuleDetailed, MappingAgentResult, ResourceMapping, TerraformOutputreference
 
 
 class ResourceConverterPlanningAgent:
@@ -68,6 +68,7 @@ Your mission: Create a PRECISE conversion plan for the SINGLE azurerm_* resource
 - AVM Module Details: JSON object with the target module's full specifications
 - Resource Content: The specific resource block from Terraform
 - Variables: Available variables from the Terraform configuration
+- Outputs from the original resource: this is to help map outputs to the new module outputs
 
 --> Planning Process for THIS ONE RESOURCE:
 1. Parse the specific azurerm_* resource block
@@ -108,10 +109,7 @@ Your mission: Create a PRECISE conversion plan for the SINGLE azurerm_* resource
 |                    |             |               |             |                         |          |           |       |
 
 - Outputs Impacted / Re-mapped:
-- Dependencies (Upstream):
-- Dependents (Downstream):
 - Child Resources / Diagnostics Handling:
-- Risk Level: High/Medium/Low (justify)
 
 ## 3. Variables Plan
 ### 3.1 Existing Variables Reused
@@ -125,8 +123,7 @@ List variable names reused as-is.
 |-----------------|----------------|---------------------------|------------|-------|
 
 ## 5. Terraform Required Providers Update
-- List any changes needed to the required_providers block (e.g., version updates)
-- This is based on the requirements of the AVM modules planned for use 
+- List of the required_providers of the AVM modules planned for use.
 
 END YOUR OUTPUT.
 """
@@ -136,7 +133,7 @@ END YOUR OUTPUT.
         return cls(agent)
 
 
-    async def create_conversion_plan(self, resource_mapping: ResourceMapping, avm_module_detail: AVMModuleDetailed, tf_file: tuple[str, str]) -> str:
+    async def create_conversion_plan(self, resource_mapping: ResourceMapping, avm_module_detail: AVMModuleDetailed, tf_file: tuple[str, str], original_tf_resource_output_paramers: List[TerraformOutputreference] ) -> str:
         """
         Create a detailed conversion plan with integrated resource mapping based on repository scan, AVM knowledge, and Terraform file contents.
         
@@ -160,6 +157,7 @@ END YOUR OUTPUT.
             "Create a detailed Terraform to AVM conversion plan with integrated resource mapping.\n\n"
             f"Resource Mapping JSON:\n{resource_mapping.model_dump_json()}\n\n"
             f"AVM Module Details JSON:\n{avm_detail_json}\n\n"
-            f"Terraform File:\n{file_summary}"
+            f"Terraform File:\n{file_summary}\n\n"
+            f"Original Resource Referenced Outputs JSON:\n{json.dumps([output.model_dump() for output in original_tf_resource_output_paramers], indent=2)}\n\n"
         )
         return await self.agent.get_response(message)

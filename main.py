@@ -133,9 +133,6 @@ class TerraformAVMOrchestrator:
         with open(f"{output_dir}/01_tf_metadata.json", "w", encoding="utf-8") as f:
             f.write(tf_metadata_agent_output.model_dump_json(indent=2))
                
-
-        exit()
-        
         self.logger.info("Step 2: Running AVM Knowledge Agent")
         knowledge_result : AVMKnowledgeAgentResult = await self.avm_service.fetch_avm_knowledge(use_cache=True)
         self._log_agent_response("AVMKnowledgeAgent", knowledge_result)
@@ -223,7 +220,13 @@ class TerraformAVMOrchestrator:
                 resources_planings.append(f"Resource {mapping_result.source_resource.type} {mapping_result.source_resource.name} mapping to module {mapping_result.target_module.name} version {mapping_result.target_module.version} but source file not found. It will be skipped.")
                 continue
 
-            planning_result = await resource_planning_agent.create_conversion_plan(avm_module_detail=avm_module_detail,resource_mapping=mapping_result, tf_file=tf_file)
+            # look up the tf_metadata_agent_output to find the resource with type and name
+            tf_metadata = next((m for m in tf_metadata_agent_output.azurerm_resources if m.type == mapping_result.source_resource.type and m.name == mapping_result.source_resource.name), None)
+            if tf_metadata is None:
+                resources_planings.append(f"Resource {mapping_result.source_resource.type} {mapping_result.source_resource.name} mapping to module {mapping_result.target_module.name} version {mapping_result.target_module.version} but metadata not found. It will be skipped.")
+                continue
+
+            planning_result = await resource_planning_agent.create_conversion_plan(avm_module_detail=avm_module_detail,resource_mapping=mapping_result, tf_file=tf_file, original_tf_resource_output_paramers=tf_metadata.referenced_outputs)
             self._log_agent_response("ResourceConverterPlanningAgent", planning_result)
             with open(f"{output_dir}/05_{mapping_result.source_resource.type}_{mapping_result.source_resource.name}_conversion_plan.md", "w", encoding="utf-8") as f:
                 f.write(str(planning_result))
