@@ -118,7 +118,9 @@ Your mission: Create a PRECISE conversion plan for the SINGLE azurerm_* resource
 |                    |             |               |             |                         |          |           |       |
 
 ## 3. Variables Plan
-### 3.1 New Variables Required
+### 3.1 Existing Variables Reused
+List variable names reused as-is.
+### 3.2 New Variables Required
     Only list new variables when a required AVM module input cannot be inferred from existing attributes, variables or the context.
 | Variable | Type | Source | Reason | Default? |
 |----------|------|--------|--------|----------|
