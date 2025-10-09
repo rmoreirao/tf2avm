@@ -145,8 +145,6 @@ List variable names reused as-is.
 ## 5. Terraform Required Providers Update
 - List any changes needed to the required_providers block (e.g., version updates)
 - This is based on the requirements of the AVM modules planned for use 
-
-END YOUR OUTPUT.
 """
             )
 

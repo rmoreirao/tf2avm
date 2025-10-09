@@ -97,24 +97,29 @@ Your mission: Create a PRECISE conversion plan for the SINGLE azurerm_* resource
 
 ### {resource_type}.{name}
 - Source File: {path}
-- Target AVM Module: {module_name} (version if known)
+- Target AVM Module: {module_name} version {module_version}
+- AVM Resource Name: {avm_resource_name}
+- Transformation Action: 
+    - Options:
+        - Convert from Resource to AVM Module
+        - Convert from Resource to AVM Module parameter (delete current resource)
+        - Skip (unmappable, document reason)
 
 - Resource Input Name → AVM Input Mapping Table:
     - Make sure to include in the "Input Mapping Table":
         - !!! all required AVM module inputs !!!
         - !!! Attributes Available on Current resource which are not mappable to AVM module inputs !!!
+        - !!! Try to infer the required inputs from current context !!!
+        - !!! If AVM module inputs are not mappable to current resource attributes, then propose new variable and already map the input to it !!!
+        - !!! Also include the parameters that are related to Child Resources. For ex.: Diagnostics Handling !!!
 
 | Resource Input Name | Input Value | AVM Input Name | Input Value | AVM Optional or Required | Handling | Transform | Notes |
 |--------------------|-------------|---------------|-------------|-------------------------|----------|-----------|-------|
 |                    |             |               |             |                         |          |           |       |
 
-- Outputs Impacted / Re-mapped:
-- Child Resources / Diagnostics Handling:
-
 ## 3. Variables Plan
-### 3.1 Existing Variables Reused
-List variable names reused as-is.
-### 3.2 New Variables Required
+### 3.1 New Variables Required
+    Only list new variables when a required AVM module input cannot be inferred from existing attributes, variables or the context.
 | Variable | Type | Source | Reason | Default? |
 |----------|------|--------|--------|----------|
 
@@ -122,10 +127,11 @@ List variable names reused as-is.
 | Original Output | Current Source | New Source (Module Output) | Change Type | Notes |
 |-----------------|----------------|---------------------------|------------|-------|
 
+for example:
+| key_vault_uri | azurerm_key_vault.{key_vault_name}.vault_uri | module.{avm_kv_module_name}.uri | remap | Updated to use AVM module output |
+
 ## 5. Terraform Required Providers Update
 - List of the required_providers of the AVM modules planned for use.
-
-END YOUR OUTPUT.
 """
             )
 

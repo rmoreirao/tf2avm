@@ -61,11 +61,10 @@ Your responsibilities:
 4. Preserve code structure, comments, and formatting where possible
 5. Generate all converted Terraform files
 
-Input format:
-You will receive file contents directly in the message, formatted as:
-File: relative_path/filename.tf
-Content:
-[file content]
+Inputs:
+- Conversion Plan: Detailed conversion per file and resource
+- Terraform File Contents: The contents of all .tf files to be converted
+- Output Directory: The directory where converted files should be written
 ---
 
 Authoritative Conversion Plan (follow this precisely; it overrides generic guidance if conflicts arise): the conversion plan will be provided at runtime.
@@ -78,16 +77,15 @@ Operational Process:
 - Replace resource blocks with AVM module blocks (source, version from plan).
 - Map attributes exactly as specified.
 - Insert conversion comment header.
-5. Update variables.tf and outputs.tf per plan.required_variables and plan.required_outputs.
-6. Preserve and annotate unmapped resources as described.
-7. Write converted files to output folder maintaining structure. Output directory will be provided at runtime.
-8. Validate that all mapped resources were converted as per the plan and report any deviations.
-8. Summarize the conversion: counts (converted, skipped, unmapped), new variables, new outputs, deviations from plan.
+5. Update variables and outputs per plan.
+6. Preserve unmapped resources as described.
+7. Clean up any resource which is fully converted to module.
+8. Write converted files to output folder maintaining structure. Output directory will be provided at runtime.
+9. Validate that all mapped resources were converted as per the plan and report any deviations.
+10. Summarize the conversion: counts (converted, skipped, unmapped), new variables, new outputs, deviations from plan.
 
 Available tools:
 - write_file: Write a file to the specified path with given content.
-- read_tf_files: Read and return the contents of all Terraform files in the specified directory.
-
 
 Instructions:
 - Always follow the provided conversion plan exactly.
@@ -100,26 +98,13 @@ Instructions:
         return cls(agent)
 
 
-    async def run_conversion(self, conversion_plan: str, output_dir: str, tf_files: dict) -> str:
-        """
-        Run autonomous conversion using the conversion plan and Terraform file contents.
-        
-        Args:
-            conversion_plan: Detailed conversion plan from ConverterPlanningAgent
-            output_dir: Directory where converted files should be written
-            tf_files: Dictionary mapping relative file paths to file contents
-                     e.g., {'main.tf': 'content...', 'variables.tf': 'content...'}
-        
-        Returns:
-            The final agent response summarizing the conversion.
-        """
-        
+    async def run_conversion(self, conversion_plan: str, output_dir: str, tf_files: dict) -> str:        
         # Format tf_files for the agent
         files_summary = "\n".join([f"File: {path}\nContent:\n{content}\n---" for path, content in tf_files.items()])
         
         kickoff_message = (
             f"Begin conversion now using the conversion plan and Terraform file contents.\n\n"
-            f"Conversion Plan:\n{conversion_plan}\n\n"
+            f"Conversion Plan per file / resource:\n{conversion_plan}\n\n"
             f"Output Directory: '{output_dir}'\n\n"
             f"Terraform Files:\n{files_summary}"
         )

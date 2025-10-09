@@ -226,12 +226,24 @@ class TerraformAVMOrchestrator:
                 resources_planings.append(f"Resource {mapping_result.source_resource.type} {mapping_result.source_resource.name} mapping to module {mapping_result.target_module.name} version {mapping_result.target_module.version} but metadata not found. It will be skipped.")
                 continue
 
-            planning_result = await resource_planning_agent.create_conversion_plan(avm_module_detail=avm_module_detail,resource_mapping=mapping_result, tf_file=tf_file, original_tf_resource_output_paramers=tf_metadata.referenced_outputs)
+            referenced_outputs = tf_metadata.referenced_outputs or []
+            planning_result = await resource_planning_agent.create_conversion_plan(avm_module_detail=avm_module_detail,resource_mapping=mapping_result, tf_file=tf_file, original_tf_resource_output_paramers=referenced_outputs)
             self._log_agent_response("ResourceConverterPlanningAgent", planning_result)
             with open(f"{output_dir}/05_{mapping_result.source_resource.type}_{mapping_result.source_resource.name}_conversion_plan.md", "w", encoding="utf-8") as f:
                 f.write(str(planning_result))
 
-        exit()
+            resources_planings.append(str(planning_result))
+
+        #1) apply the changes per file / per resource
+        # For each file / resource:
+        # Logic: 
+        #   - load the current version of the file
+        #   - find the resource that you change to modify
+        #   - find the mapping of that resource
+        #   - find the planning of that resource
+        #   - replace the resource with the new AVM module
+        
+        #2) apply changes on variables and outputs
 
         # self.logger.info("Step 5: Running Converter Planning Agent (with integrated mapping)")
         # planning_agent = await ConverterPlanningAgent.create()
@@ -253,6 +265,7 @@ class TerraformAVMOrchestrator:
         # Step 4: Converter Agent
         self.logger.info("Step 4: Running Converter Agent (user approved)")
         converter_agent = await ConverterAgent.create()
+        planning_result = "\n\n".join(resources_planings)
         converter_result = await converter_agent.run_conversion(planning_result, migrated_output_dir, tf_files)
         self._log_agent_response("ConverterAgent", converter_result)
 
