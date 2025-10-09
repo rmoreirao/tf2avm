@@ -6,6 +6,7 @@ import shutil
 import traceback
 from typing import Dict, Any, List
 
+from agents.converter_planning_agent_per_resource import ResourceConverterPlanningAgent
 from services.avm_service import AVMService
 from config.settings import get_settings, validate_environment
 from config.logging import setup_logging
@@ -132,6 +133,9 @@ class TerraformAVMOrchestrator:
         with open(f"{output_dir}/01_tf_metadata.json", "w", encoding="utf-8") as f:
             f.write(tf_metadata_agent_output.model_dump_json(indent=2))
                
+
+        exit()
+        
         self.logger.info("Step 2: Running AVM Knowledge Agent")
         knowledge_result : AVMKnowledgeAgentResult = await self.avm_service.fetch_avm_knowledge(use_cache=True)
         self._log_agent_response("AVMKnowledgeAgent", knowledge_result)
@@ -200,12 +204,38 @@ class TerraformAVMOrchestrator:
         with open(f"{output_dir}/05_avm_module_details.json", "w", encoding="utf-8") as f:
             f.write(json.dumps([v.model_dump() for v in modules_details], indent=2))
         
-        self.logger.info("Step 5: Running Converter Planning Agent (with integrated mapping)")
-        planning_agent = await ConverterPlanningAgent.create()
-        planning_result = await planning_agent.create_conversion_plan(mapping_result, modules_details, tf_files)
-        self._log_agent_response("ConverterPlanningAgent", planning_result)
-        with open(f"{output_dir}/05_conversion_plan.md", "w", encoding="utf-8") as f:
-            f.write(str(planning_result))
+        self.logger.info("Step 5: Running Converter Planning Agent Per Resource")
+        resource_planning_agent = await ResourceConverterPlanningAgent.create()
+
+        resources_planings = []
+        for mapping_result in mapping_result.mappings:
+            if mapping_result.target_module is None:
+                resources_planings.append(f"Resource {mapping_result.source_resource.type} {mapping_result.source_resource.name} has no mapping and will be skipped.")
+                continue
+            
+            avm_module_detail = next((m for m in modules_details if m.module.name == mapping_result.target_module.name and m.module.version == mapping_result.target_module.version), None)
+            if avm_module_detail is None:
+                resources_planings.append(f"Resource {mapping_result.source_resource.type} {mapping_result.source_resource.name} mapping to module {mapping_result.target_module.name} version {mapping_result.target_module.version} but details not found. It will be skipped.")
+                continue
+
+            tf_file = next(((k, v) for k, v in tf_files.items() if f'resource "{mapping_result.source_resource.type}" "{mapping_result.source_resource.name}"' in v), None)
+            if tf_file is None:
+                resources_planings.append(f"Resource {mapping_result.source_resource.type} {mapping_result.source_resource.name} mapping to module {mapping_result.target_module.name} version {mapping_result.target_module.version} but source file not found. It will be skipped.")
+                continue
+
+            planning_result = await resource_planning_agent.create_conversion_plan(avm_module_detail=avm_module_detail,resource_mapping=mapping_result, tf_file=tf_file)
+            self._log_agent_response("ResourceConverterPlanningAgent", planning_result)
+            with open(f"{output_dir}/05_{mapping_result.source_resource.type}_{mapping_result.source_resource.name}_conversion_plan.md", "w", encoding="utf-8") as f:
+                f.write(str(planning_result))
+
+        exit()
+
+        # self.logger.info("Step 5: Running Converter Planning Agent (with integrated mapping)")
+        # planning_agent = await ConverterPlanningAgent.create()
+        # planning_result = await planning_agent.create_conversion_plan(mapping_result, modules_details, tf_files)
+        # self._log_agent_response("ConverterPlanningAgent", planning_result)
+        # with open(f"{output_dir}/05_conversion_plan.md", "w", encoding="utf-8") as f:
+        #     f.write(str(planning_result))
 
         # # Ask user for approval to proceed
         # approved = await self._prompt_user_approval()
@@ -255,7 +285,13 @@ class TerraformAVMOrchestrator:
             response_text = str(response.message.content)
         else:
             response_text = str(response) if response else "No response"
-        self.logger.info(f"[{agent_name}] Response: {response_text}")
+        
+        try:
+            self.logger.info(f"[{agent_name}] Response: {response_text}")
+        except UnicodeEncodeError:
+            safe = response_text.encode("utf-8", errors="replace").decode("utf-8")
+            self.logger.info(f"[{agent_name}] Response: {safe}")
+
         print(f"[{agent_name}]: {response_text}")
 
     async def _prompt_user_approval(self) -> bool:

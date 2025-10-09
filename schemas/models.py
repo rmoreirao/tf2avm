@@ -5,6 +5,13 @@ from enum import Enum
 
 
 
+class TerraformOutputreference(BaseModel):
+    """Represents a Terraform output variable."""
+    name: str = Field(description="The name of the output variable")
+    value: str = Field(description="The value of the output variable")
+    attribute: str = Field(description="The specific attribute of the resource being referenced")
+    description: Optional[str] = Field(default=None, description="Description of the output variable")
+    sensitive: bool = Field(default=False, description="Whether the output is sensitive")
 
 class TerraformResource(BaseModel):
     """Represents a Terraform resource."""
@@ -16,6 +23,7 @@ class TerraformResourceWithRelations(TerraformResource):
     """Represents relationships between Terraform resources."""
     child_resources: Optional[List['TerraformResource']] = Field(default=None, description="List of child resources nested within this resource")
     parent_resource: Optional['TerraformResource'] = Field(default=None, description="The parent resource if this is a child resource")
+    referenced_outputs: Optional[List[TerraformOutputreference]] = Field(default=None, description="List of outputs that reference this resource")
 
 class TerraformMetadataAgentResult(BaseModel):
     """Result of repository scanning."""

@@ -81,7 +81,14 @@ Examples of child resources:
 - A network interface (child) associated with a virtual machine (parent).
 - A disk (child) attached to a virtual machine (parent).
 - azurerm_monitor_diagnostic_setting (child) associated with an Azure resource (parent).
-5. Create a detailed scan result
+5. Identify any Outputs that reference these resources:
+    - For example, the output below references the azurerm_linux_web_app resource type, the ""web"" resource name, and the ""default_hostname"" attribute of the resource.:
+        output "web_app_url" {
+            description = "URL of the Web App"
+            value = "https://$\{azurerm_linux_web_app.web.default_hostname\}"
+        }
+    - The output can be on different files within the same repository.
+6. Create a detailed scan result
 
 >>>Instructions:
 
