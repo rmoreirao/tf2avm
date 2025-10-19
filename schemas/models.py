@@ -99,6 +99,33 @@ class ConversionResult(BaseModel):
     avm_mapping_file: Optional[str] = None
 
 
+class TerraformValidationError(BaseModel):
+    """Represents a single Terraform validation error."""
+    severity: str = Field(description="Error severity: 'error', 'warning', 'info'")
+    summary: str = Field(description="Brief summary of the error")
+    detail: str = Field(description="Detailed description of the error")
+    file_path: Optional[str] = Field(default=None, description="Path to the file containing the error")
+    line_number: Optional[int] = Field(default=None, description="Line number where the error occurs")
+    column_number: Optional[int] = Field(default=None, description="Column number where the error occurs")
+    error_code: Optional[str] = Field(default=None, description="Terraform error code if available")
+
+class FileValidationErrors(BaseModel):
+    """Represents validation errors grouped by file."""
+    file_path: str = Field(description="Path to the Terraform file")
+    errors: List[TerraformValidationError] = Field(description="List of validation errors in this file")
+    error_count: int = Field(description="Total number of errors in this file")
+    warning_count: int = Field(description="Total number of warnings in this file")
+
+class TerraformValidatorAgentResult(BaseModel):
+    """Result of Terraform validation analysis."""
+    validation_success: bool = Field(description="Whether the Terraform validation passed")
+    total_errors: int = Field(description="Total number of validation errors across all files")
+    total_warnings: int = Field(description="Total number of validation warnings across all files")
+    files_with_errors: List[FileValidationErrors] = Field(description="List of files containing validation errors")
+    validation_summary: str = Field(description="Summary of the validation results and recommended actions")
+    raw_terraform_output: Optional[str] = Field(default=None, description="Raw output from terraform validate command")
+
+
 class ValidationIssue(BaseModel):
     """Represents a validation issue."""
     severity: str  # "error", "warning", "info"

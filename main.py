@@ -7,15 +7,13 @@ import traceback
 from typing import Dict, Any, List
 
 from agents.converter_planning_agent_per_resource import ResourceConverterPlanningAgent
+from agents.tf_validator_agent import TerraformValidatorAgent
 from services.avm_service import AVMService
 from config.settings import get_settings, validate_environment
 from config.logging import setup_logging
 from agents.tf_metadata_agent import TFMetadataAgent
-from agents.converter_planning_agent import ConverterPlanningAgent
 from agents.converter_agent import ConverterAgent
-from agents.validator_agent import ValidatorAgent
-from agents.report_agent import ReportAgent
-from schemas.models import AVMKnowledgeAgentResult, AVMResourceDetailsAgentResult, MappingAgentResult, TerraformMetadataAgentResult
+from schemas.models import AVMKnowledgeAgentResult, AVMResourceDetailsAgentResult, MappingAgentResult, TerraformMetadataAgentResult, TerraformValidatorAgentResult
 from agents.mapping_agent import MappingAgent
 
 
@@ -108,6 +106,12 @@ class TerraformAVMOrchestrator:
 
     async def _run_sequential_workflow(self, repo_path: str, output_dir: str) -> str:
         """Run the agents in sequence with an interactive approval gate after planning."""
+
+        # terraform_service = TerraformService()
+        # result: TerraformValidationResult = terraform_service.validate_terraform("D:\\repos\\tf2avm\\tests\\test_run\\repo_tf_basic\\output\\20251009_155830\\migrated")
+
+        # print("Result of terraform validate JSON:" + str(result))
+        # exit()
 
         # await self._store_avm_cache()
 
@@ -262,38 +266,31 @@ class TerraformAVMOrchestrator:
         migrated_output_dir = Path(output_dir) / "migrated"
         migrated_output_dir.mkdir(parents=True, exist_ok=True)
 
-        # Step 4: Converter Agent
-        self.logger.info("Step 4: Running Converter Agent (user approved)")
+        self.logger.info("Step 6: Running Converter Agent")
         converter_agent = await ConverterAgent.create()
         planning_result = "\n\n".join(resources_planings)
         converter_result = await converter_agent.run_conversion(planning_result, migrated_output_dir, tf_files)
         self._log_agent_response("ConverterAgent", converter_result)
 
-        exit()
+        with open(f"{output_dir}/06_conversion_summary.md", "w", encoding="utf-8") as f:
+            f.write(str(converter_result))
 
-        # Step 5: Validator Agent
-        self.logger.info("Step 5: Running Validator Agent")
-        validator_agent = await ValidatorAgent.create()
-        validator_result = await validator_agent.validate_conversion(repo_path, str(migrated_output_dir), str(converter_result))
-        self._log_agent_response("ValidatorAgent", validator_result)
+        # Step 7: Terraform Validation and Error Analysis
+        self.logger.info("Step 7: Running Terraform Validator Agent")
+        tf_validator_agent = await TerraformValidatorAgent.create()
+        validation_result: TerraformValidatorAgentResult = await tf_validator_agent.validate_and_analyze(str(migrated_output_dir))
+        self._log_agent_response("TerraformValidatorAgent", validation_result)
 
-        # Step 6: Report Agent
-        self.logger.info("Step 6: Running Report Agent")
-        report_agent = await ReportAgent.create()
-        
-        # Prepare all results for the report
-        all_results = {
-            "scanner": str(tf_metadata_agent_output),
-            "knowledge": str(knowledge_result),
-            "planning": str(planning_result),
-            "conversion": str(converter_result),
-            "validation": str(validator_result)
-        }
-        
-        report_result = await report_agent.generate_report(all_results, output_dir)
-        self._log_agent_response("ReportAgent", report_result)
+        with open(f"{output_dir}/07_terraform_validation.json", "w", encoding="utf-8") as f:
+            f.write(validation_result.model_dump_json(indent=2))
 
-        return str(report_result)
+        if not validation_result.validation_success:
+            self.logger.warning(f"Terraform validation failed with {validation_result.total_errors} errors and {validation_result.total_warnings} warnings")
+            # TODO: In future iterations, this could trigger an automatic fix agent
+        else:
+            self.logger.info("Terraform validation passed successfully")
+
+        return str("Some result")
     
     def _log_agent_response(self, agent_name: str, response) -> None:
         """Log agent response in a consistent format."""
@@ -310,21 +307,6 @@ class TerraformAVMOrchestrator:
 
         print(f"[{agent_name}]: {response_text}")
 
-    async def _prompt_user_approval(self) -> bool:
-        """Prompt user to approve moving from planning to conversion. Returns True if approved."""
-        try:
-            # Use a thread to avoid blocking the event loop
-            response = await asyncio.to_thread(input, "A conversion plan has been generated (conversion_plan.md). Proceed with conversion? [y/N]: ")
-            return response.strip().lower() in ("y", "yes")
-        except Exception as e:
-            self.logger.warning(f"Failed to capture user approval input: {e}. Defaulting to not approved.")
-            return False
-    
-    async def cleanup(self):
-        """Clean up resources."""
-        self.logger.info("Cleanup completed")
-
-
 async def main():
     """Main entry point for the application."""
     import typer
@@ -336,12 +318,9 @@ async def main():
         """Run the Terraform to AVM conversion."""
         async def _run():
             orchestrator = TerraformAVMOrchestrator()
-            try:
-                await orchestrator.initialize()
-                result = await orchestrator.convert_repository(repo_path, output_dir)
-                print(f"Conversion result: {result}")
-            finally:
-                await orchestrator.cleanup()
+            await orchestrator.initialize()
+            result = await orchestrator.convert_repository(repo_path, output_dir)
+            print(f"Conversion result: {result}")
         
         asyncio.run(_run())
     
@@ -354,14 +333,12 @@ if __name__ == "__main__":
     # Simple test run
     async def test_run():
         orchestrator = TerraformAVMOrchestrator()
-        try:
-            await orchestrator.initialize()
-            result = await orchestrator.convert_repository(
-                repo_path="D:\\repos\\tf2avm\\tests\\fixtures\\repo_tf_basic",
-                output_dir="D:\\repos\\tf2avm\\tests\\test_run\\repo_tf_basic\\output\\" + datetime.now().strftime("%Y%m%d_%H%M%S")
-            )
-            print(f"Test conversion result: {result}")
-        finally:
-            await orchestrator.cleanup()
+
+        await orchestrator.initialize()
+        result = await orchestrator.convert_repository(
+            repo_path="D:\\repos\\tf2avm\\tests\\fixtures\\repo_tf_basic",
+            output_dir="D:\\repos\\tf2avm\\tests\\test_run\\repo_tf_basic\\output\\" + datetime.now().strftime("%Y%m%d_%H%M%S")
+        )
+        print(f"Test conversion result: {result}")
     
     asyncio.run(test_run())

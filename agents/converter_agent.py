@@ -87,6 +87,10 @@ Operational Process:
 Available tools:
 - write_file: Write a file to the specified path with given content.
 
+Output:
+- Provide a summary of the conversion process including counts of converted resources, skipped resources, unmapped resources, new variables added, new outputs created, and any deviations from the plan.
+- Use MD formatting for the summary.
+
 Instructions:
 - Always follow the provided conversion plan exactly.
 - Never ask for clarifications; proceed autonomously.
