@@ -7,7 +7,13 @@ from config.settings import get_settings
 from config.logging import get_logger
 from plugins.terraform_plugin import TerraformPlugin
 from plugins.http_plugin import HttpClientPlugin
-from schemas.models import AVMKnowledgeAgentResult, AVMModuleDetailed, MappingAgentResult, ResourceMapping, TerraformOutputreference
+from schemas.models import (
+    AVMModuleDetailed, 
+    ResourceMapping, 
+    TerraformOutputreference,
+    ResourceConverterPlanningAgentResult,
+    ResourceConversionPlan
+)
 
 
 class ResourceConverterPlanningAgent:
@@ -61,7 +67,7 @@ class ResourceConverterPlanningAgent:
 
 You are the Resource Planning Agent analyzing ONE SPECIFIC RESOURCE at a time.
 
-Your mission: Create a PRECISE conversion plan for the SINGLE azurerm_* resource provided.
+Your mission: Create a PRECISE conversion plan for the SINGLE azurerm_* resource provided, outputting BOTH structured JSON and human-readable Markdown.
 
 --> Input format:
 - Resource Mapping: JSON object with source resource and target AVM module
@@ -85,11 +91,65 @@ Your mission: Create a PRECISE conversion plan for the SINGLE azurerm_* resource
 
 
 --> STRICT BEHAVIOR:
-- ALWAYS output the full plan in Markdown using the exact structure defined below.
+- ALWAYS output VALID JSON followed by Markdown
 - DO NOT ask questions. Proceed autonomously.
 - Include mapping analysis as part of the planning process.
 
---> Output format (use ALL headings, even if some sections are empty—state 'None'):
+--> Output format:
+
+First, output a JSON object with this exact structure:
+```json
+{
+  "conversion_plan": {
+    "resource_type": "azurerm_*",
+    "resource_name": "resource_name",
+    "source_file": "path/to/file.tf",
+    "target_avm_module": "avm-res-*",
+    "target_avm_version": "x.y.z",
+    "avm_resource_name": "proposed_module_instance_name",
+    "transformation_action": "convert_to_module|convert_to_parameter|skip",
+    "transformation_reason": "reason if skipped or special handling",
+    "attribute_mappings": [
+      {
+        "resource_input_name": "attribute_name",
+        "resource_input_value": "value or expression",
+        "avm_input_name": "module_input_name",
+        "avm_input_value": "mapped value",
+        "is_required": true,
+        "handling": "direct|transform|new_variable|unmappable",
+        "transform": "transformation description if needed",
+        "notes": "additional context"
+      }
+    ],
+    "existing_variables_reused": ["var1", "var2"],
+    "new_variables_required": [
+      {
+        "name": "var_name",
+        "type": "string",
+        "source": "inferred|required_by_avm",
+        "reason": "why needed",
+        "default_value": "default if any"
+      }
+    ],
+    "output_mappings": [
+      {
+        "original_output_name": "output_name",
+        "original_source": "azurerm_resource.name.attribute",
+        "new_source": "module.name.output",
+        "change_type": "remap|new|remove",
+        "notes": "context"
+      }
+    ],
+    "required_providers": ["provider requirement strings"],
+    "risk_level": "High|Medium|Low",
+    "risk_notes": "explanation of risks"
+  },
+  "planning_summary": "brief summary of planning outcome",
+  "warnings": ["warning1", "warning2"]
+}
+```
+
+Then, output the Markdown plan with this structure:
 
 # Terraform → AVM Conversion Plan
 
@@ -99,40 +159,28 @@ Your mission: Create a PRECISE conversion plan for the SINGLE azurerm_* resource
 - Source File: {path}
 - Target AVM Module: {module_name} version {module_version}
 - AVM Resource Name: {avm_resource_name}
-- Transformation Action: 
-    - Options:
-        - Convert from Resource to AVM Module
-        - Convert from Resource to AVM Module parameter (delete current resource)
-        - Skip (unmappable, document reason)
+- Transformation Action: {action}
+- Risk Level: {High|Medium|Low}
 
-- Resource Input Name → AVM Input Mapping Table:
-    - Make sure to include in the "Input Mapping Table":
-        - !!! all required AVM module inputs !!!
-        - !!! Attributes Available on Current resource which are not mappable to AVM module inputs !!!
-        - !!! Try to infer the required inputs from current context !!!
-        - !!! If AVM module inputs are not mappable to current resource attributes, then propose new variable and already map the input to it !!!
-        - !!! Also include the parameters that are related to Child Resources. For ex.: Diagnostics Handling !!!
+### Attribute Mapping Table
 
 | Resource Input Name | Input Value | AVM Input Name | Input Value | AVM Optional or Required | Handling | Transform | Notes |
 |--------------------|-------------|---------------|-------------|-------------------------|----------|-----------|-------|
 |                    |             |               |             |                         |          |           |       |
 
-## 3. Variables Plan
-### 3.1 Existing Variables Reused
+## Variables Plan
+### Existing Variables Reused
 List variable names reused as-is.
-### 3.2 New Variables Required
-    Only list new variables when a required AVM module input cannot be inferred from existing attributes, variables or the context.
+
+### New Variables Required
 | Variable | Type | Source | Reason | Default? |
 |----------|------|--------|--------|----------|
 
-## 4. Outputs Plan
+## Outputs Plan
 | Original Output | Current Source | New Source (Module Output) | Change Type | Notes |
 |-----------------|----------------|---------------------------|------------|-------|
 
-for example:
-| key_vault_uri | azurerm_key_vault.{key_vault_name}.vault_uri | module.{avm_kv_module_name}.uri | remap | Updated to use AVM module output |
-
-## 5. Terraform Required Providers Update
+## Terraform Required Providers Update
 - List of the required_providers of the AVM modules planned for use.
 """
             )
@@ -141,7 +189,13 @@ for example:
         return cls(agent)
 
 
-    async def create_conversion_plan(self, resource_mapping: ResourceMapping, avm_module_detail: AVMModuleDetailed, tf_file: tuple[str, str], original_tf_resource_output_paramers: List[TerraformOutputreference] ) -> str:
+    async def create_conversion_plan(
+        self, 
+        resource_mapping: ResourceMapping, 
+        avm_module_detail: AVMModuleDetailed, 
+        tf_file: tuple[str, str], 
+        original_tf_resource_output_paramers: List[TerraformOutputreference]
+    ) -> ResourceConverterPlanningAgentResult:
         """
         Create a detailed conversion plan with integrated resource mapping based on repository scan, AVM knowledge, and Terraform file contents.
         
@@ -149,9 +203,10 @@ for example:
             resource_mapping: Mapping results from MappingAgent
             avm_module_detail: AVM module knowledge from AVMKnowledgeAgent
             tf_file: Tuple of (filename, file_content)
+            original_tf_resource_output_paramers: List of outputs referencing this resource
         
         Returns:
-            Detailed conversion plan with integrated mapping analysis in markdown format.
+            ResourceConverterPlanningAgentResult with both structured and markdown plans.
         """
         
         # Unpack the tuple
@@ -167,5 +222,76 @@ for example:
             f"AVM Module Details JSON:\n{avm_detail_json}\n\n"
             f"Terraform File:\n{file_summary}\n\n"
             f"Original Resource Referenced Outputs JSON:\n{json.dumps([output.model_dump() for output in original_tf_resource_output_paramers], indent=2)}\n\n"
+            "Output the response in two parts:\n"
+            "1. First, a valid JSON object with the structured plan\n"
+            "2. Then, the markdown formatted plan\n"
         )
-        return await self.agent.get_response(message)
+        
+        response = await self.agent.get_response(message)
+        
+        # Parse the response to extract JSON and markdown
+        response_text = str(response)
+        
+        try:
+            # Try to extract JSON from the response
+            # Look for JSON code block or raw JSON
+            json_start = response_text.find('{')
+            json_end = response_text.rfind('}') + 1
+            
+            if json_start != -1 and json_end > json_start:
+                json_str = response_text[json_start:json_end]
+                result_dict = json.loads(json_str)
+                
+                # Extract markdown (everything after the JSON)
+                markdown_start = response_text.find('#', json_end)
+                if markdown_start == -1:
+                    # If no markdown section found, use a default
+                    markdown_plan = "# Conversion Plan\n\nSee structured output for details."
+                else:
+                    markdown_plan = response_text[markdown_start:].strip()
+                
+                # Create the result object
+                return ResourceConverterPlanningAgentResult(
+                    conversion_plan=ResourceConversionPlan(**result_dict['conversion_plan']),
+                    markdown_plan=markdown_plan,
+                    planning_summary=result_dict.get('planning_summary', 'Conversion plan created'),
+                    warnings=result_dict.get('warnings', [])
+                )
+            else:
+                # Fallback: if JSON parsing fails, treat entire response as markdown
+                self.logger.warning("Failed to parse JSON from agent response, using fallback structure")
+                return self._create_fallback_result(resource_mapping, avm_module_detail, filename, response_text)
+                
+        except Exception as e:
+            self.logger.error(f"Error parsing agent response: {e}")
+            return self._create_fallback_result(resource_mapping, avm_module_detail, filename, response_text)
+    
+    def _create_fallback_result(
+        self, 
+        resource_mapping: ResourceMapping, 
+        avm_module_detail: AVMModuleDetailed, 
+        filename: str, 
+        response_text: str
+    ) -> ResourceConverterPlanningAgentResult:
+        """Create a fallback result when JSON parsing fails."""
+        return ResourceConverterPlanningAgentResult(
+            conversion_plan=ResourceConversionPlan(
+                resource_type=resource_mapping.source_resource.type,
+                resource_name=resource_mapping.source_resource.name,
+                source_file=filename,
+                target_avm_module=resource_mapping.target_module.name if resource_mapping.target_module else "unknown",
+                target_avm_version=resource_mapping.target_module.version if resource_mapping.target_module else "unknown",
+                avm_resource_name=f"{resource_mapping.source_resource.name}_avm",
+                transformation_action="convert_to_module",
+                attribute_mappings=[],
+                existing_variables_reused=[],
+                new_variables_required=[],
+                output_mappings=[],
+                required_providers=[],
+                risk_level="High",
+                risk_notes="Fallback result due to parsing error - manual review required"
+            ),
+            markdown_plan=response_text,
+            planning_summary="Fallback result created due to response parsing error",
+            warnings=["Failed to parse structured output from agent - using fallback"]
+        )

@@ -13,7 +13,7 @@ from config.settings import get_settings, validate_environment
 from config.logging import setup_logging
 from agents.tf_metadata_agent import TFMetadataAgent
 from agents.converter_agent import ConverterAgent
-from schemas.models import AVMKnowledgeAgentResult, AVMResourceDetailsAgentResult, MappingAgentResult, TerraformMetadataAgentResult, TerraformValidatorAgentResult
+from schemas.models import AVMKnowledgeAgentResult, AVMResourceDetailsAgentResult, MappingAgentResult, TerraformMetadataAgentResult, TerraformValidatorAgentResult, ResourceConverterPlanningAgentResult
 from agents.mapping_agent import MappingAgent
 
 
@@ -209,34 +209,63 @@ class TerraformAVMOrchestrator:
         resource_planning_agent = await ResourceConverterPlanningAgent.create()
 
         resources_planings = []
+        resources_planning_results: List[ResourceConverterPlanningAgentResult] = []
+        
         for mapping_result in mapping_result.mappings:
             if mapping_result.target_module is None:
-                resources_planings.append(f"Resource {mapping_result.source_resource.type} {mapping_result.source_resource.name} has no mapping and will be skipped.")
+                skip_msg = f"Resource {mapping_result.source_resource.type} {mapping_result.source_resource.name} has no mapping and will be skipped."
+                resources_planings.append(skip_msg)
+                self.logger.warning(skip_msg)
                 continue
             
             avm_module_detail = next((m for m in modules_details if m.module.name == mapping_result.target_module.name and m.module.version == mapping_result.target_module.version), None)
             if avm_module_detail is None:
-                resources_planings.append(f"Resource {mapping_result.source_resource.type} {mapping_result.source_resource.name} mapping to module {mapping_result.target_module.name} version {mapping_result.target_module.version} but details not found. It will be skipped.")
+                skip_msg = f"Resource {mapping_result.source_resource.type} {mapping_result.source_resource.name} mapping to module {mapping_result.target_module.name} version {mapping_result.target_module.version} but details not found. It will be skipped."
+                resources_planings.append(skip_msg)
+                self.logger.warning(skip_msg)
                 continue
 
             tf_file = next(((k, v) for k, v in tf_files.items() if f'resource "{mapping_result.source_resource.type}" "{mapping_result.source_resource.name}"' in v), None)
             if tf_file is None:
-                resources_planings.append(f"Resource {mapping_result.source_resource.type} {mapping_result.source_resource.name} mapping to module {mapping_result.target_module.name} version {mapping_result.target_module.version} but source file not found. It will be skipped.")
+                skip_msg = f"Resource {mapping_result.source_resource.type} {mapping_result.source_resource.name} mapping to module {mapping_result.target_module.name} version {mapping_result.target_module.version} but source file not found. It will be skipped."
+                resources_planings.append(skip_msg)
+                self.logger.warning(skip_msg)
                 continue
 
             # look up the tf_metadata_agent_output to find the resource with type and name
             tf_metadata = next((m for m in tf_metadata_agent_output.azurerm_resources if m.type == mapping_result.source_resource.type and m.name == mapping_result.source_resource.name), None)
             if tf_metadata is None:
-                resources_planings.append(f"Resource {mapping_result.source_resource.type} {mapping_result.source_resource.name} mapping to module {mapping_result.target_module.name} version {mapping_result.target_module.version} but metadata not found. It will be skipped.")
+                skip_msg = f"Resource {mapping_result.source_resource.type} {mapping_result.source_resource.name} mapping to module {mapping_result.target_module.name} version {mapping_result.target_module.version} but metadata not found. It will be skipped."
+                resources_planings.append(skip_msg)
+                self.logger.warning(skip_msg)
                 continue
 
             referenced_outputs = tf_metadata.referenced_outputs or []
-            planning_result = await resource_planning_agent.create_conversion_plan(avm_module_detail=avm_module_detail,resource_mapping=mapping_result, tf_file=tf_file, original_tf_resource_output_paramers=referenced_outputs)
-            self._log_agent_response("ResourceConverterPlanningAgent", planning_result)
-            with open(f"{output_dir}/05_{mapping_result.source_resource.type}_{mapping_result.source_resource.name}_conversion_plan.md", "w", encoding="utf-8") as f:
-                f.write(str(planning_result))
-
-            resources_planings.append(str(planning_result))
+            planning_result: ResourceConverterPlanningAgentResult = await resource_planning_agent.create_conversion_plan(
+                avm_module_detail=avm_module_detail,
+                resource_mapping=mapping_result, 
+                tf_file=tf_file, 
+                original_tf_resource_output_paramers=referenced_outputs
+            )
+            
+            self._log_agent_response("ResourceConverterPlanningAgent", planning_result.planning_summary)
+            
+            # Store structured result
+            resources_planning_results.append(planning_result)
+            
+            # Save both JSON and markdown
+            resource_identifier = f"{mapping_result.source_resource.type}_{mapping_result.source_resource.name}"
+            
+            # Save structured JSON
+            with open(f"{output_dir}/05_{resource_identifier}_conversion_plan.json", "w", encoding="utf-8") as f:
+                f.write(planning_result.model_dump_json(indent=2))
+            
+            # Save markdown
+            with open(f"{output_dir}/05_{resource_identifier}_conversion_plan.md", "w", encoding="utf-8") as f:
+                f.write(planning_result.markdown_plan)
+            
+            # Append markdown for converter agent
+            resources_planings.append(planning_result.markdown_plan)
 
         #1) apply the changes per file / per resource
         # For each file / resource:

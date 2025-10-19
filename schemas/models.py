@@ -155,6 +155,92 @@ class ConversionReport(BaseModel):
     next_steps: List[str]
 
 
+class AttributeMapping(BaseModel):
+    """Mapping between a Terraform resource attribute and AVM module input."""
+    resource_input_name: str = Field(description="Name of the Terraform resource attribute")
+    resource_input_value: Optional[str] = Field(default=None, description="Value of the resource attribute")
+    avm_input_name: str = Field(description="Name of the corresponding AVM module input parameter")
+    avm_input_value: Optional[str] = Field(default=None, description="Proposed value for the AVM input")
+    is_required: bool = Field(description="Whether this AVM input is required")
+    handling: str = Field(description="How to handle this mapping: 'direct', 'transform', 'new_variable', 'unmappable'")
+    transform: Optional[str] = Field(default=None, description="Transformation logic if needed")
+    notes: Optional[str] = Field(default=None, description="Additional notes about this mapping")
+
+class VariableProposal(BaseModel):
+    """Proposed new variable for the conversion."""
+    name: str = Field(description="Variable name")
+    type: str = Field(description="Variable type (string, number, bool, list, map, etc.)")
+    source: str = Field(description="Source of this variable (inferred, required by AVM, etc.)")
+    reason: str = Field(description="Why this variable is needed")
+    default_value: Optional[Any] = Field(default=None, description="Proposed default value")
+
+class OutputMapping(BaseModel):
+    """Mapping between original Terraform output and new AVM module output."""
+    original_output_name: str = Field(description="Name of the original Terraform output")
+    original_source: str = Field(description="Current source expression (e.g., azurerm_key_vault.kv.vault_uri)")
+    new_source: str = Field(description="New source using module output (e.g., module.kv.uri)")
+    change_type: str = Field(description="Type of change: 'remap', 'new', 'remove'")
+    notes: Optional[str] = Field(default=None, description="Additional context about this output mapping")
+
+class ResourceConversionPlan(BaseModel):
+    """Detailed conversion plan for a single Terraform resource."""
+    resource_type: str = Field(description="Original Terraform resource type (e.g., azurerm_key_vault)")
+    resource_name: str = Field(description="Original Terraform resource name")
+    source_file: str = Field(description="Path to the source Terraform file")
+    target_avm_module: str = Field(description="Target AVM module name")
+    target_avm_version: str = Field(description="Target AVM module version")
+    avm_resource_name: str = Field(description="Proposed name for the AVM module instance")
+    transformation_action: str = Field(
+        description="Action to take: 'convert_to_module', 'convert_to_parameter', 'skip'"
+    )
+    transformation_reason: Optional[str] = Field(
+        default=None, 
+        description="Reason for skip or special handling"
+    )
+    attribute_mappings: List[AttributeMapping] = Field(
+        description="Detailed mappings between resource attributes and AVM inputs"
+    )
+    existing_variables_reused: List[str] = Field(
+        default_factory=list,
+        description="List of existing variable names that will be reused"
+    )
+    new_variables_required: List[VariableProposal] = Field(
+        default_factory=list,
+        description="New variables that need to be created"
+    )
+    output_mappings: List[OutputMapping] = Field(
+        default_factory=list,
+        description="Mappings for outputs referencing this resource"
+    )
+    required_providers: List[str] = Field(
+        default_factory=list,
+        description="Required provider versions from the AVM module"
+    )
+    risk_level: str = Field(
+        default="Low",
+        description="Risk assessment: 'High', 'Medium', 'Low'"
+    )
+    risk_notes: Optional[str] = Field(
+        default=None,
+        description="Explanation of risks or concerns"
+    )
+
+class ResourceConverterPlanningAgentResult(BaseModel):
+    """Result from the Resource Converter Planning Agent for a single resource."""
+    conversion_plan: ResourceConversionPlan = Field(
+        description="Detailed conversion plan for the resource"
+    )
+    markdown_plan: str = Field(
+        description="Full conversion plan in markdown format for human readability"
+    )
+    planning_summary: str = Field(
+        description="Brief summary of the planning outcome"
+    )
+    warnings: List[str] = Field(
+        default_factory=list,
+        description="Any warnings or concerns identified during planning"
+    )
+
 class WorkflowState(BaseModel):
     """Represents the state of the conversion workflow."""
     repo_path: str
