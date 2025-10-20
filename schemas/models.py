@@ -172,7 +172,7 @@ class VariableProposal(BaseModel):
     type: str = Field(description="Variable type (string, number, bool, list, map, etc.)")
     source: str = Field(description="Source of this variable (inferred, required by AVM, etc.)")
     reason: str = Field(description="Why this variable is needed")
-    default_value: Optional[Any] = Field(default=None, description="Proposed default value")
+    default_value: Optional[str] = Field(default=None, description="Proposed default value")
 
 class OutputMapping(BaseModel):
     """Mapping between original Terraform output and new AVM module output."""
@@ -182,11 +182,16 @@ class OutputMapping(BaseModel):
     change_type: str = Field(description="Type of change: 'remap', 'new', 'remove'")
     notes: Optional[str] = Field(default=None, description="Additional context about this output mapping")
 
-class ResourceConversionPlan(BaseModel):
-    """Detailed conversion plan for a single Terraform resource."""
+
+class ResourceConverterPlanningAgentResult(BaseModel):
+    """Result from the Resource Converter Planning Agent for a single resource."""
+    planning_summary: str = Field(
+        description="Brief summary of the planning outcome. Must be concise and to the point. Mandatory field."
+    )
+    
     source_file: str = Field(default=None, description="Path to the source Terraform file. Mandatory field.")
-    resource_type: Optional[str] = Field(default=None, description="Original Terraform resource type (e.g., azurerm_key_vault)")
-    resource_name: Optional[str] = Field(default=None, description="Original Terraform resource name")
+    resource_type: str = Field(default=None, description="Original Terraform resource type (e.g., azurerm_key_vault)")
+    resource_name: str = Field(default=None, description="Original Terraform resource name")
     target_avm_module: Optional[str] = Field(default=None, description="Target AVM module name")
     target_avm_version: Optional[str] = Field(default=None, description="Target AVM module version")
     avm_resource_name: Optional[str] = Field(default=None, description="Proposed name for the AVM module instance")
@@ -195,7 +200,7 @@ class ResourceConversionPlan(BaseModel):
     )
     transformation_reason: Optional[str] = Field(
         default=None, 
-        description="Reason for skip or special handling"
+        description="Reason for skip or any other special handling"
     )
     attribute_mappings: Optional[List[AttributeMapping]] = Field(
         default_factory=list,
@@ -224,19 +229,6 @@ class ResourceConversionPlan(BaseModel):
     risk_notes: Optional[str] = Field(
         default=None,
         description="Explanation of risks or concerns"
-    )
-
-class ResourceConverterPlanningAgentResult(BaseModel):
-    """Result from the Resource Converter Planning Agent for a single resource."""
-    conversion_plan: ResourceConversionPlan = Field(
-        description="Detailed conversion plan for the resource"
-    )
-    planning_summary: str = Field(
-        description="Brief summary of the planning outcome"
-    )
-    warnings: List[str] = Field(
-        default_factory=list,
-        description="Any warnings or concerns identified during planning"
     )
 
 class ErrorFixProposal(BaseModel):

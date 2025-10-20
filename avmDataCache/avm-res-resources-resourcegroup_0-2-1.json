@@ -3,7 +3,7 @@
     "name": "avm-res-resources-resourcegroup",
     "display_name": "Azure/avm-res-resources-resourcegroup",
     "version": "0.2.1",
-    "description": "To gain access, please finish setting up this repository now at: ",
+    "description": "Azure Resource Group",
     "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-resources-resourcegroup/azurerm",
     "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-resources-resourcegroup",
     "requirements": [

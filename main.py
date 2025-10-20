@@ -87,22 +87,6 @@ class TerraformAVMOrchestrator:
                 "traceback": full_traceback,
                 "timestamp": datetime.now().isoformat()
             }
-    
-    async def _store_avm_cache(self) -> None:
-        self.logger.info("Storing AVM Knowledge Agent into local cache")
-        knowledge_result : AVMKnowledgeAgentResult = await self.avm_service.fetch_avm_knowledge(use_cache=True)
-
-        for module in knowledge_result.modules:
-            try:
-                await self.avm_service.fetch_avm_resource_details(
-                    module_name=module.name,
-                    module_version=module.version,
-                    use_cache=True
-                )
-            except Exception as e:
-                self.logger.warning(f"Failed to fetch details for module {module.name} version {module.version}: {e}")
-                continue
-
 
 
     async def _run_sequential_workflow(self, repo_path: str, output_dir: str) -> str:
@@ -113,8 +97,6 @@ class TerraformAVMOrchestrator:
 
         # print("Result of terraform validate JSON:" + str(result))
         # exit()
-
-        # await self._store_avm_cache()
 
         # read all TF files and store in dictionary: relative folder/name -> content
         tf_files = {}
@@ -265,29 +247,8 @@ class TerraformAVMOrchestrator:
             # Append markdown for converter agent
             resources_planings.append(planning_result_json)
 
-        #1) apply the changes per file / per resource
-        # For each file / resource:
-        # Logic: 
-        #   - load the current version of the file
-        #   - find the resource that you change to modify
-        #   - find the mapping of that resource
-        #   - find the planning of that resource
-        #   - replace the resource with the new AVM module
-        
-        #2) apply changes on variables and outputs
+        exit()
 
-        # self.logger.info("Step 5: Running Converter Planning Agent (with integrated mapping)")
-        # planning_agent = await ConverterPlanningAgent.create()
-        # planning_result = await planning_agent.create_conversion_plan(mapping_result, modules_details, tf_files)
-        # self._log_agent_response("ConverterPlanningAgent", planning_result)
-        # with open(f"{output_dir}/05_conversion_plan.md", "w", encoding="utf-8") as f:
-        #     f.write(str(planning_result))
-
-        # # Ask user for approval to proceed
-        # approved = await self._prompt_user_approval()
-        # if not approved:
-        #     self.logger.info("User declined to proceed after planning stage. Aborting further conversion steps.")
-        #     return "Conversion halted after planning (user declined)."
 
         # create the migrated folder
         migrated_output_dir = Path(output_dir) / "migrated"

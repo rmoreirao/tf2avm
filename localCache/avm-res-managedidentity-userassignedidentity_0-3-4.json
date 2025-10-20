@@ -5,7 +5,7 @@
     "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-managedidentity-userassignedidentity/azurerm/0.3.4",
     "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-managedidentity-userassignedidentity",
     "version": "0.3.4",
-    "description": "To gain access, please finish setting up this repository now at: ",
+    "description": "Azure User Assigned Managed Identity Resource",
     "resources": [
       "azurerm_management_lock.this",
       "azurerm_user_assigned_identity.this",

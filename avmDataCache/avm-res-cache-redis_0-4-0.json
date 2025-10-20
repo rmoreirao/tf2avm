@@ -3,7 +3,7 @@
     "name": "avm-res-cache-redis",
     "display_name": "Azure/avm-res-cache-redis",
     "version": "0.4.0",
-    "description": "To gain access, please finish setting up this repository now at: ",
+    "description": "Azure Redis Cache Service",
     "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-cache-redis/azurerm",
     "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-cache-redis",
     "requirements": [
