@@ -191,7 +191,7 @@ class ResourceConversionPlan(BaseModel):
     target_avm_version: Optional[str] = Field(default=None, description="Target AVM module version")
     avm_resource_name: Optional[str] = Field(default=None, description="Proposed name for the AVM module instance")
     transformation_action: str = Field(
-        description="Action to take: 'convert_to_module', 'convert_to_parameter', 'skip'"
+        description="Action to take: 'convert_to_module', 'convert_to_parameter', 'skip', 'unknown'"
     )
     transformation_reason: Optional[str] = Field(
         default=None, 

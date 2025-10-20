@@ -170,7 +170,6 @@ class TerraformAVMOrchestrator:
                 use_cache=True
             )
             modules_details.append(module_detail)
-            # self._log_agent_response(f"AVMResourceDetailsAgent - {mapping.target_module.name} {mapping.target_module.version}", modules_details)
 
         with open(f"{output_dir}/04_avm_module_details.json", "w", encoding="utf-8") as f:
             f.write(json.dumps([v.model_dump() for v in modules_details], indent=2))
@@ -206,6 +205,9 @@ class TerraformAVMOrchestrator:
         with open(f"{output_dir}/05_avm_module_details.json", "w", encoding="utf-8") as f:
             f.write(json.dumps([v.model_dump() for v in modules_details], indent=2))
         
+
+        exit()
+
         self.logger.info("Step 5: Running Converter Planning Agent Per Resource")
         resource_planning_agent = await ResourceConverterPlanningAgent.create()
 
