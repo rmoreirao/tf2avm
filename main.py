@@ -8,12 +8,13 @@ from typing import Dict, Any, List
 
 from agents.converter_planning_agent_per_resource import ResourceConverterPlanningAgent
 from agents.tf_validator_agent import TerraformValidatorAgent
+from agents.tf_fix_planner_agent import TerraformFixPlannerAgent
 from services.avm_service import AVMService
 from config.settings import get_settings, validate_environment
 from config.logging import setup_logging
 from agents.tf_metadata_agent import TFMetadataAgent
 from agents.converter_agent import ConverterAgent
-from schemas.models import AVMKnowledgeAgentResult, AVMResourceDetailsAgentResult, MappingAgentResult, TerraformMetadataAgentResult, TerraformValidatorAgentResult, ResourceConverterPlanningAgentResult
+from schemas.models import AVMKnowledgeAgentResult, AVMResourceDetailsAgentResult, MappingAgentResult, TerraformMetadataAgentResult, TerraformValidatorAgentResult, TerraformFixPlanAgentResult, ResourceConverterPlanningAgentResult
 from agents.mapping_agent import MappingAgent
 
 
@@ -241,31 +242,28 @@ class TerraformAVMOrchestrator:
                 continue
 
             referenced_outputs = tf_metadata.referenced_outputs or []
-            planning_result: ResourceConverterPlanningAgentResult = await resource_planning_agent.create_conversion_plan(
+            full_planning_result: ResourceConverterPlanningAgentResult = await resource_planning_agent.create_conversion_plan(
                 avm_module_detail=avm_module_detail,
                 resource_mapping=mapping_result, 
                 tf_file=tf_file, 
                 original_tf_resource_output_paramers=referenced_outputs
             )
             
-            self._log_agent_response("ResourceConverterPlanningAgent", planning_result.planning_summary)
+            self._log_agent_response("ResourceConverterPlanningAgent", full_planning_result.planning_summary)
             
             # Store structured result
-            resources_planning_results.append(planning_result)
+            resources_planning_results.append(full_planning_result)
             
             # Save both JSON and markdown
             resource_identifier = f"{mapping_result.source_resource.type}_{mapping_result.source_resource.name}"
             
             # Save structured JSON
             with open(f"{output_dir}/05_{resource_identifier}_conversion_plan.json", "w", encoding="utf-8") as f:
-                f.write(planning_result.model_dump_json(indent=2))
-            
-            # Save markdown
-            with open(f"{output_dir}/05_{resource_identifier}_conversion_plan.md", "w", encoding="utf-8") as f:
-                f.write(planning_result.markdown_plan)
-            
+                planning_result_json = full_planning_result.model_dump_json(indent=2)
+                f.write(planning_result_json)
+                       
             # Append markdown for converter agent
-            resources_planings.append(planning_result.markdown_plan)
+            resources_planings.append(planning_result_json)
 
         #1) apply the changes per file / per resource
         # For each file / resource:
@@ -297,8 +295,8 @@ class TerraformAVMOrchestrator:
 
         self.logger.info("Step 6: Running Converter Agent")
         converter_agent = await ConverterAgent.create()
-        planning_result = "\n\n".join(resources_planings)
-        converter_result = await converter_agent.run_conversion(planning_result, migrated_output_dir, tf_files)
+        full_planning_result = "\n\n".join(resources_planings)
+        converter_result = await converter_agent.run_conversion(full_planning_result, migrated_output_dir, tf_files)
         self._log_agent_response("ConverterAgent", converter_result)
 
         with open(f"{output_dir}/06_conversion_summary.md", "w", encoding="utf-8") as f:
@@ -313,11 +311,36 @@ class TerraformAVMOrchestrator:
         with open(f"{output_dir}/07_terraform_validation.json", "w", encoding="utf-8") as f:
             f.write(validation_result.model_dump_json(indent=2))
 
+        # Step 8: Fix Planning
         if not validation_result.validation_success:
-            self.logger.warning(f"Terraform validation failed with {validation_result.total_errors} errors and {validation_result.total_warnings} warnings")
-            # TODO: In future iterations, this could trigger an automatic fix agent
+            self.logger.warning(
+                f"Terraform validation failed with {validation_result.total_errors} errors "
+                f"and {validation_result.total_warnings} warnings"
+            )
+            self.logger.info("Step 8: Running Terraform Fix Planner Agent")
+            
+            tf_fix_planner_agent = await TerraformFixPlannerAgent.create()
+            fix_plan_result: TerraformFixPlanAgentResult = await tf_fix_planner_agent.plan_fixes(
+                validation_result=validation_result,
+                directory=str(migrated_output_dir),
+                conversion_plans=resources_planning_results
+            )
+            self._log_agent_response("TerraformFixPlannerAgent", fix_plan_result)
+            
+            # Save the fix plan
+            with open(f"{output_dir}/08_fix_plan.json", "w", encoding="utf-8") as f:
+                f.write(fix_plan_result.model_dump_json(indent=2))
+            
+            # Log summary statistics
+            self.logger.info(
+                f"Fix planning complete: {fix_plan_result.total_fixable_errors} fixable errors, "
+                f"{fix_plan_result.total_manual_review_required} requiring manual review"
+            )
+            
+            if fix_plan_result.critical_issues:
+                self.logger.warning(f"Critical issues found: {', '.join(fix_plan_result.critical_issues)}")
         else:
-            self.logger.info("Terraform validation passed successfully")
+            self.logger.info("Terraform validation passed successfully - no fix planning needed")
 
         return str("Some result")
     

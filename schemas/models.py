@@ -157,7 +157,7 @@ class ConversionReport(BaseModel):
 
 class AttributeMapping(BaseModel):
     """Mapping between a Terraform resource attribute and AVM module input."""
-    resource_input_name: str = Field(description="Name of the Terraform resource attribute")
+    resource_input_name: Optional[str] = Field(default=None, description="Name of the Terraform resource attribute")
     resource_input_value: Optional[str] = Field(default=None, description="Value of the resource attribute")
     avm_input_name: str = Field(description="Name of the corresponding AVM module input parameter")
     avm_input_value: Optional[str] = Field(default=None, description="Proposed value for the AVM input")
@@ -165,7 +165,7 @@ class AttributeMapping(BaseModel):
     handling: str = Field(description="How to handle this mapping: 'direct', 'transform', 'new_variable', 'unmappable'")
     transform: Optional[str] = Field(default=None, description="Transformation logic if needed")
     notes: Optional[str] = Field(default=None, description="Additional notes about this mapping")
-
+    
 class VariableProposal(BaseModel):
     """Proposed new variable for the conversion."""
     name: str = Field(description="Variable name")
@@ -230,9 +230,6 @@ class ResourceConverterPlanningAgentResult(BaseModel):
     conversion_plan: ResourceConversionPlan = Field(
         description="Detailed conversion plan for the resource"
     )
-    markdown_plan: str = Field(
-        description="Full conversion plan in markdown format for human readability"
-    )
     planning_summary: str = Field(
         description="Brief summary of the planning outcome"
     )
@@ -240,6 +237,38 @@ class ResourceConverterPlanningAgentResult(BaseModel):
         default_factory=list,
         description="Any warnings or concerns identified during planning"
     )
+
+class ErrorFixProposal(BaseModel):
+    """Proposed fix for a single validation error."""
+    error_summary: str = Field(description="Brief error description")
+    error_detail: str = Field(description="Full Terraform error message")
+    line_number: Optional[int] = Field(default=None, description="Line number of error")
+    column_number: Optional[int] = Field(default=None, description="Column number of error")
+    root_cause_analysis: str = Field(description="Root cause explanation")
+    proposed_fix: str = Field(description="Step-by-step fix instructions")
+    code_snippet_before: Optional[str] = Field(default=None, description="Original code")
+    code_snippet_after: Optional[str] = Field(default=None, description="Fixed code")
+    fix_confidence: str = Field(description="High|Medium|Low")
+    requires_manual_review: bool = Field(default=False, description="Manual intervention flag")
+    related_errors: List[str] = Field(default_factory=list, description="Related error summaries")
+
+class FileFixPlan(BaseModel):
+    """Fix plan for a single file."""
+    file_path: str = Field(description="Path to the Terraform file")
+    error_count: int = Field(description="Number of errors")
+    fix_priority: str = Field(description="Critical|High|Medium|Low")
+    errors_to_fix: List[ErrorFixProposal] = Field(description="Error-level fixes")
+    overall_fix_strategy: str = Field(description="File-level strategy")
+    estimated_complexity: str = Field(description="Simple|Moderate|Complex")
+
+class TerraformFixPlanAgentResult(BaseModel):
+    """Complete fix plan result (JSON only)."""
+    fix_plan: List[FileFixPlan] = Field(description="Per-file fix plans")
+    fix_summary: str = Field(description="Overall summary")
+    total_fixable_errors: int = Field(description="Auto-fixable count")
+    total_manual_review_required: int = Field(description="Manual review count")
+    recommended_fix_order: List[str] = Field(description="File paths in optimal order")
+    critical_issues: List[str] = Field(default_factory=list, description="Critical problems")
 
 class WorkflowState(BaseModel):
     """Represents the state of the conversion workflow."""
