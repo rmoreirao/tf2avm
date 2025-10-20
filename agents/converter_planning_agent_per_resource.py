@@ -91,7 +91,7 @@ Your mission: Create a PRECISE conversion plan for the SINGLE azurerm_* resource
 
 
 --> STRICT BEHAVIOR:
-- ALWAYS output VALID JSON
+- ALWAYS output VALID JSON - including all required fields
 - DO NOT ask questions. Proceed autonomously.
 - Include mapping analysis as part of the planning process.
 

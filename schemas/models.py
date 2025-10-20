@@ -184,12 +184,12 @@ class OutputMapping(BaseModel):
 
 class ResourceConversionPlan(BaseModel):
     """Detailed conversion plan for a single Terraform resource."""
-    resource_type: str = Field(description="Original Terraform resource type (e.g., azurerm_key_vault)")
-    resource_name: str = Field(description="Original Terraform resource name")
-    source_file: str = Field(description="Path to the source Terraform file")
-    target_avm_module: str = Field(description="Target AVM module name")
-    target_avm_version: str = Field(description="Target AVM module version")
-    avm_resource_name: str = Field(description="Proposed name for the AVM module instance")
+    source_file: str = Field(default=None, description="Path to the source Terraform file. Mandatory field.")
+    resource_type: Optional[str] = Field(default=None, description="Original Terraform resource type (e.g., azurerm_key_vault)")
+    resource_name: Optional[str] = Field(default=None, description="Original Terraform resource name")
+    target_avm_module: Optional[str] = Field(default=None, description="Target AVM module name")
+    target_avm_version: Optional[str] = Field(default=None, description="Target AVM module version")
+    avm_resource_name: Optional[str] = Field(default=None, description="Proposed name for the AVM module instance")
     transformation_action: str = Field(
         description="Action to take: 'convert_to_module', 'convert_to_parameter', 'skip'"
     )
@@ -197,22 +197,23 @@ class ResourceConversionPlan(BaseModel):
         default=None, 
         description="Reason for skip or special handling"
     )
-    attribute_mappings: List[AttributeMapping] = Field(
+    attribute_mappings: Optional[List[AttributeMapping]] = Field(
+        default_factory=list,
         description="Detailed mappings between resource attributes and AVM inputs"
     )
-    existing_variables_reused: List[str] = Field(
+    existing_variables_reused: Optional[List[str]] = Field(
         default_factory=list,
         description="List of existing variable names that will be reused"
     )
-    new_variables_required: List[VariableProposal] = Field(
+    new_variables_required: Optional[List[VariableProposal]] = Field(
         default_factory=list,
         description="New variables that need to be created"
     )
-    output_mappings: List[OutputMapping] = Field(
+    output_mappings: Optional[List[OutputMapping]] = Field(
         default_factory=list,
         description="Mappings for outputs referencing this resource"
     )
-    required_providers: List[str] = Field(
+    required_providers: Optional[List[str]] = Field(
         default_factory=list,
         description="Required provider versions from the AVM module"
     )
