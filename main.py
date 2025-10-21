@@ -247,8 +247,6 @@ class TerraformAVMOrchestrator:
             # Append markdown for converter agent
             resources_planings.append(planning_result_json)
 
-        exit()
-
 
         # create the migrated folder
         migrated_output_dir = Path(output_dir) / "migrated"
