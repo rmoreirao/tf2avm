@@ -70,6 +70,7 @@ class AVMResourceDetailsAgentResult(BaseModel):
 
 class ResourceMapping(BaseModel):
     """Mapping between Terraform resource and AVM module."""
+    source_file: str = Field(description="Path to the source Terraform file containing the resource")
     source_resource: TerraformResource = Field(description="The original Terraform resource to be mapped")
     target_module: Optional[AVMModule] = Field(default=None, description="The AVM module that replaces the Terraform resource")
     confidence_score: str = Field(description="Confidence level of the mapping: High (100pct), Medium (99pct - 50pct), Low (49pct - 20pct) or None if unmappable")
@@ -194,13 +195,29 @@ class ResourceConverterPlanningAgentResult(BaseModel):
     resource_name: str = Field(default=None, description="Original Terraform resource name")
     target_avm_module: Optional[str] = Field(default=None, description="Target AVM module name")
     target_avm_version: Optional[str] = Field(default=None, description="Target AVM module version")
-    avm_resource_name: Optional[str] = Field(default=None, description="Proposed name for the AVM module instance")
-    transformation_action: str = Field(
-        description="Action to take: 'convert_to_module', 'convert_to_parameter', 'skip', 'unknown'"
+    target_avm_module_name: Optional[str] = Field(default=None,
+        description=(
+            "Proposed name for the AVM module instance. Names are unique, lowercase, and use underscores.\n"
+            "Propose a name based on the original resource name and type, ensuring clarity and uniqueness.\n"
+            "1) For ex.: original resource type 'azurerm_key_vault' and name 'name = var.key_vault_name',\n"
+            "the proposed name is 'key_vault_key_vault_name'.\n"
+            "2) For ex.: original resource type 'azurerm_key_vault' and name 'name = ''kv_main'' ',\n"
+            "the proposed name is 'key_vault_kv_main'."
+        )
     )
-    transformation_reason: Optional[str] = Field(
+    transformation_type: str = Field(
+        description=(
+            "Action to take for this resource transformation:\n"
+            "- 'convert_resource_to_avm_module': Replace the azurerm_* resource with a new AVM module.\n"
+            "- 'convert_resource_to_avm_module_parameter': Convert the azurerm_* resource to another AVM module input parameter (e.g., child resources that become module configuration). The original resource will be removed.\n"
+            "- 'skip': Leave resource unchanged (not covered by AVM or intentionally excluded)\n"
+            "- 'manual_review': Requires human intervention due to complexity or ambiguity"
+        )
+    )
+    transformation_description: str = Field(description="This is the description based on the chosen transformation_type")
+    transformation_issue_reason: Optional[str] = Field(
         default=None, 
-        description="Reason for skip or any other special handling"
+        description="If transformation_type is 'skip' or 'manual_review', explain the reason or issue that led to this decision."
     )
     attribute_mappings: Optional[List[AttributeMapping]] = Field(
         default_factory=list,

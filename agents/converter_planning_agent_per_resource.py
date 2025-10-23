@@ -110,7 +110,7 @@ Your mission: Create a PRECISE conversion plan for the SINGLE azurerm_* resource
     async def create_conversion_plan(
         self, 
         resource_mapping: ResourceMapping, 
-        avm_module_detail: AVMModuleDetailed, 
+        avm_module_detail: AVMModuleDetailed | None, 
         tf_file: tuple[str, str], 
         original_tf_resource_output_paramers: List[TerraformOutputreference]
     ) -> ResourceConverterPlanningAgentResult:
@@ -120,7 +120,7 @@ Your mission: Create a PRECISE conversion plan for the SINGLE azurerm_* resource
         
         # Format file for the agent
         file_summary = f"File: {filename}\nContent:\n{file_content}\n---"
-        avm_detail_json = avm_module_detail.model_dump_json()
+        avm_detail_json = avm_module_detail.model_dump_json() if avm_module_detail else json.dumps({"avm_module": "not applicable"})
 
         message = (
             "Create a detailed Terraform to AVM conversion plan with integrated resource mapping.\n\n"

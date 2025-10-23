@@ -194,58 +194,53 @@ class TerraformAVMOrchestrator:
         resources_planings = []
         resources_planning_results: List[ResourceConverterPlanningAgentResult] = []
         
-        for mapping_result in mapping_result.mappings:
-            if mapping_result.target_module is None:
-                skip_msg = f"Resource {mapping_result.source_resource.type} {mapping_result.source_resource.name} has no mapping and will be skipped."
-                resources_planings.append(skip_msg)
-                self.logger.warning(skip_msg)
-                continue
+        # Create async tasks for parallel processing
+        async def process_single_resource(mapping_result):
+            """Process a single resource mapping."""
+            if mapping_result.target_module is not None and mapping_result.target_module.name is not None:
+                avm_module_detail = next((m for m in modules_details if m.module.name == mapping_result.target_module.name and m.module.version == mapping_result.target_module.version), None)
+            else:
+                avm_module_detail = None
             
-            avm_module_detail = next((m for m in modules_details if m.module.name == mapping_result.target_module.name and m.module.version == mapping_result.target_module.version), None)
-            if avm_module_detail is None:
-                skip_msg = f"Resource {mapping_result.source_resource.type} {mapping_result.source_resource.name} mapping to module {mapping_result.target_module.name} version {mapping_result.target_module.version} but details not found. It will be skipped."
-                resources_planings.append(skip_msg)
-                self.logger.warning(skip_msg)
-                continue
-
-            tf_file = next(((k, v) for k, v in tf_files.items() if f'resource "{mapping_result.source_resource.type}" "{mapping_result.source_resource.name}"' in v), None)
+            tf_file = next(((name, content) for name, content in tf_files.items() if name.endswith(mapping_result.source_file)), None)
             if tf_file is None:
-                skip_msg = f"Resource {mapping_result.source_resource.type} {mapping_result.source_resource.name} mapping to module {mapping_result.target_module.name} version {mapping_result.target_module.version} but source file not found. It will be skipped."
-                resources_planings.append(skip_msg)
-                self.logger.warning(skip_msg)
-                continue
+                raise FileNotFoundError(f"Terraform file '{mapping_result.source_file}' not found in repository files.")
 
-            # look up the tf_metadata_agent_output to find the resource with type and name
-            tf_metadata = next((m for m in tf_metadata_agent_output.azurerm_resources if m.type == mapping_result.source_resource.type and m.name == mapping_result.source_resource.name), None)
-            if tf_metadata is None:
-                skip_msg = f"Resource {mapping_result.source_resource.type} {mapping_result.source_resource.name} mapping to module {mapping_result.target_module.name} version {mapping_result.target_module.version} but metadata not found. It will be skipped."
-                resources_planings.append(skip_msg)
-                self.logger.warning(skip_msg)
-                continue
+            original_tf_resource_metadata = next((m for m in tf_metadata_agent_output.azurerm_resources if m.type == mapping_result.source_resource.type and m.name == mapping_result.source_resource.name), None)
+            referenced_outputs = original_tf_resource_metadata.referenced_outputs or [] if original_tf_resource_metadata else []
 
-            referenced_outputs = tf_metadata.referenced_outputs or []
-            full_planning_result: ResourceConverterPlanningAgentResult = await resource_planning_agent.create_conversion_plan(
+            resource_conversion_plan: ResourceConverterPlanningAgentResult = await resource_planning_agent.create_conversion_plan(
                 avm_module_detail=avm_module_detail,
                 resource_mapping=mapping_result, 
                 tf_file=tf_file, 
                 original_tf_resource_output_paramers=referenced_outputs
             )
             
-            self._log_agent_response("ResourceConverterPlanningAgent", full_planning_result.planning_summary)
+            self._log_agent_response("ResourceConverterPlanningAgent", resource_conversion_plan.planning_summary)
             
-            # Store structured result
-            resources_planning_results.append(full_planning_result)
-            
-            # Save both JSON and markdown
+            # Save JSON
             resource_identifier = f"{mapping_result.source_resource.type}_{mapping_result.source_resource.name}"
-            
-            # Save structured JSON
             with open(f"{output_dir}/06_{resource_identifier}_conversion_plan.json", "w", encoding="utf-8") as f:
-                planning_result_json = full_planning_result.model_dump_json(indent=2)
+                planning_result_json = resource_conversion_plan.model_dump_json(indent=2)
                 f.write(planning_result_json)
-                       
-            # Append markdown for converter agent
-            resources_planings.append(planning_result_json)
+            
+            return resource_conversion_plan, planning_result_json
+        
+        batch_size = 6  # Number of parallel tasks per batch
+        all_mappings = list(mapping_result.mappings)
+        
+        for i in range(0, len(all_mappings), batch_size):
+            batch = all_mappings[i:i + batch_size]
+            self.logger.info(f"Processing batch {i//batch_size + 1} of {(len(all_mappings) + batch_size - 1)//batch_size} ({len(batch)} resources)")
+            
+            # Run batch in parallel
+            tasks = [process_single_resource(mapping) for mapping in batch]
+            batch_results = await asyncio.gather(*tasks)
+            
+            # Collect results
+            for result, json_str in batch_results:
+                resources_planning_results.append(result)
+                resources_planings.append(json_str)
 
 
         # create the migrated folder
@@ -254,8 +249,8 @@ class TerraformAVMOrchestrator:
 
         self.logger.info("Step 6: Running Converter Agent")
         converter_agent = await ConverterAgent.create()
-        full_planning_result = "\n\n".join(resources_planings)
-        converter_result = await converter_agent.run_conversion(full_planning_result, migrated_output_dir, tf_files)
+        resource_conversion_plan = "\n\n".join(resources_planings)
+        converter_result = await converter_agent.run_conversion(resource_conversion_plan, migrated_output_dir, tf_files)
         self._log_agent_response("ConverterAgent", converter_result)
 
         with open(f"{output_dir}/06_conversion_summary.md", "w", encoding="utf-8") as f:
