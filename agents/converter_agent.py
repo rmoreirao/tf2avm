@@ -56,13 +56,13 @@ class ConverterAgent:
 
 Your responsibilities:
 1. Transform mapped azurerm_* resources into AVM module calls according to the provided conversion plan
-2. Update variables.tf to include required AVM module inputs according to the provided conversion plan
+2. Update variables.tf to have the new_variables_required as specified in the conversion plan
 3. Update outputs.tf to maintain compatibility with original resource outputs according to the provided conversion plan
 4. Preserve code structure, comments, and formatting where possible
 5. Generate all converted Terraform files
 
 Inputs:
-- Conversion Plan: Detailed conversion per file and resource
+- Conversion Plan: Detailed conversion per file and resource. It also contains the new variables required and output changes.
 - Terraform File Contents: The contents of all .tf files to be converted
 - Output Directory: The directory where converted files should be written
 ---
@@ -77,6 +77,9 @@ Operational Process:
 - Replace resource blocks with AVM module blocks (source, version from plan).
 - Map attributes exactly as specified.
 - Insert conversion comment header.
+5. Update the variables.tf file with new variables as per plan.new_variables_required.
+5.1 !!! Only add variables that do not already exist in the original variables.tf and are listed in plan.new_variables_required !!!
+6. Update the outputs.tf file to reflect output changes as per plan.output_changes.
 5. Update variables and outputs per plan.
 6. Preserve unmapped resources as described.
 7. Clean up any resource which is fully converted to module.

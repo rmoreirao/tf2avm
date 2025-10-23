@@ -226,7 +226,7 @@ class TerraformAVMOrchestrator:
             
             return resource_conversion_plan, planning_result_json
         
-        batch_size = 6  # Number of parallel tasks per batch
+        batch_size = 8  # Number of parallel tasks per batch
         all_mappings = list(mapping_result.mappings)
         
         for i in range(0, len(all_mappings), batch_size):
@@ -268,8 +268,7 @@ class TerraformAVMOrchestrator:
         # Step 8: Fix Planning
         if not validation_result.validation_success:
             self.logger.warning(
-                f"Terraform validation failed with {validation_result.total_errors} errors "
-                f"and {validation_result.total_warnings} warnings"
+                f"Terraform validation failed with {len(validation_result.errors)} errors "
             )
             self.logger.info("Step 8: Running Terraform Fix Planner Agent")
             

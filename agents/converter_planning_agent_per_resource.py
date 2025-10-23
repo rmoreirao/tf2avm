@@ -74,22 +74,19 @@ You are the Resource Planning Agent analyzing ONE SPECIFIC RESOURCE at a time.
 Your mission: Create a PRECISE conversion plan for the SINGLE azurerm_* resource provided, outputting structured JSON.
 
 --> Input format:
-- Resource Mapping: JSON object with source resource and target AVM module
-- AVM Module Details: JSON object with the target module's full specifications
-- Resource Content: The specific resource block from Terraform
-- Variables: Available variables from the Terraform configuration
-- Outputs from the original resource: this is to help map outputs to the new module outputs
+-> Required AVM Module Inputs List: Comma-separated list of all required inputs for the target AVM module
+-> Resource Mapping: JSON object with source resource and target AVM module
+-> AVM Module Details: JSON object with the target module's full specifications
+-> Terraform File: The full content of the Terraform file containing the specific azurerm_* resource to be converted
+-> Original Resource Referenced Outputs: JSON array of output references from the original resource
 
---> Planning Process for THIS ONE RESOURCE:
+--> Planning Process from Terraform to AVM Module:
 1. Parse the specific azurerm_* resource block
-2. Extract all attributes and their values
-3. Map each attribute to the corresponding AVM module input
-4. Ensure ALL required AVM inputs are satisfied (from attributes or propose new variables)
-5. Document any unmapped attributes
-6. Identify dependencies and child resources
+2. Apply all the mappings required to satisfy the JSON Output structure
 
---> Critical Requirements:
-- EVERY required AVM module input MUST have a mapping or proposed solution
+--> Critical Requirements Checklist:
+- !!!EVERY required input in the AVM module 'AVM Module Details' MUST have a mapping or proposed solution!!!
+- !!!Make sure that you validate all required inputs are addressed!!!
 - If a required input has no source, propose a new variable with default value
 - Flag any attributes that cannot be mapped to module inputs
 
@@ -98,7 +95,6 @@ Your mission: Create a PRECISE conversion plan for the SINGLE azurerm_* resource
 - ALWAYS output VALID JSON - including all required fields
 - !!!ONLY output the JSON!!!
 - DO NOT ask questions. Proceed autonomously.
-- Include mapping analysis as part of the planning process.
 
 """
             )
@@ -122,14 +118,21 @@ Your mission: Create a PRECISE conversion plan for the SINGLE azurerm_* resource
         file_summary = f"File: {filename}\nContent:\n{file_content}\n---"
         avm_detail_json = avm_module_detail.model_dump_json() if avm_module_detail else json.dumps({"avm_module": "not applicable"})
 
+        required_inputs = []
+        if avm_module_detail and getattr(avm_module_detail, "inputs", None):
+            for input_parameter in avm_module_detail.inputs:
+                if input_parameter.required:
+                    required_inputs.append(input_parameter.name)
+
         message = (
-            "Create a detailed Terraform to AVM conversion plan with integrated resource mapping.\n\n"
-            f"Resource Mapping JSON:\n{resource_mapping.model_dump_json()}\n\n"
-            f"AVM Module Details JSON:\n{avm_detail_json}\n\n"
-            f"Terraform File:\n{file_summary}\n\n"
-            f"Original Resource Referenced Outputs JSON:\n{json.dumps([output.model_dump() for output in original_tf_resource_output_paramers], indent=2)}\n\n"
+            "Create a detailed Terraform to AVM conversion plan with integrated resource mapping. Input parameters:\n\n"
+            f"-> Required AVM Module Inputs List:\n{', '.join(required_inputs)}\n\n"
+            f"-> Resource Mapping JSON:\n{resource_mapping.model_dump_json()}\n\n"
+            f"-> AVM Module Details JSON:\n{avm_detail_json}\n\n"
+            f"-> Terraform File:\n{file_summary}\n\n"
+            f"-> Original Resource Referenced Outputs JSON:\n{json.dumps([output.model_dump() for output in original_tf_resource_output_paramers], indent=2)}\n\n"
         )
-        
+
         response = await self.agent.get_response(message)
 
 
