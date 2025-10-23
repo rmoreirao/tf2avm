@@ -140,7 +140,7 @@ NEVER ask questions or wait for user input. Always analyze the provided validati
                 validation_success=True,
                 total_errors=0,
                 total_warnings=0,
-                files_with_errors=[],
+                errors=[],
                 validation_summary="Terraform validation completed successfully with no errors or warnings.",
                 raw_terraform_output=json.dumps(validation_result.validation_data) if validation_result.validation_data else None
             )

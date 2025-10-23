@@ -158,7 +158,7 @@ NEVER ask questions or wait for user input. Always analyze autonomously and prov
         """
         self.logger.info(
             f"Starting fix planning for {validation_result.total_errors} errors "
-            f"in {len(validation_result.files_with_errors)} files"
+            f"in {len(validation_result.errors)} files"
         )
         
         # Early return if validation was successful
@@ -175,7 +175,7 @@ NEVER ask questions or wait for user input. Always analyze autonomously and prov
         
         # Read file contents for context
         file_contents = {}
-        for file_errors in validation_result.files_with_errors:
+        for file_errors in validation_result.errors:
             try:
                 file_path = file_errors.file_path
                 # Handle relative paths
