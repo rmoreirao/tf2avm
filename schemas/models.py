@@ -198,11 +198,11 @@ class ResourceConverterPlanningAgentResult(BaseModel):
     target_avm_module_name: Optional[str] = Field(default=None,
         description=(
             "Proposed name for the AVM module instance. Names are unique, lowercase, and use underscores.\n"
-            "Propose a name based on the original resource name and type, ensuring clarity and uniqueness.\n"
-            "1) For ex.: original resource type 'azurerm_key_vault' and name 'name = var.key_vault_name',\n"
-            "the proposed name is 'key_vault_key_vault_name'.\n"
-            "2) For ex.: original resource type 'azurerm_key_vault' and name 'name = ''kv_main'' ',\n"
-            "the proposed name is 'key_vault_kv_main'."
+            "Propose a name based on the original resource name and type.\n"
+            "1) For ex.: original resource type 'azurerm_cosmosdb_account' and name 'name = var.cosmosdb_account_name' and the AVM target is 'avm-res-documentdb-databaseaccount',\n"
+            "the proposed name is 'cosmosdb_account_cosmosdb_account_name'.\n"
+            "2) For ex.: original resource type 'azurerm_cosmosdb_account' and name 'name = ''cosmos_database'' ' and the AVM target is 'avm-res-documentdb-databaseaccount',\n"
+            "the proposed name is 'cosmosdb_account_cosmos_database'."
         )
     )
     transformation_type: str = Field(
