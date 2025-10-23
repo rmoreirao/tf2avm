@@ -138,8 +138,6 @@ NEVER ask questions or wait for user input. Always analyze the provided validati
             self.logger.info("Terraform validation passed successfully")
             return TerraformValidatorAgentResult(
                 validation_success=True,
-                total_errors=0,
-                total_warnings=0,
                 errors=[],
                 validation_summary="Terraform validation completed successfully with no errors or warnings.",
                 raw_terraform_output=json.dumps(validation_result.validation_data) if validation_result.validation_data else None
@@ -182,7 +180,7 @@ Focus on providing actionable insights that can help fix the validation issues. 
         
         # Add raw terraform output to the result
         result.raw_terraform_output = json.dumps(validation_data, indent=2)
-        
-        self.logger.info(f"Validation analysis completed. Found {result.total_errors} errors and {result.total_warnings} warnings")
-        
+
+        self.logger.info("Validation analysis completed.")
+
         return result

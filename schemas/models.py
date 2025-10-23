@@ -226,7 +226,7 @@ class ResourceConverterPlanningAgentResult(BaseModel):
     )
     new_variables_required: Optional[List[VariableProposal]] = Field(
         default_factory=list,
-        description="New variables that need to be created"
+        description="New variables that need to be created. Variables must be simple types (string, number, bool, list, map). Complex types are not allowed."
     )
     output_mappings: Optional[List[OutputMapping]] = Field(
         default_factory=list,

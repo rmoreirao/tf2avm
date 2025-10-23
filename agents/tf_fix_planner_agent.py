@@ -157,8 +157,7 @@ NEVER ask questions or wait for user input. Always analyze autonomously and prov
             TerraformFixPlanAgentResult: Structured fix plan (JSON only)
         """
         self.logger.info(
-            f"Starting fix planning for {validation_result.total_errors} errors "
-            f"in {len(validation_result.errors)} files"
+            f"Starting fix planning for {len(validation_result.errors)} errors "
         )
         
         # Early return if validation was successful

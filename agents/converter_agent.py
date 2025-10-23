@@ -83,9 +83,25 @@ Operational Process:
 5. Update variables and outputs per plan.
 6. Preserve unmapped resources as described.
 7. Clean up any resource which is fully converted to module.
-8. Write converted files to output folder maintaining structure. Output directory will be provided at runtime.
-9. Validate that all mapped resources were converted as per the plan and report any deviations.
-10. Summarize the conversion: counts (converted, skipped, unmapped), new variables, new outputs, deviations from plan.
+8. Update Required Providers based on the conversion plan "required_providers".
+8.1 Ensure no duplicate provider entries.
+8.2 Merge versions where multiple constraints exist.
+8.3 Required Providers Consolidation Logic:
+     - Collect every constraint string from all plan sections named required_providers.
+     - Group by provider name.
+     - Normalize each constraint:
+         ~>X.Y    => >=X.Y.0, <X.(Y+1).0
+         >=A,<B   => keep as bounds.
+     - Intersect all bounds for the provider:
+         Lower bound = highest >= / >.
+         Upper bound = lowest < / <=.
+     - If intersection is empty (example: time ~>0.9 vs time ~>0.12), pick the higher minor/series (prefer newest) and record a warning: "conflict resolved by choosing time ~>0.12".
+     - If intersection matches a clean minor series (>=X.Y.Z and <X.(Y+1).0 with Z=0) express as ~>X.Y; else keep explicit >= / < form.
+     - Output a single terraform { required_providers { ... } } block (usually versions.tf). Include source and merged version.
+     - Do not add providers not referenced in any plan; do not duplicate.
+9. Write converted files to output folder maintaining structure. Output directory will be provided at runtime.
+10. Validate that all mapped resources were converted as per the plan and report any deviations.
+11. Summarize the conversion: counts (converted, skipped, unmapped), new variables, new outputs, deviations from plan.
 
 Available tools:
 - write_file: Write a file to the specified path with given content.

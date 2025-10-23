@@ -83,6 +83,7 @@ Your mission: Create a PRECISE conversion plan for the SINGLE azurerm_* resource
 --> Planning Process from Terraform to AVM Module:
 1. Parse the specific azurerm_* resource block
 2. Apply all the mappings required to satisfy the JSON Output structure
+3. When proposing new variables, ensure they are simple types (string, number, bool, list, map).
 
 --> Critical Requirements Checklist:
 - !!!EVERY required input in the AVM module 'AVM Module Details' MUST have a mapping or proposed solution!!!
