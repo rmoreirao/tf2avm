@@ -146,6 +146,11 @@ class TerraformAVMOrchestrator:
         for mapping in valid_mappings:
             self.logger.info(f"Fetching details for AVM module: {mapping.target_module.name}, version: {mapping.target_module.version}")
 
+            # only fecth and insert if not already in modules_details
+            if any(md.module.name == mapping.target_module.name and md.module.version == mapping.target_module.version for md in modules_details):
+                self.logger.info(f"Module {mapping.target_module.name} version {mapping.target_module.version} already fetched, skipping.")
+                continue
+
             module_detail = await self.avm_service.fetch_avm_resource_details(
                 module_name=mapping.target_module.name, 
                 module_version=mapping.target_module.version, 
@@ -153,7 +158,7 @@ class TerraformAVMOrchestrator:
             )
             modules_details.append(module_detail)
 
-        with open(f"{output_dir}/04_avm_module_details.json", "w", encoding="utf-8") as f:
+        with open(f"{output_dir}/04_avm_modules_details.json", "w", encoding="utf-8") as f:
             f.write(json.dumps([v.model_dump() for v in modules_details], indent=2))
 
         
@@ -176,6 +181,11 @@ class TerraformAVMOrchestrator:
         for mapping in valid_mappings:
             self.logger.info(f"Fetching details for AVM module: {mapping.target_module.name}, version: {mapping.target_module.version}")
 
+            # only fecth and insert if not already in modules_details
+            if any(md.module.name == mapping.target_module.name and md.module.version == mapping.target_module.version for md in modules_details):
+                self.logger.info(f"Module {mapping.target_module.name} version {mapping.target_module.version} already fetched, skipping.")
+                continue
+
             module_detail = await self.avm_service.fetch_avm_resource_details(
                 module_name=mapping.target_module.name, 
                 module_version=mapping.target_module.version, 
@@ -184,7 +194,7 @@ class TerraformAVMOrchestrator:
             modules_details.append(module_detail)
             # self._log_agent_response(f"AVMResourceDetailsAgent - {mapping.target_module.name} {mapping.target_module.version}", modules_details)
 
-        with open(f"{output_dir}/05_avm_modules_details.json", "w", encoding="utf-8") as f:
+        with open(f"{output_dir}/05_avm_modules_details_final.json", "w", encoding="utf-8") as f:
             f.write(json.dumps([v.model_dump() for v in modules_details], indent=2))
         
 

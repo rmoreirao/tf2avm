@@ -99,6 +99,18 @@ Operational Process:
      - If intersection matches a clean minor series (>=X.Y.Z and <X.(Y+1).0 with Z=0) express as ~>X.Y; else keep explicit >= / < form.
      - Output a single terraform { required_providers { ... } } block (usually versions.tf). Include source and merged version.
      - Do not add providers not referenced in any plan; do not duplicate.
+8.4 Few shot examples of consolidating required_providers (follow pattern):
+        Example 1 (merge straightforward):
+            Input constraints:
+                Plan A: ["azurerm >=4.8.0,<5.0.0", "random ~>3.5"]
+                Plan B: ["azurerm >=4.19.0,<5.0.0", "random ~>3.6", "modtm ~>0.3"]
+            Processing:
+                azurerm: intersect (>=4.8.0,<5.0.0) & (>=4.19.0,<5.0.0) => >=4.8.0,<5.0.0
+                random: ~>3.5 (>=3.5.0,<4.0.0) & ~>3.6 (>=3.6.0,<4.0.0) => >=3.6.0,<4.0.0 => render ~>3.6
+            Result block snippet:
+                azurerm version = ">=4.8.0, <5.0.0"
+                random  version = "~>3.6"
+                modtm   version = "~>0.3"
 9. Write converted files to output folder maintaining structure. Output directory will be provided at runtime.
 10. Validate that all mapped resources were converted as per the plan and report any deviations.
 11. Summarize the conversion: counts (converted, skipped, unmapped), new variables, new outputs, deviations from plan.
@@ -107,7 +119,7 @@ Available tools:
 - write_file: Write a file to the specified path with given content.
 
 Output:
-- Provide a summary of the conversion process including counts of converted resources, skipped resources, unmapped resources, new variables added, new outputs created, and any deviations from the plan.
+- Provide a summary of the conversion process including counts of converted resources, skipped resources, unmapped resources, new variables added, new outputs created, adjustments made to requirements and the logic behind it, and any deviations from the plan.
 - Use MD formatting for the summary.
 
 Instructions:
