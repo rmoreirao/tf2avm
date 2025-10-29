@@ -155,14 +155,25 @@ class ConversionReport(BaseModel):
 
 class AttributeMapping(BaseModel):
     """Mapping between a Terraform resource attribute and AVM module input."""
-    resource_input_name: Optional[str] = Field(default=None, description="Name of the Terraform resource attribute")
-    resource_input_value: Optional[str] = Field(default=None, description="Value of the resource attribute")
-    avm_input_name: str = Field(description="Name of the corresponding AVM module input parameter")
-    avm_input_value: Optional[str] = Field(default=None, description="Proposed value for the AVM input")
-    is_required: bool = Field(description="Whether this AVM input is required")
-    handling: str = Field(description="How to handle this mapping: 'direct', 'transform', 'new_variable', 'unmappable'")
-    transform: Optional[str] = Field(default=None, description="Transformation logic if needed")
-    notes: Optional[str] = Field(default=None, description="Additional notes about this mapping")
+    target_avm_input_name: Optional[str] = Field(description="Name of the corresponding AVM module input parameter")
+    target_avm_input_value: Optional[str] = Field(default=None, description="Proposed value for the AVM input")
+    target_avm_is_required: bool = Field(description="Whether this AVM input is required")
+    
+    original_resource_input_name: Optional[str] = Field(default=None, description="Name of the Terraform resource attribute")
+    original_resource_input_value: Optional[str] = Field(default=None, description="Value of the resource attribute")
+    
+    handling: str = Field(description=(
+        "How to handle this mapping: \n"
+        " - 'direct_mapping_from_resource_to_avm': Direct mapping from resource attribute to AVM input.\n"
+        " - 'mapping_from_resource_to_avm_with_format_transformation': All the required values are available, but it requires format transformation to map resource attribute to AVM input.\n"
+        " - 'no_mapping_required_avm_input_not_available': No mapping needed as AVM input is not required or not available.\n"
+        " - 'new_variable_required': Requires creation of a new variable to supply the AVM input.\n"
+        " - 'unmappable': No suitable mapping found; manual intervention needed."
+                           )      
+                    )
+    handling_reason: str = Field(description="Explanation of why this handling approach was chosen")
+    format_transformation_description: Optional[str] = Field(default=None, description="Format transformation logic if needed")
+    additional_notes: Optional[str] = Field(default=None, description="Any additional context or notes about this mapping")
     
 class VariableProposal(BaseModel):
     """Proposed new variable for the conversion."""
@@ -218,7 +229,16 @@ class ResourceConverterPlanningAgentResult(BaseModel):
     )
     attribute_mappings: Optional[List[AttributeMapping]] = Field(
         default_factory=list,
-        description="Detailed mappings between resource attributes and AVM inputs"
+        description=(
+            "Detailed mappings between target AVM inputs and the original resource attributes. if the AVM input is a complex type (for ex.: 'map(object' or object')', provide mappings for each sub-attribute individually.)\n"
+            "For ex.: \n"
+            "- avm input name: 'lock',\n"
+            "  type: \"object({\n    kind = string\n    name = optional(string, null)\n  })\",\n"
+            "  mappings:\n"
+            "    - target_avm_input_name: 'lock.kind', original_resource_input_name: 'azurerm_management_lock.lock.level'\n"
+            "    - target_avm_input_name: 'lock.name', original_resource_input_name: 'azurerm_management_lock.lock.name'\n"
+            )
+
     )
     existing_variables_reused: Optional[List[str]] = Field(
         default_factory=list,
