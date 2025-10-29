@@ -120,9 +120,9 @@ class TerraformAVMOrchestrator:
         with open(f"{output_dir}/01_tf_metadata.json", "w", encoding="utf-8") as f:
             f.write(tf_metadata_agent_output.model_dump_json(indent=2))
                
-        self.logger.info("Step 2: Running AVM Knowledge Agent")
+        self.logger.info("Step 2: Running AVM Knowledge Service")
         knowledge_result : AVMKnowledgeAgentResult = await self.avm_service.fetch_avm_knowledge(use_cache=True)
-        self._log_agent_response("AVMKnowledgeAgent", knowledge_result)
+        self._log_agent_response("AVMKnowledgeService", knowledge_result)
 
         with open(f"{output_dir}/02_avm_knowledge.json", "w", encoding="utf-8") as f:
             f.write(knowledge_result.model_dump_json(indent=2))

@@ -72,6 +72,7 @@ class ResourceMapping(BaseModel):
     """Mapping between Terraform resource and AVM module."""
     source_file: str = Field(description="Path to the source Terraform file containing the resource")
     source_resource: TerraformResource = Field(description="The original Terraform resource to be mapped")
+    target_file: str = Field(description="Path to the target Terraform file for the converted resource. This is more relevant for resources that are converted to AVM module parameters.")
     target_module: Optional[AVMModule] = Field(default=None, description="The AVM module that replaces the Terraform resource")
     confidence_score: str = Field(description="Confidence level of the mapping: High (100pct), Medium (99pct - 50pct), Low (49pct - 20pct) or None if unmappable")
     mapping_reason: str = Field(description="Explanation of why this mapping was suggested")
@@ -178,9 +179,11 @@ class AttributeMapping(BaseModel):
 class VariableProposal(BaseModel):
     """Proposed new variable for the conversion."""
     name: str = Field(description="Variable name")
-    type: str = Field(description="Variable type (string, number, bool, list, map, etc.)")
-    source: str = Field(description="Source of this variable (inferred, required by AVM, etc.)")
-    reason: str = Field(description="Why this variable is needed")
+    type: str = Field(description="Variable type. Variables must be simple types (string, number, bool, list, map). Complex types are not allowed (for ex.: 'map(object' or object').")
+    target_avm_module: str = Field(description="AVM module that requires this variable")
+    target_avm_module_name: str = Field(description="Name of the AVM module instance that requires this variable")
+    target_avm_input_name: str = Field(description="Target AVM input name")
+    reason: str = Field(description="Explain why this variable is needed.")
     default_value: Optional[str] = Field(default=None, description="Proposed default value")
 
 class OutputMapping(BaseModel):
@@ -199,6 +202,7 @@ class ResourceConverterPlanningAgentResult(BaseModel):
     )
     
     source_file: str = Field(default=None, description="Path to the source Terraform file. Mandatory field.")
+    target_file: str = Field(default=None, description="Path to the target converted Terraform file. Mandatory field.")
     resource_type: str = Field(default=None, description="Original Terraform resource type (e.g., azurerm_key_vault)")
     resource_name: str = Field(default=None, description="Original Terraform resource name")
     target_avm_module: Optional[str] = Field(default=None, description="Target AVM module name")
@@ -246,7 +250,7 @@ class ResourceConverterPlanningAgentResult(BaseModel):
     )
     new_variables_required: Optional[List[VariableProposal]] = Field(
         default_factory=list,
-        description="New variables that need to be created. Variables must be simple types (string, number, bool, list, map). Complex types are not allowed."
+        description="New variables that need to be created."
     )
     output_mappings: Optional[List[OutputMapping]] = Field(
         default_factory=list,
