@@ -30,15 +30,12 @@ class TerraformAVMOrchestrator:
         
     async def initialize(self):
         """Initialize the orchestrator."""
-        try:
-            # Validate environment
-            validate_environment()
-            self.logger.info("Environment validation passed")
-            self.logger.info("Orchestrator initialized successfully")
-            
-        except Exception as e:
-            self.logger.error(f"Failed to initialize orchestrator: {e}")
-            raise
+        
+        # Validate environment
+        validate_environment()
+        self.logger.info("Environment validation passed")
+        self.logger.info("Orchestrator initialized successfully")
+        
     
     async def convert_repository(self, repo_path: str, output_dir: str) -> Dict[str, Any]:
         """
