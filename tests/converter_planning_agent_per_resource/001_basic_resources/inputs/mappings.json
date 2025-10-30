@@ -1,0 +1,256 @@
+{
+  "mappings": [
+    {
+      "source_file": "main.tf",
+      "source_resource": {
+        "type": "azurerm_resource_group",
+        "name": "main",
+        "file_path": "main.tf"
+      },
+      "target_file": "main.tf",
+      "target_module": {
+        "name": "avm-res-resources-resourcegroup",
+        "display_name": "Resource Group",
+        "version": "0.2.1",
+        "description": "Azure Resource Group"
+      },
+      "confidence_score": "High",
+      "mapping_reason": "AVM contains a dedicated Resource Group module matching azurerm_resource_group.",
+      "mapping_details": "Attributes and resource semantics for azurerm_resource_group are a direct match to the avm-res-resources-resourcegroup module."
+    },
+    {
+      "source_file": "app-service.tf",
+      "source_resource": {
+        "type": "azurerm_service_plan",
+        "name": "main",
+        "file_path": "app-service.tf"
+      },
+      "target_file": "app-service.tf",
+      "target_module": {
+        "name": "avm-res-web-serverfarm",
+        "display_name": "App Service Plan",
+        "version": "0.7.0",
+        "description": ""
+      },
+      "confidence_score": "High",
+      "mapping_reason": "AVM module avm-res-web-serverfarm explicitly provides App Service Plan (azurerm_service_plan) support.",
+      "mapping_details": "All key attributes and semantics of azurerm_service_plan are directly supported by the AVM module."
+    },
+    {
+      "source_file": "app-service.tf",
+      "source_resource": {
+        "type": "azurerm_linux_web_app",
+        "name": "web",
+        "file_path": "app-service.tf"
+      },
+      "target_file": "app-service.tf",
+      "target_module": {
+        "name": "avm-res-web-site",
+        "display_name": "Web/Function App",
+        "version": "0.19.1",
+        "description": "Terraform Azure Verified Resource Module for Web/Function App"
+      },
+      "confidence_score": "High",
+      "mapping_reason": "AVM module avm-res-web-site includes support for azurerm_linux_web_app resource.",
+      "mapping_details": "Module supports full lifecycle management of Linux Web Apps including dependency on the service plan."
+    },
+    {
+      "source_file": "app-service.tf",
+      "source_resource": {
+        "type": "azurerm_linux_web_app",
+        "name": "api",
+        "file_path": "app-service.tf"
+      },
+      "target_file": "app-service.tf",
+      "target_module": {
+        "name": "avm-res-web-site",
+        "display_name": "Web/Function App",
+        "version": "0.19.1",
+        "description": "Terraform Azure Verified Resource Module for Web/Function App"
+      },
+      "confidence_score": "High",
+      "mapping_reason": "AVM module avm-res-web-site includes support for azurerm_linux_web_app resource.",
+      "mapping_details": "Module supports full lifecycle management of Linux Web Apps including dependency on the service plan."
+    },
+    {
+      "source_file": "monitoring.tf",
+      "source_resource": {
+        "type": "azurerm_log_analytics_workspace",
+        "name": "main",
+        "file_path": "monitoring.tf"
+      },
+      "target_file": "monitoring.tf",
+      "target_module": {
+        "name": "avm-res-operationalinsights-workspace",
+        "display_name": "Log Analytics workspace",
+        "version": "0.4.2",
+        "description": "Azure Log Analytics Workspace AVM Module"
+      },
+      "confidence_score": "High",
+      "mapping_reason": "AVM module avm-res-operationalinsights-workspace manages Log Analytics Workspace resources.",
+      "mapping_details": "Inputs and outputs of azurerm_log_analytics_workspace are covered in the AVM module."
+    },
+    {
+      "source_file": "monitoring.tf",
+      "source_resource": {
+        "type": "azurerm_application_insights",
+        "name": "main",
+        "file_path": "monitoring.tf"
+      },
+      "target_file": "monitoring.tf",
+      "target_module": {
+        "name": "avm-res-insights-component",
+        "display_name": "Application Insight",
+        "version": "0.2.0",
+        "description": "AVM Terraform Module for Application Insights"
+      },
+      "confidence_score": "High",
+      "mapping_reason": "Module avm-res-insights-component directly manages azurerm_application_insights.",
+      "mapping_details": "Key attributes map 1:1 and integration with Log Analytics is also supported."
+    },
+    {
+      "source_file": "security.tf",
+      "source_resource": {
+        "type": "azurerm_key_vault",
+        "name": "main",
+        "file_path": "security.tf"
+      },
+      "target_file": "security.tf",
+      "target_module": {
+        "name": "avm-res-keyvault-vault",
+        "display_name": "Key Vault",
+        "version": "0.10.1",
+        "description": "Terraform Azure Verified Resource Module for Key Vault"
+      },
+      "confidence_score": "High",
+      "mapping_reason": "avm-res-keyvault-vault maps directly to azurerm_key_vault.",
+      "mapping_details": "AVM module supports full lifecycle of Key Vaults and access policies. Child resource azurerm_key_vault_secret may be managed within child modules or as an additional resource."
+    },
+    {
+      "source_file": "security.tf",
+      "source_resource": {
+        "type": "azurerm_key_vault_secret",
+        "name": "cosmos_connection",
+        "file_path": "security.tf"
+      },
+      "target_file": "security.tf",
+      "target_module": {
+        "name": "avm-res-keyvault-vault",
+        "display_name": "Key Vault",
+        "version": "0.10.1",
+        "description": "Terraform Azure Verified Resource Module for Key Vault"
+      },
+      "confidence_score": "Medium",
+      "mapping_reason": "The key vault secret can be managed as part of the parent vault AVM module inputs, but may also require custom handling for secret updates.",
+      "mapping_details": "AVM module can create secrets if provided as input, otherwise may require direct azurerm_key_vault_secret resource outside the AVM module."
+    },
+    {
+      "source_file": "storage.tf",
+      "source_resource": {
+        "type": "azurerm_cosmosdb_account",
+        "name": "main",
+        "file_path": "storage.tf"
+      },
+      "target_file": "storage.tf",
+      "target_module": {
+        "name": "avm-res-documentdb-databaseaccount",
+        "display_name": "CosmosDB Database Account",
+        "version": "0.10.0",
+        "description": "Terraform Azure Verified Resource Module for CosmosDB Database Account"
+      },
+      "confidence_score": "High",
+      "mapping_reason": "avm-res-documentdb-databaseaccount manages azurerm_cosmosdb_account and its associated SQL databases, containers, triggers, procedures, etc.",
+      "mapping_details": "Module supports parent/child resource relationship, so child azurerm_cosmosdb_sql_database and azurerm_cosmosdb_sql_container resources are handled via AVM module inputs."
+    },
+    {
+      "source_file": "storage.tf",
+      "source_resource": {
+        "type": "azurerm_cosmosdb_sql_database",
+        "name": "main",
+        "file_path": "storage.tf"
+      },
+      "target_file": "storage.tf",
+      "target_module": {
+        "name": "avm-res-documentdb-databaseaccount",
+        "display_name": "CosmosDB Database Account",
+        "version": "0.10.0",
+        "description": "Terraform Azure Verified Resource Module for CosmosDB Database Account"
+      },
+      "confidence_score": "High",
+      "mapping_reason": "Child Cosmos DB SQL databases are managed via inputs to the parent CosmosDB AVM module.",
+      "mapping_details": "azurerm_cosmosdb_sql_database resources can be managed as part of the database account resource set within AVM."
+    },
+    {
+      "source_file": "storage.tf",
+      "source_resource": {
+        "type": "azurerm_cosmosdb_sql_container",
+        "name": "main",
+        "file_path": "storage.tf"
+      },
+      "target_file": "storage.tf",
+      "target_module": {
+        "name": "avm-res-documentdb-databaseaccount",
+        "display_name": "CosmosDB Database Account",
+        "version": "0.10.0",
+        "description": "Terraform Azure Verified Resource Module for CosmosDB Database Account"
+      },
+      "confidence_score": "High",
+      "mapping_reason": "Child Cosmos DB SQL containers are managed via inputs to the parent CosmosDB AVM module.",
+      "mapping_details": "azurerm_cosmosdb_sql_container resources are mapped to AVM module as part of the database account's configuration."
+    },
+    {
+      "source_file": "monitoring.tf",
+      "source_resource": {
+        "type": "azurerm_monitor_diagnostic_setting",
+        "name": "web_app",
+        "file_path": "monitoring.tf"
+      },
+      "target_file": "app-service.tf",
+      "target_module": {
+        "name": "avm-res-web-site",
+        "display_name": "Web/Function App",
+        "version": "0.19.1",
+        "description": "Terraform Azure Verified Resource Module for Web/Function App"
+      },
+      "confidence_score": "High",
+      "mapping_reason": "This diagnostic setting is typically managed as part of the parent AVM web app module configuration.",
+      "mapping_details": "Diagnostic settings for web apps are exposed as input parameters for AVM module avm-res-web-site; no separate standalone module for azurerm_monitor_diagnostic_setting is required unless more advanced/custom monitoring use-cases exist."
+    },
+    {
+      "source_file": "monitoring.tf",
+      "source_resource": {
+        "type": "azurerm_monitor_diagnostic_setting",
+        "name": "api_app",
+        "file_path": "monitoring.tf"
+      },
+      "target_file": "app-service.tf",
+      "target_module": {
+        "name": "avm-res-web-site",
+        "display_name": "Web/Function App",
+        "version": "0.19.1",
+        "description": "Terraform Azure Verified Resource Module for Web/Function App"
+      },
+      "confidence_score": "High",
+      "mapping_reason": "This diagnostic setting is typically managed as part of the parent AVM web app module configuration.",
+      "mapping_details": "Diagnostic settings for web apps are exposed as input parameters for AVM module avm-res-web-site; no separate standalone module for azurerm_monitor_diagnostic_setting is required unless more advanced/custom monitoring use-cases exist."
+    },
+    {
+      "source_file": "monitoring.tf",
+      "source_resource": {
+        "type": "azurerm_monitor_diagnostic_setting",
+        "name": "cosmos_db",
+        "file_path": "monitoring.tf"
+      },
+      "target_file": "storage.tf",
+      "target_module": {
+        "name": "avm-res-documentdb-databaseaccount",
+        "display_name": "CosmosDB Database Account",
+        "version": "0.10.0",
+        "description": "Terraform Azure Verified Resource Module for CosmosDB Database Account"
+      },
+      "confidence_score": "High",
+      "mapping_reason": "azurerm_monitor_diagnostic_setting for CosmosDB account is handled via input/outputs in the parent CosmosDB AVM module.",
+      "mapping_details": "No standalone AVM module for diagnostic setting is required; these settings are integrated with the resource AVM module."
+    }
+  ]
+}

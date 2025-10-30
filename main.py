@@ -120,7 +120,6 @@ class TerraformAVMOrchestrator:
 
             # only fecth and insert if not already in modules_details
             if any(md.module.name == mapping.target_module.name and md.module.version == mapping.target_module.version for md in modules_details):
-                self.logger.info(f"Module {mapping.target_module.name} version {mapping.target_module.version} already fetched, skipping.")
                 continue
 
             module_detail = await self.avm_service.fetch_avm_resource_details(
@@ -149,7 +148,6 @@ class TerraformAVMOrchestrator:
 
             # only fecth and insert if not already in modules_details
             if any(md.module.name == mapping.target_module.name and md.module.version == mapping.target_module.version for md in modules_details):
-                self.logger.info(f"Module {mapping.target_module.name} version {mapping.target_module.version} already fetched, skipping.")
                 continue
 
             module_detail = await self.avm_service.fetch_avm_resource_details(
@@ -158,7 +156,6 @@ class TerraformAVMOrchestrator:
                 use_cache=True
             )
             modules_details.append(module_detail)
-            # self._log_agent_response(f"AVMResourceDetailsAgent - {mapping.target_module.name} {mapping.target_module.version}", modules_details)
         
 
         self._log_agent_response("AvmServiceModulesDetailsFinal", json.dumps([v.model_dump() for v in modules_details], indent=2), f"{output_dir}/05_avm_modules_details_final.json")
@@ -222,16 +219,13 @@ class TerraformAVMOrchestrator:
         converter_agent = await ConverterAgent.create()
         resource_conversion_plan = "\n\n".join(resources_planings_json)
         converter_result = await converter_agent.run_conversion(resource_conversion_plan, migrated_output_dir, tf_files)
-        self._log_agent_response("ConverterAgent", converter_result.model_dump_json(indent=2), f"{output_dir}/06_conversion_summary.json")
+        self._log_agent_response("ConverterAgent", converter_result, f"{output_dir}/06_conversion_summary.md")
 
         # Step 7: Terraform Validation and Error Analysis
         self.logger.info("Step 7: Running Terraform Validator Agent")
         tf_validator_agent = await TerraformValidatorAgent.create()
         validation_result: TerraformValidatorAgentResult = await tf_validator_agent.validate_and_analyze(str(migrated_output_dir))
-        self._log_agent_response("TerraformValidatorAgent", validation_result)
-
-        with open(f"{output_dir}/07_terraform_validation.json", "w", encoding="utf-8") as f:
-            f.write(validation_result.model_dump_json(indent=2))
+        self._log_agent_response("TerraformValidatorAgent", validation_result.model_dump_json(indent=2), f"{output_dir}/07_terraform_validation.json")
 
         # Step 8: Fix Planning
         if not validation_result.validation_success:
@@ -246,24 +240,14 @@ class TerraformAVMOrchestrator:
                 directory=str(migrated_output_dir),
                 conversion_plans=resources_planning_results
             )
-            self._log_agent_response("TerraformFixPlannerAgent", fix_plan_result)
-            
-            # Save the fix plan
-            with open(f"{output_dir}/08_fix_plan.json", "w", encoding="utf-8") as f:
-                f.write(fix_plan_result.model_dump_json(indent=2))
-            
-            # Log summary statistics
-            self.logger.info(
-                f"Fix planning complete: {fix_plan_result.total_fixable_errors} fixable errors, "
-                f"{fix_plan_result.total_manual_review_required} requiring manual review"
-            )
+            self._log_agent_response("TerraformFixPlannerAgent", fix_plan_result.model_dump_json(indent=2), f"{output_dir}/08_fix_plan.json")
             
             if fix_plan_result.critical_issues:
                 self.logger.warning(f"Critical issues found: {', '.join(fix_plan_result.critical_issues)}")
         else:
             self.logger.info("Terraform validation passed successfully - no fix planning needed")
 
-        return str("Some result")
+        return str("Finished")
 
     def _log_agent_response(self, agent_name: str, response: str, save_to_file_path: str) -> None:
         """Log agent response in a consistent format."""

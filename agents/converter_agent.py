@@ -33,10 +33,10 @@ class ConverterAgent:
         kernel = Kernel()
         
         chat_completion_service = AzureChatCompletion(
-            deployment_name=settings.azure_openai_reasoning_deployment_name,
-            api_key=settings.azure_openai_reasoning_api_key,
-            endpoint=settings.azure_openai_reasoning_endpoint,
-            api_version=settings.azure_openai_reasoning_api_version,
+            deployment_name=settings.azure_openai_deployment_name,
+            api_key=settings.azure_openai_api_key,
+            endpoint=settings.azure_openai_endpoint,
+            api_version=settings.azure_openai_api_version,
         )
         
         kernel.add_service(chat_completion_service)
@@ -77,16 +77,18 @@ Operational Process:
 - Replace resource blocks with AVM module blocks (source, version from plan).
 - Map attributes exactly as specified.
 - Insert conversion comment header.
+- Adjust the referenced outputs as per plan
 5. Update the variables.tf file with new variables as per plan.new_variables_required.
 5.1 !!! Only add variables that do not already exist in the original variables.tf and are listed in plan.new_variables_required !!!
-6. Update the outputs.tf file to reflect output changes as per plan.output_changes.
-5. Update variables and outputs per plan.
 6. Preserve unmapped resources as described.
-7. Clean up any resource which is fully converted to module.
-8. Update Required Providers based on the conversion plan "required_providers".
-8.1 Ensure no duplicate provider entries.
-8.2 Merge versions where multiple constraints exist.
-8.3 Required Providers Consolidation Logic:
+7. Clean up any resource which is fully converted to AVM module.
+7.1 For the resources which to be converted to AVM Module parameters, remove the original resource block entirely and make sure that resource is reflected correctly on target AVM module.
+7.2 The target AVM module maybe be on a different file than the original resource; ensure the module block is created in the correct file as per plan.
+8. Update the outputs.tf file to reflect output changes as per plan.output_changes.
+9. Update Required Providers based on the conversion plan "required_providers".
+9.1 Ensure no duplicate provider entries.
+9.2 Merge versions where multiple constraints exist.
+9.3 Required Providers Consolidation Logic:
      - Collect every constraint string from all plan sections named required_providers.
      - Group by provider name.
      - Normalize each constraint:
@@ -99,7 +101,7 @@ Operational Process:
      - If intersection matches a clean minor series (>=X.Y.Z and <X.(Y+1).0 with Z=0) express as ~>X.Y; else keep explicit >= / < form.
      - Output a single terraform { required_providers { ... } } block (usually versions.tf). Include source and merged version.
      - Do not add providers not referenced in any plan; do not duplicate.
-8.4 Few shot examples of consolidating required_providers (follow pattern):
+9.4 Few shot examples of consolidating required_providers (follow pattern):
         Example 1 (merge straightforward):
             Input constraints:
                 Plan A: ["azurerm >=4.8.0,<5.0.0", "random ~>3.5"]
@@ -111,9 +113,9 @@ Operational Process:
                 azurerm version = ">=4.8.0, <5.0.0"
                 random  version = "~>3.6"
                 modtm   version = "~>0.3"
-9. Write converted files to output folder maintaining structure. Output directory will be provided at runtime.
-10. Validate that all mapped resources were converted as per the plan and report any deviations.
-11. Summarize the conversion: counts (converted, skipped, unmapped), new variables, new outputs, deviations from plan.
+10. Write converted files to output folder maintaining structure. Output directory will be provided at runtime.
+11. Validate that all mapped resources were converted as per the plan and report any deviations.
+12. Summarize the conversion: counts (converted, skipped, unmapped), new variables, new outputs, deviations from plan.
 
 Available tools:
 - write_file: Write a file to the specified path with given content.
@@ -143,6 +145,5 @@ Instructions:
             f"Output Directory: '{output_dir}'\n\n"
             f"Terraform Files:\n{files_summary}"
         )
-        
-        return await self.agent.get_response(kickoff_message)
-        
+        response = await self.agent.get_response(kickoff_message)
+        return response.message.content

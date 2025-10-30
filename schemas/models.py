@@ -202,9 +202,9 @@ class ResourceConverterPlanningAgentResult(BaseModel):
     )
     
     source_file: str = Field(default=None, description="Path to the source Terraform file. Mandatory field.")
+    original_resource_type: str = Field(default=None, description="Original Terraform resource type (e.g., azurerm_key_vault)")
+    original_resource_name: str = Field(default=None, description="Original Terraform resource name")
     target_file: str = Field(default=None, description="Path to the target converted Terraform file. Mandatory field.")
-    resource_type: str = Field(default=None, description="Original Terraform resource type (e.g., azurerm_key_vault)")
-    resource_name: str = Field(default=None, description="Original Terraform resource name")
     target_avm_module: Optional[str] = Field(default=None, description="Target AVM module name")
     target_avm_version: Optional[str] = Field(default=None, description="Target AVM module version")
     target_avm_module_name: Optional[str] = Field(default=None,
