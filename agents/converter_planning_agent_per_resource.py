@@ -18,19 +18,6 @@ from schemas.models import (
 
 
 class ResourceConverterPlanningAgent:
-    """Converter Planning Agent - Creates detailed conversion plans with integrated resource mapping.
-
-    Responsibilities:
-    - Ingest repository scan results and AVM knowledge
-    - Determine conversion confidence levels and identify unmappable resources
-    - Parse Terraform source files to understand current state (resources, variables, outputs, dependencies)
-    - Produce a DETAILED conversion plan describing exactly how each azurerm_* resource will be migrated to AVM modules
-    - Plan required variable additions/refactors and output changes
-    - Highlight dependency ordering & sequencing for safe conversion
-    - Flag risky/ambiguous mappings needing human validation
-    - Provide an execution checklist the Converter Agent will follow    
-    """
-
     def __init__(self, agent: ChatCompletionAgent):
         self.logger = get_logger(__name__)
         self.settings = get_settings()
@@ -64,7 +51,7 @@ class ResourceConverterPlanningAgent:
             service=chat_completion_service,
             kernel=kernel,
             name="ResourceConverterPlanningAgent",
-            description="Produces detailed Terraform->AVM conversion plans with integrated resource mapping functionality.",
+            description="Produces detailed Terraform->AVM conversion plans.",
             plugins=[terraform_plugin, http_plugin],
             arguments=KernelArguments(execution_settings),
             instructions="""You are the Resource Converter Planning Agent in the Terraform to Azure Verified Modules (AVM) workflow.
@@ -83,14 +70,14 @@ Your mission: Create a PRECISE conversion plan for the SINGLE azurerm_* resource
 --> Planning Process from Terraform to AVM Module:
 1. Parse the specific azurerm_* resource block
 2. Apply all the mappings required to satisfy the JSON Output structure
-3. When proposing new variables, ensure they are simple types only, not nested / complex types.
+3. If a required AVM input has no mapping:
+    - Try to define a hardcoded value based on original resource attributes.
+    - If that's not possible: propose a new variable with default value. Variables must be simple types only, not nested / complex types.
+        - If the AVM input is a complex type (list, map, object) and is not able to hardcode a value, create multiple simple-type variables to cover all required fields.
 
 --> Critical Requirements Checklist:
 - !!!EVERY required input in the AVM module 'AVM Module Details' MUST have a mapping or proposed solution!!!
 - !!!Make sure that you validate all required inputs are addressed!!!
-- If a required AVM input has no source:
-    - Try to define a hardcoded value based on original resource attributes.
-    - If that's not possible: propose a new variable with default value. Variables must be simple types only, not nested / complex types.
 - Flag any attributes that cannot be mapped to module inputs
 
 

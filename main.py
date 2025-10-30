@@ -1,3 +1,4 @@
+import time
 import asyncio
 from datetime import datetime
 import json
@@ -178,6 +179,8 @@ class TerraformAVMOrchestrator:
             original_tf_resource_metadata = next((m for m in tf_metadata_agent_output.azurerm_resources if m.type == mapping_result.source_resource.type and m.name == mapping_result.source_resource.name), None)
             referenced_outputs = original_tf_resource_metadata.referenced_outputs or [] if original_tf_resource_metadata else []
 
+            start_time = time.time()
+
             resource_conversion_plan: ResourceConverterPlanningAgentResult = await resource_planning_agent.create_conversion_plan(
                 avm_module_detail=avm_module_detail,
                 resource_mapping=mapping_result, 
@@ -188,6 +191,13 @@ class TerraformAVMOrchestrator:
             resource_identifier = f"{mapping_result.source_resource.type}_{mapping_result.source_resource.name}"
             planning_result_json = resource_conversion_plan.model_dump_json(indent=2)
             self._log_agent_response("ResourceConverterPlanningAgent", planning_result_json, f"{output_dir}/06_{resource_identifier}_conversion_plan.json")
+
+            #  Calculate execution time in seconds
+            execution_time = time.time() - start_time
+            self.logger.info(
+                f"✅ Conversion plan completed for {resource_identifier} | "
+                f"⏱️ Time: {execution_time:.2f}s"
+            )
             
             return resource_conversion_plan, planning_result_json
         

@@ -1,4 +1,5 @@
 import shutil
+from typing import List
 import pytest
 import json
 from pathlib import Path
@@ -14,9 +15,14 @@ class TestResourceConverterPlanningAgent:
     """End-to-end tests for Resource Converter Planning Agent"""
 
     @pytest.fixture
-    def test_data_dir(self):
+    def test_data_dir_001(self):
         """Return the test data directory for converter planning agent tests."""
         return Path(__file__).parent / "001_basic_resources" / "inputs"
+    
+    @pytest.fixture
+    def monitoring_test_data_dir_002(self):
+        """Return the test data directory for monitoring resources test 002."""
+        return Path(__file__).parent / "002_monitoring_mapping" / "inputs"
 
     @pytest.fixture
     def output_dir(self, request):
@@ -25,7 +31,7 @@ class TestResourceConverterPlanningAgent:
         test_name = request.node.name
         
         # Create output directory: tests\test_run\{test_name}\output
-        base_output = Path(__file__).parent.parent.parent / "tests_runs" / "main_test" / test_name / "output"
+        base_output = Path(__file__).parent.parent.parent / "tests_runs" / "converter_planning_test" / test_name / "output"
 
         # Clean the output directory if it exists
         if base_output.exists():
@@ -35,40 +41,47 @@ class TestResourceConverterPlanningAgent:
         return base_output
 
     @pytest.fixture
-    def tf_files(self, test_data_dir):
+    def tf_files(self, test_data_dir_001):
         """Load all .tf files from the test data directory."""
-        tf_dir = test_data_dir / "tf"
+        tf_dir = test_data_dir_001 / "tf"
         files = {}
         for tf_file in tf_dir.glob("*.tf"):
             files[tf_file.name] = tf_file.read_text(encoding="utf-8")
         return files
 
     @pytest.fixture
-    def avm_knowledge(self, test_data_dir):
+    def avm_knowledge(self, test_data_dir_001):
         """Load AVM knowledge JSON."""
-        with open(test_data_dir / "avm_knowledge.json", "r", encoding="utf-8") as f:
+        with open(test_data_dir_001 / "avm_knowledge.json", "r", encoding="utf-8") as f:
             return json.load(f)
 
     @pytest.fixture
-    def avm_modules_details(self, test_data_dir):
+    def avm_modules_details(self, test_data_dir_001):
         """Load AVM modules details JSON."""
-        with open(test_data_dir / "avm_modules_details_final.json", "r", encoding="utf-8") as f:
+        with open(test_data_dir_001 / "avm_modules_details_final.json", "r", encoding="utf-8") as f:
             return json.load(f)
 
     @pytest.fixture
-    def mappings(self, test_data_dir):
+    def mappings(self, test_data_dir_001):
         """Load resource mappings JSON."""
-        with open(test_data_dir / "mappings.json", "r", encoding="utf-8") as f:
+        with open(test_data_dir_001 / "mappings.json", "r", encoding="utf-8") as f:
             return json.load(f)
 
     @pytest.fixture
-    def tf_metadata(self, test_data_dir):
+    def tf_metadata(self, test_data_dir_001):
         """Load TF metadata JSON."""
-        with open(test_data_dir / "tf_metadata.json", "r", encoding="utf-8") as f:
+        with open(test_data_dir_001 / "tf_metadata.json", "r", encoding="utf-8") as f:
             return json.load(f)
+        
+    def save_output(self, output_dir: Path, filename: str, content: str):
+        """Save output to file"""
+        output_file = output_dir / filename
+        with open(output_file, 'w', encoding='utf-8') as f:
+            f.write(content)
+        print(f"Output saved to: {output_file}")
 
     @pytest.mark.asyncio
-    async def test_create_conversion_plan(self, tf_files, mappings, avm_modules_details, tf_metadata):
+    async def test_create_conversion_plan_001(self, tf_files, mappings, avm_modules_details, tf_metadata):
         """Test ResourceConverterPlanningAgent conversion plan for each mapping."""
         agent = await ResourceConverterPlanningAgent.create()
 
@@ -114,9 +127,50 @@ class TestResourceConverterPlanningAgent:
 
             # Save or assert result
             assert isinstance(result, ResourceConverterPlanningAgentResult)
-            assert result.resource is not None
+            assert result.planning_summary is not None
             assert result.plan is not None
             print(result.model_dump_json(indent=2))
+
+    
+
+    @pytest.mark.asyncio
+    async def test_conversion_plan_monitoring_resources_002(self, monitoring_test_data_dir_002, output_dir):
+        """Test ResourceConverterPlanningAgent for monitoring diagnostic setting mapping."""
+        agent = await ResourceConverterPlanningAgent.create()
+
+        # Load mapping
+        mapping_path = monitoring_test_data_dir_002 / "mapping_azurerm_monitor_diagnostic_setting_web_app.json"
+        with open(mapping_path, "r", encoding="utf-8") as f:
+            mapping_json = json.load(f)
+        resource_mapping = ResourceMapping.model_validate(mapping_json)
+
+        # Load AVM module detail
+        avm_module_detail_path = monitoring_test_data_dir_002 / "avm_module_detail_avm-res-web-site.json"
+        with open(avm_module_detail_path, "r", encoding="utf-8") as f:
+            avm_module_detail_json = json.load(f)
+        avm_module_detail = AVMModuleDetailed.model_validate(avm_module_detail_json)
+
+        # Load TF file content
+        tf_file_path = monitoring_test_data_dir_002 / "monitoring.tf"
+        tf_file = (tf_file_path.name, tf_file_path.read_text(encoding="utf-8"))
+
+        # No referenced outputs for this test
+        output: List[TerraformOutputreference] = []
+
+        # Run the agent
+        result: ResourceConverterPlanningAgentResult = await agent.create_conversion_plan(
+            resource_mapping=resource_mapping,
+            avm_module_detail=avm_module_detail,
+            tf_file=tf_file,
+            original_tf_resource_output_paramers=output,
+        )
+
+        result_json = result.model_dump_json(indent=2)
+        self.save_output(output_dir, "conversion_plan.json", result_json)
+
+        # Assertions
+        assert isinstance(result, ResourceConverterPlanningAgentResult)
+        assert result.planning_summary is not None
 
     @pytest.mark.asyncio
     async def test_agent_creation(self):

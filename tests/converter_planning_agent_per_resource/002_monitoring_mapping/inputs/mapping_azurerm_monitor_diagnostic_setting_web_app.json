@@ -1,0 +1,18 @@
+{
+  "source_file": "monitoring.tf",
+  "source_resource": {
+    "type": "azurerm_monitor_diagnostic_setting",
+    "name": "web_app",
+    "file_path": "monitoring.tf"
+  },
+  "target_file": "app-service.tf",
+  "target_module": {
+    "name": "avm-res-web-site",
+    "display_name": "Web/Function App",
+    "version": "0.19.1",
+    "description": "Terraform Azure Verified Resource Module for Web/Function App"
+  },
+  "confidence_score": "High",
+  "mapping_reason": "This diagnostic setting is typically managed as part of the parent AVM web app module configuration.",
+  "mapping_details": "Diagnostic settings for web apps are exposed as input parameters for AVM module avm-res-web-site; no separate standalone module for azurerm_monitor_diagnostic_setting is required unless more advanced/custom monitoring use-cases exist."
+}

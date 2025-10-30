@@ -179,7 +179,7 @@ class AttributeMapping(BaseModel):
 class VariableProposal(BaseModel):
     """Proposed new variable for the conversion."""
     name: str = Field(description="Variable name")
-    type: str = Field(description="Variable type. Variables must be simple types (string, number, bool, list, map). Complex types are not allowed (for ex.: 'map(object' or object').")
+    type: str = Field(description="Variable type. Variables must be simple types (for ex.: string, number, bool). Complex types are not allowed (for ex.: 'map(object' or object').")
     target_avm_module: str = Field(description="AVM module that requires this variable")
     target_avm_module_name: str = Field(description="Name of the AVM module instance that requires this variable")
     target_avm_input_name: str = Field(description="Target AVM input name")
@@ -248,9 +248,10 @@ class ResourceConverterPlanningAgentResult(BaseModel):
         default_factory=list,
         description="List of existing variable names that will be reused"
     )
+    
     new_variables_required: Optional[List[VariableProposal]] = Field(
         default_factory=list,
-        description="New variables that need to be created."
+        description="New variables that need to be created. Variables must be simple types (for ex.: string, number, bool). Complex types are not allowed (for ex.: 'map(object' or object')."
     )
     output_mappings: Optional[List[OutputMapping]] = Field(
         default_factory=list,
