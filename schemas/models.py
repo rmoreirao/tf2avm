@@ -168,7 +168,7 @@ class AttributeMapping(BaseModel):
         " - 'direct_mapping_from_resource_to_avm': Direct mapping from resource attribute to AVM input.\n"
         " - 'mapping_from_resource_to_avm_with_format_transformation': All the required values are available, but it requires format transformation to map resource attribute to AVM input.\n"
         " - 'no_mapping_required_avm_input_not_available': No mapping needed as AVM input is not required or not available.\n"
-        " - 'new_variable_required': Requires creation of a new variable to supply the AVM input.\n"
+        " - 'new_variable_required': Requires creation of a new variable to supply the AVM input. Variable must be a simple type (string, number, bool) and must not be a complex type (e.g., map(object), object).\n"
         " - 'unmappable': No suitable mapping found; manual intervention needed."
                            )      
                     )
