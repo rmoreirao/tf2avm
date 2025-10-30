@@ -23,7 +23,7 @@ class TestTFMetadataAgent:
 
         
         # Create output directory: tests\test_run\{test_name}\output
-        base_output = Path(__file__).parent.parent / "test_run" / test_name / "output"
+        base_output = Path(__file__).parent.parent.parent / "tests_runs" / "tf_metadata_agent" / test_name / "output"
 
         # Clean the output directory if it exists
         if base_output.exists():

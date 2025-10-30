@@ -1,3 +1,4 @@
+import shutil
 import pytest
 import json
 from pathlib import Path
@@ -16,6 +17,22 @@ class TestResourceConverterPlanningAgent:
     def test_data_dir(self):
         """Return the test data directory for converter planning agent tests."""
         return Path(__file__).parent / "001_basic_resources" / "inputs"
+
+    @pytest.fixture
+    def output_dir(self, request):
+        """Create and return output directory based on test name"""
+        # Get the test name (e.g., test_case_001_repo_tf_basic)
+        test_name = request.node.name
+        
+        # Create output directory: tests\test_run\{test_name}\output
+        base_output = Path(__file__).parent.parent.parent / "tests_runs" / "main_test" / test_name / "output"
+
+        # Clean the output directory if it exists
+        if base_output.exists():
+            shutil.rmtree(base_output)
+
+        base_output.mkdir(parents=True, exist_ok=True)
+        return base_output
 
     @pytest.fixture
     def tf_files(self, test_data_dir):

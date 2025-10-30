@@ -209,3 +209,5 @@ __marimo__/
 
 # add /output/ folder to gitignore
 output/
+
+tests_runs/
