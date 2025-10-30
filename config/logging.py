@@ -1,6 +1,7 @@
 import logging
 import sys
 from pathlib import Path
+from datetime import datetime
 
 
 def setup_logging(log_level: str = "INFO") -> logging.Logger:
@@ -10,12 +11,14 @@ def setup_logging(log_level: str = "INFO") -> logging.Logger:
     log_dir = Path("logs")
     log_dir.mkdir(exist_ok=True)
     
+    daily_filename = f"tf2avm_{datetime.now():%Y%m%d}.log"
+    file_path = log_dir / daily_filename
     # Configure logging
     logging.basicConfig(
-        level=getattr(logging, log_level.upper()),
+        level=getattr(logging, log_level.upper(), logging.INFO),
         format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
         handlers=[
-            logging.FileHandler(log_dir / "tf2avm_v2.log"),
+            logging.FileHandler(file_path),
             logging.StreamHandler(sys.stdout)
         ]
     )

@@ -52,52 +52,34 @@ class TerraformAVMOrchestrator:
         Returns:
             Dict containing conversion results and metadata
         """
-        try:
-            #validate the repo_path exists and contains .tf files
-            repo_path_obj = Path(repo_path)
-            if not repo_path_obj.exists() or not repo_path_obj.is_dir():
-                raise FileNotFoundError(f"Repository path '{repo_path}' does not exist or is not a directory.")
-            
-            # Create output directory
-            Path(output_dir).mkdir(parents=True, exist_ok=True)
-            
-            self.logger.info(f"Starting conversion of repository: {repo_path}")
-            self.logger.info(f"Output directory: {output_dir}")
-            
-            # Execute sequential workflow
-            result = await self._run_sequential_workflow(repo_path, output_dir)
-            
-            self.logger.info("Conversion workflow completed successfully")
-            
-            return {
-                "status": "completed",
-                "repo_path": repo_path,
-                "output_directory": output_dir,
-                "result": str(result),
-                "timestamp": datetime.now().isoformat()
-            }
-        except Exception as e:
-            full_traceback = traceback.format_exc()
-            self.logger.error(f"Error during conversion: {e}\n{full_traceback}")
-            return {
-                "status": "failed",
-                "repo_path": repo_path,
-                "output_directory": output_dir,
-                "error": str(e),
-                "traceback": full_traceback,
-                "timestamp": datetime.now().isoformat()
-            }
+    
+        #validate the repo_path exists and contains .tf files
+        repo_path_obj = Path(repo_path)
+        if not repo_path_obj.exists() or not repo_path_obj.is_dir():
+            raise FileNotFoundError(f"Repository path '{repo_path}' does not exist or is not a directory.")
+        
+        # Create output directory
+        Path(output_dir).mkdir(parents=True, exist_ok=True)
+        
+        self.logger.info(f"Starting conversion of repository: {repo_path}")
+        self.logger.info(f"Output directory: {output_dir}")
+        
+        # Execute sequential workflow
+        result = await self._run_sequential_workflow(repo_path, output_dir)
+        
+        self.logger.info("Conversion workflow completed successfully")
+        
+        return {
+            "status": "completed",
+            "repo_path": repo_path,
+            "output_directory": output_dir,
+            "result": str(result),
+            "timestamp": datetime.now().isoformat()
+        }
 
 
     async def _run_sequential_workflow(self, repo_path: str, output_dir: str) -> str:
         """Run the agents in sequence with an interactive approval gate after planning."""
-
-        # terraform_service = TerraformService()
-        # result: TerraformValidationResult = terraform_service.validate_terraform("D:\\repos\\tf2avm\\tests\\test_run\\repo_tf_basic\\output\\20251009_155830\\migrated")
-
-        # print("Result of terraform validate JSON:" + str(result))
-        # exit()
-
         # read all TF files and store in dictionary: relative folder/name -> content
         tf_files = {}
         for tf_file in Path(repo_path).rglob("*.tf"):
@@ -115,26 +97,16 @@ class TerraformAVMOrchestrator:
         self.logger.info("Step 1: Running Repository Scanner Agent")
         tf_metadata_agent = await TFMetadataAgent.create()
         tf_metadata_agent_output : TerraformMetadataAgentResult = await tf_metadata_agent.scan_repository(tf_files)
-        self._log_agent_response("TFMetadataAgent", tf_metadata_agent_output)
-
-        with open(f"{output_dir}/01_tf_metadata.json", "w", encoding="utf-8") as f:
-            f.write(tf_metadata_agent_output.model_dump_json(indent=2))
+        self._log_agent_response("TFMetadataAgent", tf_metadata_agent_output.model_dump_json(indent=2), f"{output_dir}/01_tf_metadata.json")
                
         self.logger.info("Step 2: Running AVM Knowledge Service")
         knowledge_result : AVMKnowledgeAgentResult = await self.avm_service.fetch_avm_knowledge(use_cache=True)
-        self._log_agent_response("AVMKnowledgeService", knowledge_result)
-
-        with open(f"{output_dir}/02_avm_knowledge.json", "w", encoding="utf-8") as f:
-            f.write(knowledge_result.model_dump_json(indent=2))
+        self._log_agent_response("AVMKnowledgeService", knowledge_result.model_dump_json(indent=2), f"{output_dir}/02_avm_knowledge.json")
 
         self.logger.info("Step 3: Running Mapping Agent")
         mapping_agent = await MappingAgent.create()
         mapping_result : MappingAgentResult = await mapping_agent.create_mappings(tf_metadata_agent_output, knowledge_result)
-        self._log_agent_response("MappingAgent", mapping_result)
-
-        with open(f"{output_dir}/03_mappings.json", "w", encoding="utf-8") as f:
-            f.write(mapping_result.model_dump_json(indent=2))
-
+        self._log_agent_response("MappingAgent", mapping_result.model_dump_json(indent=2), f"{output_dir}/03_mappings.json")
 
         self.logger.info("Step 4: Retrieving AVM Resource Details")
 
@@ -158,20 +130,14 @@ class TerraformAVMOrchestrator:
             )
             modules_details.append(module_detail)
 
-        with open(f"{output_dir}/04_avm_modules_details.json", "w", encoding="utf-8") as f:
-            f.write(json.dumps([v.model_dump() for v in modules_details], indent=2))
+        self._log_agent_response("AvmServiceModulesDetails", json.dumps([v.model_dump() for v in modules_details], indent=2), f"{output_dir}/04_avm_modules_details.json")
 
-        
         # if there are resources without mappings, execute again the planning agent with the AVM resource details
         if len(valid_mappings) < len(mapping_result.mappings):
             self.logger.info("Some resources do not have mappings. Re-running planning with AVM resource details integrated.")
 
             mapping_result : MappingAgentResult = await mapping_agent.review_mappings(tf_metadata_agent_output, knowledge_result, mapping_result, modules_details)
-            self._log_agent_response("MappingAgent", mapping_result)
-
-            with open(f"{output_dir}/04_01_retry_mappings.json", "w", encoding="utf-8") as f:
-                f.write(mapping_result.model_dump_json(indent=2))
-
+            self._log_agent_response("MappingAgent", mapping_result.model_dump_json(indent=2), f"{output_dir}/04_01_mappings_after_review.json")
         
         # filter all mappings where target_module is not None
         valid_mappings = [m for m in mapping_result.mappings if m.target_module is not None]
@@ -193,15 +159,14 @@ class TerraformAVMOrchestrator:
             )
             modules_details.append(module_detail)
             # self._log_agent_response(f"AVMResourceDetailsAgent - {mapping.target_module.name} {mapping.target_module.version}", modules_details)
-
-        with open(f"{output_dir}/05_avm_modules_details_final.json", "w", encoding="utf-8") as f:
-            f.write(json.dumps([v.model_dump() for v in modules_details], indent=2))
         
 
+        self._log_agent_response("AvmServiceModulesDetailsFinal", json.dumps([v.model_dump() for v in modules_details], indent=2), f"{output_dir}/05_avm_modules_details_final.json")
+        
         self.logger.info("Step 6: Running Converter Planning Agent Per Resource")
         resource_planning_agent = await ResourceConverterPlanningAgent.create()
 
-        resources_planings = []
+        resources_planings_json = []
         resources_planning_results: List[ResourceConverterPlanningAgentResult] = []
         
         # Create async tasks for parallel processing
@@ -225,14 +190,10 @@ class TerraformAVMOrchestrator:
                 tf_file=tf_file, 
                 original_tf_resource_output_paramers=referenced_outputs
             )
-            
-            self._log_agent_response("ResourceConverterPlanningAgent", resource_conversion_plan.planning_summary)
-            
-            # Save JSON
+
             resource_identifier = f"{mapping_result.source_resource.type}_{mapping_result.source_resource.name}"
-            with open(f"{output_dir}/06_{resource_identifier}_conversion_plan.json", "w", encoding="utf-8") as f:
-                planning_result_json = resource_conversion_plan.model_dump_json(indent=2)
-                f.write(planning_result_json)
+            planning_result_json = resource_conversion_plan.model_dump_json(indent=2)
+            self._log_agent_response("ResourceConverterPlanningAgent", planning_result_json, f"{output_dir}/06_{resource_identifier}_conversion_plan.json")
             
             return resource_conversion_plan, planning_result_json
         
@@ -250,7 +211,7 @@ class TerraformAVMOrchestrator:
             # Collect results
             for result, json_str in batch_results:
                 resources_planning_results.append(result)
-                resources_planings.append(json_str)
+                resources_planings_json.append(json_str)
 
 
         # create the migrated folder
@@ -259,12 +220,9 @@ class TerraformAVMOrchestrator:
 
         self.logger.info("Step 6: Running Converter Agent")
         converter_agent = await ConverterAgent.create()
-        resource_conversion_plan = "\n\n".join(resources_planings)
+        resource_conversion_plan = "\n\n".join(resources_planings_json)
         converter_result = await converter_agent.run_conversion(resource_conversion_plan, migrated_output_dir, tf_files)
-        self._log_agent_response("ConverterAgent", converter_result)
-
-        with open(f"{output_dir}/06_conversion_summary.md", "w", encoding="utf-8") as f:
-            f.write(str(converter_result))
+        self._log_agent_response("ConverterAgent", converter_result.model_dump_json(indent=2), f"{output_dir}/06_conversion_summary.json")
 
         # Step 7: Terraform Validation and Error Analysis
         self.logger.info("Step 7: Running Terraform Validator Agent")
@@ -306,21 +264,19 @@ class TerraformAVMOrchestrator:
             self.logger.info("Terraform validation passed successfully - no fix planning needed")
 
         return str("Some result")
-    
-    def _log_agent_response(self, agent_name: str, response) -> None:
+
+    def _log_agent_response(self, agent_name: str, response: str, save_to_file_path: str) -> None:
         """Log agent response in a consistent format."""
-        if response and hasattr(response, 'message') and hasattr(response.message, 'content'):
-            response_text = str(response.message.content)
-        else:
-            response_text = str(response) if response else "No response"
-        
+                
         try:
-            self.logger.info(f"[{agent_name}] Response: {response_text}")
+            self.logger.info(f"[{agent_name}] Response: {response}")
         except UnicodeEncodeError:
-            safe = response_text.encode("utf-8", errors="replace").decode("utf-8")
+            safe = response.encode("utf-8", errors="replace").decode("utf-8")
             self.logger.info(f"[{agent_name}] Response: {safe}")
 
-        print(f"[{agent_name}]: {response_text}")
+        if save_to_file_path:
+            with open(save_to_file_path, "w", encoding="utf-8") as f:
+                f.write(response)
 
 async def main():
     """Main entry point for the application."""
