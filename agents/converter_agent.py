@@ -5,7 +5,8 @@ from config.settings import get_settings
 from config.logging import get_logger
 from plugins.terraform_plugin import TerraformPlugin
 from plugins.filesystem_plugin import FileSystemPlugin
-
+from schemas.models import ResourceConverterPlanningAgentResult
+from typing import List, Optional
 
 class ConverterAgent:
     """
@@ -135,15 +136,20 @@ Instructions:
         return cls(agent)
 
 
-    async def run_conversion(self, conversion_plan: str, output_dir: str, tf_files: dict) -> str:        
+    async def run_conversion(self, conversion_plans:List[ResourceConverterPlanningAgentResult], output_dir: str, tf_files: dict) -> str:        
         # Format tf_files for the agent
         files_summary = "\n".join([f"File: {path}\nContent:\n{content}\n---" for path, content in tf_files.items()])
         
+        conversion_plans_json = []
+            
+        for plan in conversion_plans:
+            conversion_plans_json.append(f"{plan.model_dump_json(indent=2)}\n")
+
         kickoff_message = (
             f"Begin conversion now using the conversion plan and Terraform file contents.\n\n"
-            f"Conversion Plan per file / resource:\n{conversion_plan}\n\n"
-            f"Output Directory: '{output_dir}'\n\n"
-            f"Terraform Files:\n{files_summary}"
+            f">>>> Conversion Plan per file per resource:\n{conversion_plans_json}\n\n"
+            f">>>> Output Directory: '{output_dir}'\n\n"
+            f">>>> Terraform Files:\n{files_summary}"
         )
         response = await self.agent.get_response(kickoff_message)
         return response.message.content

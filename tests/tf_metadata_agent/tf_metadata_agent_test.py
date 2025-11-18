@@ -5,7 +5,7 @@ import shutil
 from pathlib import Path
 from agents.tf_metadata_agent import TFMetadataAgent
 from schemas.models import TerraformMetadataAgentResult
-
+from datetime import datetime
 
 class TestTFMetadataAgent:
     """End-to-end tests for TF Metadata Agent"""
@@ -23,7 +23,8 @@ class TestTFMetadataAgent:
 
         
         # Create output directory: tests\test_run\{test_name}\output
-        base_output = Path(__file__).parent.parent.parent / "tests_runs" / "tf_metadata_agent" / test_name / "output"
+        timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+        base_output = Path(__file__).parent.parent.parent / "tests_runs" / "tf_metadata_agent" /   test_name / timestamp / "output"
 
         # Clean the output directory if it exists
         if base_output.exists():

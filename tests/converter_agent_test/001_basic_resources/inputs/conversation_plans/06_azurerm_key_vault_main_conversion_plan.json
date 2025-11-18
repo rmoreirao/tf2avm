@@ -1,0 +1,166 @@
+{
+  "planning_summary": "The azurerm_key_vault.main resource is fully convertible to the Azure Verified Module 'avm-res-keyvault-vault'. All required AVM module inputs have direct mappings. AVM access policies must be mapped using 'legacy_access_policies' because AVM recommends RBAC but supports legacy access policies as well. Outputs for vault name and URI are remapped to use AVM outputs. No complex unmappable attributes or gaps found; only the necessary transformation for access_policy is noted.",
+  "source_file": "security.tf",
+  "original_resource_type": "azurerm_key_vault",
+  "original_resource_name": "main",
+  "target_file": "security.tf",
+  "target_avm_module": "avm-res-keyvault-vault",
+  "target_avm_version": "0.10.1",
+  "target_avm_module_name": "key_vault_main",
+  "transformation_type": "convert_resource_to_avm_module",
+  "transformation_description": "Replace azurerm_key_vault.main with avm-res-keyvault-vault using mapped attributes and direct references. 'access_policy' blocks are mapped to 'legacy_access_policies'. The secret resource configuration will be handled separately.",
+  "transformation_issue_reason": null,
+  "attribute_mappings": [
+    {
+      "target_avm_input_name": "name",
+      "target_avm_input_value": "var.key_vault_name",
+      "target_avm_is_required": true,
+      "original_resource_input_name": "name",
+      "original_resource_input_value": "var.key_vault_name",
+      "handling": "direct_mapping_from_resource_to_avm",
+      "handling_reason": "Direct mapping between resource attribute and AVM input.",
+      "format_transformation_description": null,
+      "additional_notes": null
+    },
+    {
+      "target_avm_input_name": "location",
+      "target_avm_input_value": "azurerm_resource_group.main.location",
+      "target_avm_is_required": true,
+      "original_resource_input_name": "location",
+      "original_resource_input_value": "azurerm_resource_group.main.location",
+      "handling": "direct_mapping_from_resource_to_avm",
+      "handling_reason": "Direct mapping between resource attribute and AVM input.",
+      "format_transformation_description": null,
+      "additional_notes": null
+    },
+    {
+      "target_avm_input_name": "resource_group_name",
+      "target_avm_input_value": "azurerm_resource_group.main.name",
+      "target_avm_is_required": true,
+      "original_resource_input_name": "resource_group_name",
+      "original_resource_input_value": "azurerm_resource_group.main.name",
+      "handling": "direct_mapping_from_resource_to_avm",
+      "handling_reason": "Direct mapping between resource attribute and AVM input.",
+      "format_transformation_description": null,
+      "additional_notes": null
+    },
+    {
+      "target_avm_input_name": "tenant_id",
+      "target_avm_input_value": "data.azurerm_client_config.current.tenant_id",
+      "target_avm_is_required": true,
+      "original_resource_input_name": "tenant_id",
+      "original_resource_input_value": "data.azurerm_client_config.current.tenant_id",
+      "handling": "direct_mapping_from_resource_to_avm",
+      "handling_reason": "Direct mapping between resource attribute and AVM input.",
+      "format_transformation_description": null,
+      "additional_notes": null
+    },
+    {
+      "target_avm_input_name": "sku_name",
+      "target_avm_input_value": "\"standard\"",
+      "target_avm_is_required": false,
+      "original_resource_input_name": "sku_name",
+      "original_resource_input_value": "\"standard\"",
+      "handling": "direct_mapping_from_resource_to_avm",
+      "handling_reason": "Direct mapping between resource attribute and AVM input.",
+      "format_transformation_description": null,
+      "additional_notes": null
+    },
+    {
+      "target_avm_input_name": "tags",
+      "target_avm_input_value": "var.tags",
+      "target_avm_is_required": false,
+      "original_resource_input_name": "tags",
+      "original_resource_input_value": "var.tags",
+      "handling": "direct_mapping_from_resource_to_avm",
+      "handling_reason": "Direct mapping between resource attribute and AVM input.",
+      "format_transformation_description": null,
+      "additional_notes": null
+    },
+    {
+      "target_avm_input_name": "enabled_for_disk_encryption",
+      "target_avm_input_value": "true",
+      "target_avm_is_required": false,
+      "original_resource_input_name": "enabled_for_disk_encryption",
+      "original_resource_input_value": "true",
+      "handling": "direct_mapping_from_resource_to_avm",
+      "handling_reason": "Direct mapping between resource attribute and AVM input.",
+      "format_transformation_description": null,
+      "additional_notes": null
+    },
+    {
+      "target_avm_input_name": "soft_delete_retention_days",
+      "target_avm_input_value": "7",
+      "target_avm_is_required": false,
+      "original_resource_input_name": "soft_delete_retention_days",
+      "original_resource_input_value": "7",
+      "handling": "direct_mapping_from_resource_to_avm",
+      "handling_reason": "Direct mapping between resource attribute and AVM input.",
+      "format_transformation_description": null,
+      "additional_notes": null
+    },
+    {
+      "target_avm_input_name": "purge_protection_enabled",
+      "target_avm_input_value": "false",
+      "target_avm_is_required": false,
+      "original_resource_input_name": "purge_protection_enabled",
+      "original_resource_input_value": "false",
+      "handling": "direct_mapping_from_resource_to_avm",
+      "handling_reason": "Direct mapping between resource attribute and AVM input.",
+      "format_transformation_description": null,
+      "additional_notes": null
+    },
+    {
+      "target_avm_input_name": "legacy_access_policies_enabled",
+      "target_avm_input_value": "true",
+      "target_avm_is_required": false,
+      "original_resource_input_name": "access_policy",
+      "original_resource_input_value": "present (3 blocks)",
+      "handling": "mapping_from_resource_to_avm_with_format_transformation",
+      "handling_reason": "AVM module supports legacy access policies via 'legacy_access_policies' and needs legacy_access_policies_enabled set to true. Attribute values come from the access_policy blocks.",
+      "format_transformation_description": "Transform each 'access_policy' block into an object with matching fields for 'legacy_access_policies' (object_id, tenant_id, key_permissions, secret_permissions, etc.). Produce a map object keyed by object_id, values as per AVM spec.",
+      "additional_notes": "Web and API app principle IDs and permissions for each block to be included."
+    },
+    {
+      "target_avm_input_name": "legacy_access_policies",
+      "target_avm_input_value": "{ map of each access_policy block }",
+      "target_avm_is_required": false,
+      "original_resource_input_name": "access_policy",
+      "original_resource_input_value": "present",
+      "handling": "mapping_from_resource_to_avm_with_format_transformation",
+      "handling_reason": "Direct format transformation of access_policy blocks to legacy_access_policies input for AVM.",
+      "format_transformation_description": "Produce a map(string, object({object_id, tenant_id, key_permissions, secret_permissions ...})) structure from the repeated access_policy blocks.",
+      "additional_notes": "Each block mapped (3 blocks: current client, web app, api app)."
+    }
+  ],
+  "existing_variables_reused": [
+    "key_vault_name",
+    "tags"
+  ],
+  "new_variables_required": [],
+  "output_mappings": [
+    {
+      "original_output_name": "key_vault_name",
+      "original_source": "azurerm_key_vault.main.name",
+      "new_source": "module.key_vault_main.name",
+      "change_type": "remap",
+      "notes": "Direct replacement; AVM module output 'name' gives the Key Vault's name."
+    },
+    {
+      "original_output_name": "key_vault_uri",
+      "original_source": "azurerm_key_vault.main.vault_uri",
+      "new_source": "module.key_vault_main.uri",
+      "change_type": "remap",
+      "notes": "Direct replacement; AVM module output 'uri' gives the Key Vault URI."
+    }
+  ],
+  "required_providers": [
+    "azapi ~> 2.4",
+    "azurerm >= 3.117, < 5.0",
+    "modtm ~> 0.3",
+    "random ~> 3.5",
+    "time ~> 0.9"
+  ],
+  "risk_level": "Low",
+  "risk_notes": "Mapping is direct and covers required and optional fields. Only notable concern is format transformation for legacy access policies, which is a well-documented migration step."
+}

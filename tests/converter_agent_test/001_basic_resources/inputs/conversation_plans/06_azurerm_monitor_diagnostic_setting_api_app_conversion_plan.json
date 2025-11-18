@@ -1,0 +1,127 @@
+{
+  "planning_summary": "The azurerm_monitor_diagnostic_setting.api_app resource, which configures diagnostics for an Azure Linux Web App, is fully replaced by the 'diagnostic_settings' input of the avm-res-web-site AVM module. All required settings for log/metric collection and log analytics workspace wiring are mapped directly to AVM input parameters. No unmappable attributes or outputs are present.",
+  "source_file": "monitoring.tf",
+  "original_resource_type": "azurerm_monitor_diagnostic_setting",
+  "original_resource_name": "api_app",
+  "target_file": "app-service.tf",
+  "target_avm_module": "avm-res-web-site",
+  "target_avm_version": "0.19.1",
+  "target_avm_module_name": "monitor_diagnostic_setting_api_app",
+  "transformation_type": "convert_resource_to_avm_module_parameter",
+  "transformation_description": "The azurerm_monitor_diagnostic_setting.api_app resource is not needed as a standalone resource; its configuration is mapped into the 'diagnostic_settings' map input field within the avm-res-web-site module instance that represents azurerm_linux_web_app.api.",
+  "transformation_issue_reason": null,
+  "attribute_mappings": [
+    {
+      "target_avm_input_name": "diagnostic_settings.api-app-diagnostics.name",
+      "target_avm_input_value": "api-app-diagnostics",
+      "target_avm_is_required": false,
+      "original_resource_input_name": "name",
+      "original_resource_input_value": "api-app-diagnostics",
+      "handling": "direct_mapping_from_resource_to_avm",
+      "handling_reason": "The diagnostic setting name directly matches the AVM input subfield for identification.",
+      "format_transformation_description": null,
+      "additional_notes": null
+    },
+    {
+      "target_avm_input_name": "diagnostic_settings.api-app-diagnostics.workspace_resource_id",
+      "target_avm_input_value": "azurerm_log_analytics_workspace.main.id",
+      "target_avm_is_required": false,
+      "original_resource_input_name": "log_analytics_workspace_id",
+      "original_resource_input_value": "azurerm_log_analytics_workspace.main.id",
+      "handling": "direct_mapping_from_resource_to_avm",
+      "handling_reason": "Log Analytics workspace wiring is required for logs/metrics destination; maps directly.",
+      "format_transformation_description": null,
+      "additional_notes": null
+    },
+    {
+      "target_avm_input_name": "diagnostic_settings.api-app-diagnostics.log_categories",
+      "target_avm_input_value": "[\"AppServiceHTTPLogs\",\"AppServiceConsoleLogs\",\"AppServiceAppLogs\"]",
+      "target_avm_is_required": false,
+      "original_resource_input_name": "enabled_log.category",
+      "original_resource_input_value": "[\"AppServiceHTTPLogs\",\"AppServiceConsoleLogs\",\"AppServiceAppLogs\"]",
+      "handling": "mapping_from_resource_to_avm_with_format_transformation",
+      "handling_reason": "AVM expects a set/list of log categories; original resource has the same in repeated blocks.",
+      "format_transformation_description": "Extract all 'enabled_log.category' values and consolidate as a set/list for the 'log_categories' AVM field.",
+      "additional_notes": null
+    },
+    {
+      "target_avm_input_name": "diagnostic_settings.api-app-diagnostics.metric_categories",
+      "target_avm_input_value": "[\"AllMetrics\"]",
+      "target_avm_is_required": false,
+      "original_resource_input_name": "metric.category",
+      "original_resource_input_value": "[\"AllMetrics\"]",
+      "handling": "mapping_from_resource_to_avm_with_format_transformation",
+      "handling_reason": "Repeated 'metric' blocks in Terraform correspond to specifying which metrics are collected.",
+      "format_transformation_description": "Extract all 'metric.category' values and consolidate as a set/list for the 'metric_categories' AVM field.",
+      "additional_notes": null
+    },
+    {
+      "target_avm_input_name": "diagnostic_settings.api-app-diagnostics.log_analytics_destination_type",
+      "target_avm_input_value": "Dedicated",
+      "target_avm_is_required": false,
+      "original_resource_input_name": null,
+      "original_resource_input_value": null,
+      "handling": "direct_mapping_from_resource_to_avm",
+      "handling_reason": "Default behavior for log analytics destination is 'Dedicated'. Hardcoded for match.",
+      "format_transformation_description": null,
+      "additional_notes": null
+    },
+    {
+      "target_avm_input_name": "diagnostic_settings.api-app-diagnostics.storage_account_resource_id",
+      "target_avm_input_value": null,
+      "target_avm_is_required": false,
+      "original_resource_input_name": null,
+      "original_resource_input_value": null,
+      "handling": "no_mapping_required_avm_input_not_available",
+      "handling_reason": "No storage account diagnostic destination used or needed in input resource.",
+      "format_transformation_description": null,
+      "additional_notes": null
+    },
+    {
+      "target_avm_input_name": "diagnostic_settings.api-app-diagnostics.event_hub_authorization_rule_resource_id",
+      "target_avm_input_value": null,
+      "target_avm_is_required": false,
+      "original_resource_input_name": null,
+      "original_resource_input_value": null,
+      "handling": "no_mapping_required_avm_input_not_available",
+      "handling_reason": "No event hub destination needed or specified in source.",
+      "format_transformation_description": null,
+      "additional_notes": null
+    },
+    {
+      "target_avm_input_name": "diagnostic_settings.api-app-diagnostics.event_hub_name",
+      "target_avm_input_value": null,
+      "target_avm_is_required": false,
+      "original_resource_input_name": null,
+      "original_resource_input_value": null,
+      "handling": "no_mapping_required_avm_input_not_available",
+      "handling_reason": "Not set in original; not needed for conversion.",
+      "format_transformation_description": null,
+      "additional_notes": null
+    },
+    {
+      "target_avm_input_name": "diagnostic_settings.api-app-diagnostics.marketplace_partner_resource_id",
+      "target_avm_input_value": null,
+      "target_avm_is_required": false,
+      "original_resource_input_name": null,
+      "original_resource_input_value": null,
+      "handling": "no_mapping_required_avm_input_not_available",
+      "handling_reason": "Not relevant for this setting type.",
+      "format_transformation_description": null,
+      "additional_notes": null
+    }
+  ],
+  "existing_variables_reused": [
+    "azurerm_log_analytics_workspace.main.id"
+  ],
+  "new_variables_required": null,
+  "output_mappings": [],
+  "required_providers": [
+    "azapi ~> 2.4",
+    "azurerm ~> 4.0, >= 4.8.0, >= 4.21.1, < 5.0.0",
+    "modtm ~> 0.3",
+    "random >= 3.5.0, < 4.0.0"
+  ],
+  "risk_level": "Low",
+  "risk_notes": "All features required by original resource are natively supported in AVM module and are mapped as diagnostic_settings input; no loss in fidelity or functionality."
+}

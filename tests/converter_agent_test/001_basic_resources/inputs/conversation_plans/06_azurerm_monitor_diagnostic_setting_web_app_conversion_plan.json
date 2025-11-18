@@ -1,0 +1,94 @@
+{
+  "planning_summary": "The azurerm_monitor_diagnostic_setting.web_app resource is fully covered by the avm-res-web-site module via its diagnostic_settings input. All relevant attributes (workspace, enabled_log/categories, metrics, retention policies) can be mapped to the diagnostic_settings structure in the AVM module. No output mapping is needed as this resource is an attached subresource. No additional variables are required.",
+  "source_file": "monitoring.tf",
+  "original_resource_type": "azurerm_monitor_diagnostic_setting",
+  "original_resource_name": "web_app",
+  "target_file": "app-service.tf",
+  "target_avm_module": "avm-res-web-site",
+  "target_avm_version": "0.19.1",
+  "target_avm_module_name": "web_app_web_app_diagnostics",
+  "transformation_type": "convert_resource_to_avm_module_parameter",
+  "transformation_description": "The azurerm_monitor_diagnostic_setting.web_app resource will be migrated into the diagnostic_settings map attribute of the avm-res-web-site module. The original azurerm_monitor_diagnostic_setting resource is removed, and all properties will be transferred to the AVM module configuration for diagnostic settings.",
+  "transformation_issue_reason": null,
+  "attribute_mappings": [
+    {
+      "target_avm_input_name": "diagnostic_settings.web_app_diagnostics.name",
+      "target_avm_input_value": "web-app-diagnostics",
+      "target_avm_is_required": false,
+      "original_resource_input_name": "name",
+      "original_resource_input_value": "web-app-diagnostics",
+      "handling": "direct_mapping_from_resource_to_avm",
+      "handling_reason": "The diagnostic setting name directly maps to the AVM diagnostic_settings map key or 'name' attribute.",
+      "format_transformation_description": null,
+      "additional_notes": null
+    },
+    {
+      "target_avm_input_name": "diagnostic_settings.web_app_diagnostics.workspace_resource_id",
+      "target_avm_input_value": "azurerm_log_analytics_workspace.main.id",
+      "target_avm_is_required": false,
+      "original_resource_input_name": "log_analytics_workspace_id",
+      "original_resource_input_value": "azurerm_log_analytics_workspace.main.id",
+      "handling": "direct_mapping_from_resource_to_avm",
+      "handling_reason": "Workspace resource ID directly maps to workspace_resource_id in AVM.",
+      "format_transformation_description": null,
+      "additional_notes": null
+    },
+    {
+      "target_avm_input_name": "diagnostic_settings.web_app_diagnostics.log_categories",
+      "target_avm_input_value": "[\"AppServiceHTTPLogs\", \"AppServiceConsoleLogs\", \"AppServiceAppLogs\"]",
+      "target_avm_is_required": false,
+      "original_resource_input_name": "enabled_log.category",
+      "original_resource_input_value": "[\"AppServiceHTTPLogs\", \"AppServiceConsoleLogs\", \"AppServiceAppLogs\"]",
+      "handling": "mapping_from_resource_to_avm_with_format_transformation",
+      "handling_reason": "AVM expects a set of log category strings; source resource provides repeated blocks of 'enabled_log' with 'category' attributes. Format transformation needed to flatten.",
+      "format_transformation_description": "Aggregate each enabled_log block's category into a single list/set for AVM.",
+      "additional_notes": null
+    },
+    {
+      "target_avm_input_name": "diagnostic_settings.web_app_diagnostics.metric_categories",
+      "target_avm_input_value": "[\"AllMetrics\"]",
+      "target_avm_is_required": false,
+      "original_resource_input_name": "metric.category",
+      "original_resource_input_value": "[\"AllMetrics\"]",
+      "handling": "mapping_from_resource_to_avm_with_format_transformation",
+      "handling_reason": "Source metric block(s) provide 'category' which can be mapped to AVM set of strings.",
+      "format_transformation_description": "Extract metric 'category' value from metric blocks and flatten to set/list.",
+      "additional_notes": null
+    },
+    {
+      "target_avm_input_name": "diagnostic_settings.web_app_diagnostics.log_groups",
+      "target_avm_input_value": "[\"allLogs\"]",
+      "target_avm_is_required": false,
+      "original_resource_input_name": null,
+      "original_resource_input_value": null,
+      "handling": "new_variable_required",
+      "handling_reason": "AVM module expects log_groups, not present in the original resource. Default value matches AVM's default.",
+      "format_transformation_description": null,
+      "additional_notes": "Can use AVM default ['allLogs'] if not specified."
+    },
+    {
+      "target_avm_input_name": "diagnostic_settings.web_app_diagnostics.retention_in_days",
+      "target_avm_input_value": "0 (logs); 0 (metrics); not specified explicitly",
+      "target_avm_is_required": false,
+      "original_resource_input_name": null,
+      "original_resource_input_value": null,
+      "handling": "new_variable_required",
+      "handling_reason": "Retention in days not specified for logs/metrics in AVM; original resource metrics retention_policy.enabled = false, so use default. Explicit mapping not required unless user customization needed.",
+      "format_transformation_description": null,
+      "additional_notes": "Will inherit AVM defaults unless overridden."
+    }
+  ],
+  "existing_variables_reused": [
+    "azurerm_log_analytics_workspace.main.id"
+  ],
+  "new_variables_required": [],
+  "output_mappings": [],
+  "required_providers": [
+    "azapi ~> 2.4",
+    "azurerm ~> 4.0, >= 4.8.0, >= 4.21.1, < 5.0.0",
+    "modtm ~> 0.3",
+    "random >= 3.5.0, < 4.0.0"
+  ],
+  "risk_level": "Low",
+  "risk_notes": "Mapping is direct and supported by the AVM module. Risk is low due to limited customization and clear attribute alignment. Some AVM options like log_groups and retention_in_days may require user awareness of defaults."
+}

@@ -161,7 +161,6 @@ class TerraformAVMOrchestrator:
         self.logger.info("Step 6: Running Converter Planning Agent Per Resource")
         resource_planning_agent = await ResourceConverterPlanningAgent.create()
 
-        resources_planings_json = []
         resources_planning_results: List[ResourceConverterPlanningAgentResult] = []
         
         # Create async tasks for parallel processing
@@ -199,7 +198,7 @@ class TerraformAVMOrchestrator:
                 f"⏱️ Time: {execution_time:.2f}s"
             )
             
-            return resource_conversion_plan, planning_result_json
+            return resource_conversion_plan
         
         batch_size = 8  # Number of parallel tasks per batch
         all_mappings = list(mapping_result.mappings)
@@ -213,9 +212,8 @@ class TerraformAVMOrchestrator:
             batch_results = await asyncio.gather(*tasks)
             
             # Collect results
-            for result, json_str in batch_results:
+            for result in batch_results:
                 resources_planning_results.append(result)
-                resources_planings_json.append(json_str)
 
 
         # create the migrated folder
@@ -224,8 +222,7 @@ class TerraformAVMOrchestrator:
 
         self.logger.info("Step 6: Running Converter Agent")
         converter_agent = await ConverterAgent.create()
-        resource_conversion_plan = "\n\n".join(resources_planings_json)
-        converter_result = await converter_agent.run_conversion(resource_conversion_plan, migrated_output_dir, tf_files)
+        converter_result = await converter_agent.run_conversion(resources_planning_results, migrated_output_dir, tf_files)
         self._log_agent_response("ConverterAgent", converter_result, f"{output_dir}/06_conversion_summary.md")
 
         # Step 7: Terraform Validation and Error Analysis
@@ -289,18 +286,3 @@ async def main():
     app = typer.Typer()
     app.command()(run_conversion)
     app()
-
-
-if __name__ == "__main__":
-    # Simple test run
-    async def test_run():
-        orchestrator = TerraformAVMOrchestrator()
-
-        await orchestrator.initialize()
-        result = await orchestrator.convert_repository(
-            repo_path="D:\\repos\\tf2avm\\tests\\fixtures\\repo_tf_basic",
-            output_dir="D:\\repos\\tf2avm\\tests\\test_run\\repo_tf_basic\\output\\" + datetime.now().strftime("%Y%m%d_%H%M%S")
-        )
-        print(f"Test conversion result: {result}")
-    
-    asyncio.run(test_run())

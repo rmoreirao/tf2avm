@@ -3,6 +3,7 @@ import json
 import shutil
 from pathlib import Path
 from main import TerraformAVMOrchestrator
+from datetime import datetime
 
 
 class TestTerraformAVMOrchestrator:
@@ -20,7 +21,10 @@ class TestTerraformAVMOrchestrator:
         test_name = request.node.name
         
         # Create output directory: tests\test_run\{test_name}\output
-        base_output = Path(__file__).parent.parent.parent / "tests_runs" / "main_test" / test_name / "output"
+        # Generate timestamp in YYYYMMDDHHMMSS format
+        timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
+        
+        base_output = Path(__file__).parent.parent.parent / "tests_runs" / "main_test" / test_name / timestamp /  "output"
 
         # Clean the output directory if it exists
         if base_output.exists():
@@ -139,21 +143,4 @@ class TestTerraformAVMOrchestrator:
 @pytest.mark.asyncio
 async def test_all_cases():
     """Run all test cases"""
-    pytest.main([__file__, "-v"])
-
-
-@pytest.mark.asyncio  
-async def test_basic_only():
-    """Run only basic test cases"""
-    pytest.main([__file__, "-v", "-k", "basic"])
-
-
-@pytest.mark.asyncio
-async def test_initialization_only():
-    """Run only initialization tests"""
-    pytest.main([__file__, "-v", "-k", "initialization"])
-
-
-if __name__ == "__main__":
-    # Run all tests when executed directly
     pytest.main([__file__, "-v"])
