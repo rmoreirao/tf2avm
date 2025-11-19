@@ -1,0 +1,253 @@
+{
+  "module": {
+    "name": "avm-res-compute-virtualmachinescaleset",
+    "display_name": "Azure/avm-res-compute-virtualmachinescaleset",
+    "version": "0.8.0",
+    "description": "Terraform Azure Verified Resource Module for Virtual Machine Scale Set",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-compute-virtualmachinescaleset/azurerm",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-compute-virtualmachinescaleset",
+    "requirements": [
+      "azapi ~> 2.0",
+      "azurerm >= 4.0, < 4.37",
+      "modtm ~> 0.3",
+      "random >= 3.6.2"
+    ],
+    "resources": [
+      "azurerm_role_assignment",
+      "random_uuid",
+      "modtm_telemetry",
+      "azurerm_orchestrated_virtual_machine_scale_set",
+      "azapi_update_resource",
+      "azurerm_management_lock"
+    ],
+    "inputs": [
+      {
+        "name": "resource_group_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "boot_diagnostics",
+        "type": "object({\n    storage_account_uri = optional(string)\n  })",
+        "required": false
+      },
+      {
+        "name": "eviction_policy",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "extensions_time_budget",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "managed_identities",
+        "type": "object({\n    system_assigned            = optional(bool, false)\n    user_assigned_resource_ids = optional(set(string), [])\n  })",
+        "required": false
+      },
+      {
+        "name": "max_bid_price",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "os_disk",
+        "type": "object({\n    caching                   = string\n    disk_encryption_set_id    = optional(string)\n    disk_size_gb              = optional(number)\n    storage_account_type      = string\n    write_accelerator_enabled = optional(bool)\n    diff_disk_settings = optional(object({\n      option    = string\n      placement = optional(string)\n    }))\n  })",
+        "required": false
+      },
+      {
+        "name": "timeouts",
+        "type": "object({\n    create = optional(string)\n    delete = optional(string)\n    read   = optional(string)\n    update = optional(string)\n  })",
+        "required": false
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "admin_ssh_keys",
+        "type": "set(object({\n    id         = string\n    public_key = string\n    username   = string\n  }))",
+        "required": false
+      },
+      {
+        "name": "capacity_reservation_group_id",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "instances",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "priority",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "sku_name",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "source_image_id",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "data_disk",
+        "type": "set(object({\n    caching                        = string\n    create_option                  = optional(string)\n    disk_encryption_set_id         = optional(string)\n    disk_size_gb                   = optional(number)\n    lun                            = optional(number)\n    storage_account_type           = string\n    ultra_ssd_disk_iops_read_write = optional(number)\n    ultra_ssd_disk_mbps_read_write = optional(number)\n    write_accelerator_enabled      = optional(bool)\n  }))",
+        "required": false
+      },
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "os_profile",
+        "type": "object({\n    custom_data = optional(string)\n    linux_configuration = optional(object({\n      admin_username                  = string\n      computer_name_prefix            = optional(string)\n      disable_password_authentication = optional(bool)\n      patch_assessment_mode           = optional(string)\n      patch_mode                      = optional(string, \"AutomaticByPlatform\")\n      provision_vm_agent              = optional(bool, true)\n      admin_ssh_key_id                = optional(set(string))\n      secret = optional(set(object({\n        key_vault_id = string\n        certificate = set(object({\n          url = string\n        }))\n      })))\n    }))\n    windows_configuration = optional(object({\n      admin_username           = string\n      computer_name_prefix     = optional(string)\n      enable_automatic_updates = optional(bool, false)\n      hotpatching_enabled      = optional(bool)\n      patch_assessment_mode    = optional(string)\n      patch_mode               = optional(string, \"AutomaticByPlatform\")\n      provision_vm_agent       = optional(bool, true)\n      timezone                 = optional(string)\n      secret = optional(set(object({\n        key_vault_id = string\n        certificate = set(object({\n          store = string\n          url   = string\n        }))\n      })))\n      winrm_listener = optional(set(object({\n        certificate_url = optional(string)\n        protocol        = string\n      })))\n    }))\n  })",
+        "required": false
+      },
+      {
+        "name": "priority_mix",
+        "type": "object({\n    base_regular_count            = optional(number)\n    regular_percentage_above_base = optional(number)\n  })",
+        "required": false
+      },
+      {
+        "name": "upgrade_policy",
+        "type": "object({\n    upgrade_mode = optional(string, \"Manual\")\n    rolling_upgrade_policy = optional(object({\n      cross_zone_upgrades_enabled             = optional(bool)\n      max_batch_instance_percent              = optional(number)\n      max_unhealthy_instance_percent          = optional(number)\n      max_unhealthy_upgraded_instance_percent = optional(number)\n      pause_time_between_batches              = optional(string)\n      prioritize_unhealthy_instances_enabled  = optional(bool)\n      maximum_surge_instances_enabled         = optional(bool)\n    }), {})\n  })",
+        "required": false
+      },
+      {
+        "name": "extension",
+        "type": "set(object({\n    auto_upgrade_minor_version_enabled        = optional(bool)\n    extensions_to_provision_after_vm_creation = optional(set(string))\n    failure_suppression_enabled               = optional(bool)\n    force_extension_execution_on_change       = optional(string)\n    name                                      = string\n    publisher                                 = string\n    settings                                  = optional(string)\n    type                                      = string\n    type_handler_version                      = string\n    protected_settings_from_key_vault = optional(object({\n      secret_url      = string\n      source_vault_id = string\n    }), null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "lock",
+        "type": "object({\n    kind = string\n    name = optional(string, null)\n  })",
+        "required": false
+      },
+      {
+        "name": "network_interface",
+        "type": "set(object({\n    dns_servers                   = optional(set(string))\n    enable_accelerated_networking = optional(bool)\n    enable_ip_forwarding          = optional(bool)\n    name                          = string\n    network_security_group_id     = optional(string)\n    primary                       = optional(bool)\n    ip_configuration = set(object({\n      application_gateway_backend_address_pool_ids = optional(set(string))\n      application_security_group_ids               = optional(set(string))\n      load_balancer_backend_address_pool_ids       = optional(set(string))\n      name                                         = string\n      primary                                      = optional(bool)\n      subnet_id                                    = optional(string)\n      version                                      = optional(string)\n      public_ip_address = optional(set(object({\n        domain_name_label       = optional(string)\n        idle_timeout_in_minutes = optional(number)\n        name                    = string\n        public_ip_prefix_id     = optional(string)\n        sku_name                = optional(string)\n        version                 = optional(string)\n        ip_tag = optional(set(object({\n          tag  = string\n          type = string\n        })))\n      })))\n    }))\n  }))",
+        "required": false
+      },
+      {
+        "name": "single_placement_group",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "platform_fault_domain_count",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "encryption_at_host_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "proximity_placement_group_id",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "role_assignments",
+        "type": "map(object({\n    role_definition_id_or_name             = string\n    principal_id                           = string\n    description                            = optional(string, null)\n    skip_service_principal_aad_check       = optional(bool, false)\n    condition                              = optional(string, null)\n    condition_version                      = optional(string, null)\n    delegated_managed_identity_resource_id = optional(string, null)\n    principal_type                         = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "zone_balance",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "extension_protected_setting",
+        "type": "map(string)",
+        "required": true
+      },
+      {
+        "name": "automatic_instance_repair",
+        "type": "object({\n    enabled      = bool\n    grace_period = optional(string)\n  })",
+        "required": false
+      },
+      {
+        "name": "extension_operations_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "license_type",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "location",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "additional_capabilities",
+        "type": "object({\n    ultra_ssd_enabled = optional(bool)\n  })",
+        "required": false
+      },
+      {
+        "name": "admin_password",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "plan",
+        "type": "object({\n    name      = string\n    product   = string\n    publisher = string\n  })",
+        "required": false
+      },
+      {
+        "name": "source_image_reference",
+        "type": "object({\n    offer     = string\n    publisher = string\n    sku       = string\n    version   = string\n  })",
+        "required": false
+      },
+      {
+        "name": "termination_notification",
+        "type": "object({\n    enabled = bool\n    timeout = optional(string)\n  })",
+        "required": false
+      },
+      {
+        "name": "zones",
+        "type": "set(string)",
+        "required": false
+      },
+      {
+        "name": "user_data_base64",
+        "type": "string",
+        "required": true
+      }
+    ],
+    "outputs": [
+      {
+        "name": "resource_name",
+        "description": "The name of the Virtual Machine Scale Set.",
+        "sensitive": false
+      },
+      {
+        "name": "resource",
+        "description": "All attributes of the Virtual Machine Scale Set resource.",
+        "sensitive": false
+      },
+      {
+        "name": "resource_id",
+        "description": "The ID of the Virtual Machine Scale Set.",
+        "sensitive": false
+      }
+    ]
+  }
+}

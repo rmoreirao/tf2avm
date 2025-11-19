@@ -1,0 +1,91 @@
+{
+  "module": {
+    "name": "avm-res-compute-hostgroup",
+    "display_name": "Azure/avm-res-compute-hostgroup",
+    "version": "0.1.2",
+    "description": "AVM Module for Compute Host groups, also known as Dedicated Host Groups",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-compute-hostgroup/azurerm",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-compute-hostgroup",
+    "requirements": [
+      "azurerm >= 4.0, < 5.0",
+      "modtm ~> 0.3",
+      "random >= 3.5.0"
+    ],
+    "resources": [
+      "azurerm_dedicated_host_group",
+      "azurerm_dedicated_host",
+      "random_uuid",
+      "modtm_telemetry",
+      "azurerm_resource_group"
+    ],
+    "inputs": [
+      {
+        "name": "dedicated_hosts",
+        "type": "map(object({\n    name                    = string\n    sku_name                = string\n    auto_replace_on_failure = optional(bool, true)\n    platform_fault_domain   = number\n    license_type            = optional(string, \"None\")\n    tags                    = optional(map(string), null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "zone",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "location",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "platform_fault_domain_count",
+        "type": "number",
+        "required": true
+      },
+      {
+        "name": "automatic_placement_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "dedicated_host_group_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "resource_group_name",
+        "type": "string",
+        "required": true
+      }
+    ],
+    "outputs": [
+      {
+        "name": "resource",
+        "description": "All atrributes of the Dedicated Host group",
+        "sensitive": false
+      },
+      {
+        "name": "resource_id",
+        "description": "The resource ID of the Dedicated Host Group",
+        "sensitive": false
+      },
+      {
+        "name": "host_ids",
+        "description": "A map of the hosts in the Dedicated Host Group to the resource IDs",
+        "sensitive": false
+      },
+      {
+        "name": "name",
+        "description": "The name of the Dedicated Host Group",
+        "sensitive": false
+      }
+    ]
+  }
+}

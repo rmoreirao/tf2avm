@@ -1,0 +1,173 @@
+{
+  "module": {
+    "name": "avm-res-containerinstance-containergroup",
+    "display_name": "Azure/avm-res-containerinstance-containergroup",
+    "version": "0.2.0",
+    "description": "Terraform Azure Verified Resource Module for Container Instance",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-containerinstance-containergroup/azurerm",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-containerinstance-containergroup",
+    "requirements": [
+      "azapi ~> 2.4",
+      "azurerm ~> 4.0",
+      "modtm ~> 0.3",
+      "random ~> 3.5"
+    ],
+    "resources": [
+      "azurerm_container_group",
+      "azurerm_role_assignment",
+      "azurerm_private_endpoint",
+      "azurerm_private_endpoint_application_security_group_association",
+      "random_uuid",
+      "modtm_telemetry"
+    ],
+    "inputs": [
+      {
+        "name": "liveness_probe",
+        "type": "object({\n    exec = object({\n      command = list(string)\n    })\n    period_seconds        = number\n    failure_threshold     = number\n    success_threshold     = number\n    timeout_seconds       = number\n    initial_delay_seconds = number\n    http_get = object({\n      path         = string\n      port         = number\n      http_headers = map(string)\n    })\n    tcp_socket = object({\n      port = number\n    })\n  })",
+        "required": false
+      },
+      {
+        "name": "subnet_ids",
+        "type": "list(string)",
+        "required": false
+      },
+      {
+        "name": "tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "zones",
+        "type": "list(string)",
+        "required": false
+      },
+      {
+        "name": "location",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "dns_name_servers",
+        "type": "list(string)",
+        "required": false
+      },
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "key_vault_user_assigned_identity_id",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "managed_identities",
+        "type": "object({\n    system_assigned            = optional(bool, false)\n    user_assigned_resource_ids = optional(set(string), [])\n  })",
+        "required": false
+      },
+      {
+        "name": "private_endpoints",
+        "type": "map(object({\n    name = optional(string, null)\n    role_assignments = optional(map(object({\n      role_definition_id_or_name             = string\n      principal_id                           = string\n      description                            = optional(string, null)\n      skip_service_principal_aad_check       = optional(bool, false)\n      condition                              = optional(string, null)\n      condition_version                      = optional(string, null)\n      delegated_managed_identity_resource_id = optional(string, null)\n      principal_type                         = optional(string, null)\n    })), {})\n    lock = optional(object({\n      kind = string\n      name = optional(string, null)\n    }), null)\n    tags                                    = optional(map(string), null)\n    subnet_resource_id                      = string\n    subresource_name                        = string # NOTE: `subresource_name` can be excluded if the resource does not support multiple sub resource types (e.g. storage account supports blob, queue, etc)\n    private_dns_zone_group_name             = optional(string, \"default\")\n    private_dns_zone_resource_ids           = optional(set(string), [])\n    application_security_group_associations = optional(map(string), {})\n    private_service_connection_name         = optional(string, null)\n    network_interface_name                  = optional(string, null)\n    location                                = optional(string, null)\n    resource_group_name                     = optional(string, null)\n    ip_configurations = optional(map(object({\n      name               = string\n      private_ip_address = string\n    })), {})\n  }))",
+        "required": false
+      },
+      {
+        "name": "readiness_probe",
+        "type": "object({\n    exec = object({\n      command = list(string)\n    })\n    period_seconds        = number\n    failure_threshold     = number\n    success_threshold     = number\n    timeout_seconds       = number\n    initial_delay_seconds = number\n    http_get = object({\n      path         = string\n      port         = number\n      http_headers = map(string)\n    })\n    tcp_socket = object({\n      port = number\n    })\n  })",
+        "required": false
+      },
+      {
+        "name": "resource_group_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "restart_policy",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "containers",
+        "type": "map(object({\n    image  = string\n    cpu    = number\n    memory = number\n    ports = list(object({\n      port     = number\n      protocol = string\n    }))\n    volumes = map(object({\n      mount_path           = string\n      name                 = string\n      read_only            = optional(bool, false)\n      empty_dir            = optional(bool, false)\n      secret               = optional(map(string), null)\n      storage_account_name = optional(string, null)\n      storage_account_key  = optional(string, null)\n      share_name           = optional(string, null)\n      git_repo = optional(object({\n        url       = optional(string, null)\n        directory = optional(string, null)\n        revision  = optional(string, null)\n      }))\n    }))\n    environment_variables        = optional(map(string), {})\n    secure_environment_variables = optional(map(string), {})\n    commands                     = optional(list(string), null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "diagnostics_log_analytics",
+        "type": "object({\n    workspace_id  = string\n    workspace_key = string\n  })",
+        "required": false
+      },
+      {
+        "name": "dns_name_label",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "image_registry_credential",
+        "type": "map(object({\n    user_assigned_identity_id = optional(string)\n    server                    = string\n    username                  = optional(string)\n    password                  = optional(string)\n  }))",
+        "required": false
+      },
+      {
+        "name": "key_vault_key_id",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "role_assignments",
+        "type": "map(object({\n    role_definition_id_or_name             = string\n    principal_id                           = string\n    description                            = optional(string, null)\n    skip_service_principal_aad_check       = optional(bool, false)\n    condition                              = optional(string, null)\n    condition_version                      = optional(string, null)\n    delegated_managed_identity_resource_id = optional(string, null)\n    principal_type                         = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "os_type",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "dns_name_label_reuse_policy",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "priority",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "exposed_ports",
+        "type": "list(object({\n    port     = number\n    protocol = string\n  }))",
+        "required": false
+      }
+    ],
+    "outputs": [
+      {
+        "name": "resource_id",
+        "description": "Resource ID of Container Group Instance",
+        "sensitive": false
+      },
+      {
+        "name": "fqdn",
+        "description": "The FQDN of the container group derived from `dns_name_label",
+        "sensitive": false
+      },
+      {
+        "name": "ip_address",
+        "description": "The IP address allocated to the container group",
+        "sensitive": false
+      },
+      {
+        "name": "name",
+        "description": "Name of the container group",
+        "sensitive": false
+      },
+      {
+        "name": "resource_group_name",
+        "description": "Name of the container group resource group",
+        "sensitive": false
+      }
+    ]
+  }
+}

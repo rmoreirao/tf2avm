@@ -1,0 +1,410 @@
+{
+  "azurerm_resources": [
+    {
+      "type": "azurerm_resource_group",
+      "name": "main",
+      "file_path": "main.tf",
+      "child_resources": [
+        {
+          "type": "azurerm_service_plan",
+          "name": "main",
+          "file_path": "app-service.tf"
+        },
+        {
+          "type": "azurerm_linux_web_app",
+          "name": "web",
+          "file_path": "app-service.tf"
+        },
+        {
+          "type": "azurerm_linux_web_app",
+          "name": "api",
+          "file_path": "app-service.tf"
+        },
+        {
+          "type": "azurerm_log_analytics_workspace",
+          "name": "main",
+          "file_path": "monitoring.tf"
+        },
+        {
+          "type": "azurerm_application_insights",
+          "name": "main",
+          "file_path": "monitoring.tf"
+        },
+        {
+          "type": "azurerm_key_vault",
+          "name": "main",
+          "file_path": "security.tf"
+        },
+        {
+          "type": "azurerm_cosmosdb_account",
+          "name": "main",
+          "file_path": "storage.tf"
+        },
+        {
+          "type": "azurerm_cosmosdb_sql_database",
+          "name": "main",
+          "file_path": "storage.tf"
+        },
+        {
+          "type": "azurerm_cosmosdb_sql_container",
+          "name": "main",
+          "file_path": "storage.tf"
+        }
+      ],
+      "parent_resource": null,
+      "referenced_outputs": [
+        {
+          "name": "resource_group_name",
+          "value": "azurerm_resource_group.main.name",
+          "attribute": "name",
+          "description": "Name of the created resource group",
+          "sensitive": false
+        },
+        {
+          "name": "resource_group_location",
+          "value": "azurerm_resource_group.main.location",
+          "attribute": "location",
+          "description": "Location of the resource group",
+          "sensitive": false
+        }
+      ]
+    },
+    {
+      "type": "azurerm_service_plan",
+      "name": "main",
+      "file_path": "app-service.tf",
+      "child_resources": [
+        {
+          "type": "azurerm_linux_web_app",
+          "name": "web",
+          "file_path": "app-service.tf"
+        },
+        {
+          "type": "azurerm_linux_web_app",
+          "name": "api",
+          "file_path": "app-service.tf"
+        }
+      ],
+      "parent_resource": {
+        "type": "azurerm_resource_group",
+        "name": "main",
+        "file_path": "main.tf"
+      },
+      "referenced_outputs": [
+        {
+          "name": "app_service_plan_id",
+          "value": "azurerm_service_plan.main.id",
+          "attribute": "id",
+          "description": "ID of the App Service Plan",
+          "sensitive": false
+        }
+      ]
+    },
+    {
+      "type": "azurerm_linux_web_app",
+      "name": "web",
+      "file_path": "app-service.tf",
+      "child_resources": [
+        {
+          "type": "azurerm_monitor_diagnostic_setting",
+          "name": "web_app",
+          "file_path": "monitoring.tf"
+        }
+      ],
+      "parent_resource": {
+        "type": "azurerm_service_plan",
+        "name": "main",
+        "file_path": "app-service.tf"
+      },
+      "referenced_outputs": [
+        {
+          "name": "web_app_name",
+          "value": "azurerm_linux_web_app.web.name",
+          "attribute": "name",
+          "description": "Name of the Web App",
+          "sensitive": false
+        },
+        {
+          "name": "web_app_url",
+          "value": "https://${azurerm_linux_web_app.web.default_hostname}",
+          "attribute": "default_hostname",
+          "description": "URL of the Web App",
+          "sensitive": false
+        }
+      ]
+    },
+    {
+      "type": "azurerm_linux_web_app",
+      "name": "api",
+      "file_path": "app-service.tf",
+      "child_resources": [
+        {
+          "type": "azurerm_monitor_diagnostic_setting",
+          "name": "api_app",
+          "file_path": "monitoring.tf"
+        }
+      ],
+      "parent_resource": {
+        "type": "azurerm_service_plan",
+        "name": "main",
+        "file_path": "app-service.tf"
+      },
+      "referenced_outputs": [
+        {
+          "name": "api_app_name",
+          "value": "azurerm_linux_web_app.api.name",
+          "attribute": "name",
+          "description": "Name of the API App",
+          "sensitive": false
+        },
+        {
+          "name": "api_app_url",
+          "value": "https://${azurerm_linux_web_app.api.default_hostname}",
+          "attribute": "default_hostname",
+          "description": "URL of the API App",
+          "sensitive": false
+        }
+      ]
+    },
+    {
+      "type": "azurerm_log_analytics_workspace",
+      "name": "main",
+      "file_path": "monitoring.tf",
+      "child_resources": [
+        {
+          "type": "azurerm_application_insights",
+          "name": "main",
+          "file_path": "monitoring.tf"
+        },
+        {
+          "type": "azurerm_monitor_diagnostic_setting",
+          "name": "web_app",
+          "file_path": "monitoring.tf"
+        },
+        {
+          "type": "azurerm_monitor_diagnostic_setting",
+          "name": "api_app",
+          "file_path": "monitoring.tf"
+        },
+        {
+          "type": "azurerm_monitor_diagnostic_setting",
+          "name": "cosmos_db",
+          "file_path": "monitoring.tf"
+        }
+      ],
+      "parent_resource": {
+        "type": "azurerm_resource_group",
+        "name": "main",
+        "file_path": "main.tf"
+      },
+      "referenced_outputs": [
+        {
+          "name": "log_analytics_workspace_id",
+          "value": "azurerm_log_analytics_workspace.main.id",
+          "attribute": "id",
+          "description": "ID of the Log Analytics Workspace",
+          "sensitive": false
+        }
+      ]
+    },
+    {
+      "type": "azurerm_application_insights",
+      "name": "main",
+      "file_path": "monitoring.tf",
+      "child_resources": [],
+      "parent_resource": {
+        "type": "azurerm_log_analytics_workspace",
+        "name": "main",
+        "file_path": "monitoring.tf"
+      },
+      "referenced_outputs": [
+        {
+          "name": "application_insights_name",
+          "value": "azurerm_application_insights.main.name",
+          "attribute": "name",
+          "description": "Name of the Application Insights instance",
+          "sensitive": false
+        },
+        {
+          "name": "application_insights_instrumentation_key",
+          "value": "azurerm_application_insights.main.instrumentation_key",
+          "attribute": "instrumentation_key",
+          "description": "Instrumentation key for Application Insights",
+          "sensitive": true
+        },
+        {
+          "name": "application_insights_connection_string",
+          "value": "azurerm_application_insights.main.connection_string",
+          "attribute": "connection_string",
+          "description": "Connection string for Application Insights",
+          "sensitive": true
+        }
+      ]
+    },
+    {
+      "type": "azurerm_monitor_diagnostic_setting",
+      "name": "web_app",
+      "file_path": "monitoring.tf",
+      "child_resources": [],
+      "parent_resource": {
+        "type": "azurerm_linux_web_app",
+        "name": "web",
+        "file_path": "app-service.tf"
+      },
+      "referenced_outputs": []
+    },
+    {
+      "type": "azurerm_monitor_diagnostic_setting",
+      "name": "api_app",
+      "file_path": "monitoring.tf",
+      "child_resources": [],
+      "parent_resource": {
+        "type": "azurerm_linux_web_app",
+        "name": "api",
+        "file_path": "app-service.tf"
+      },
+      "referenced_outputs": []
+    },
+    {
+      "type": "azurerm_monitor_diagnostic_setting",
+      "name": "cosmos_db",
+      "file_path": "monitoring.tf",
+      "child_resources": [],
+      "parent_resource": {
+        "type": "azurerm_cosmosdb_account",
+        "name": "main",
+        "file_path": "storage.tf"
+      },
+      "referenced_outputs": []
+    },
+    {
+      "type": "azurerm_key_vault",
+      "name": "main",
+      "file_path": "security.tf",
+      "child_resources": [
+        {
+          "type": "azurerm_key_vault_secret",
+          "name": "cosmos_connection",
+          "file_path": "security.tf"
+        }
+      ],
+      "parent_resource": {
+        "type": "azurerm_resource_group",
+        "name": "main",
+        "file_path": "main.tf"
+      },
+      "referenced_outputs": [
+        {
+          "name": "key_vault_name",
+          "value": "azurerm_key_vault.main.name",
+          "attribute": "name",
+          "description": "Name of the Key Vault",
+          "sensitive": false
+        },
+        {
+          "name": "key_vault_uri",
+          "value": "azurerm_key_vault.main.vault_uri",
+          "attribute": "vault_uri",
+          "description": "URI of the Key Vault",
+          "sensitive": false
+        }
+      ]
+    },
+    {
+      "type": "azurerm_key_vault_secret",
+      "name": "cosmos_connection",
+      "file_path": "security.tf",
+      "child_resources": [],
+      "parent_resource": {
+        "type": "azurerm_key_vault",
+        "name": "main",
+        "file_path": "security.tf"
+      },
+      "referenced_outputs": []
+    },
+    {
+      "type": "azurerm_cosmosdb_account",
+      "name": "main",
+      "file_path": "storage.tf",
+      "child_resources": [
+        {
+          "type": "azurerm_cosmosdb_sql_database",
+          "name": "main",
+          "file_path": "storage.tf"
+        },
+        {
+          "type": "azurerm_monitor_diagnostic_setting",
+          "name": "cosmos_db",
+          "file_path": "monitoring.tf"
+        }
+      ],
+      "parent_resource": {
+        "type": "azurerm_resource_group",
+        "name": "main",
+        "file_path": "main.tf"
+      },
+      "referenced_outputs": [
+        {
+          "name": "cosmos_db_account_name",
+          "value": "azurerm_cosmosdb_account.main.name",
+          "attribute": "name",
+          "description": "Name of the Cosmos DB account",
+          "sensitive": false
+        },
+        {
+          "name": "cosmos_db_endpoint",
+          "value": "azurerm_cosmosdb_account.main.endpoint",
+          "attribute": "endpoint",
+          "description": "Endpoint of the Cosmos DB account",
+          "sensitive": false
+        }
+      ]
+    },
+    {
+      "type": "azurerm_cosmosdb_sql_database",
+      "name": "main",
+      "file_path": "storage.tf",
+      "child_resources": [
+        {
+          "type": "azurerm_cosmosdb_sql_container",
+          "name": "main",
+          "file_path": "storage.tf"
+        }
+      ],
+      "parent_resource": {
+        "type": "azurerm_cosmosdb_account",
+        "name": "main",
+        "file_path": "storage.tf"
+      },
+      "referenced_outputs": [
+        {
+          "name": "cosmos_db_database_name",
+          "value": "azurerm_cosmosdb_sql_database.main.name",
+          "attribute": "name",
+          "description": "Name of the Cosmos DB database",
+          "sensitive": false
+        }
+      ]
+    },
+    {
+      "type": "azurerm_cosmosdb_sql_container",
+      "name": "main",
+      "file_path": "storage.tf",
+      "child_resources": [],
+      "parent_resource": {
+        "type": "azurerm_cosmosdb_sql_database",
+        "name": "main",
+        "file_path": "storage.tf"
+      },
+      "referenced_outputs": [
+        {
+          "name": "cosmos_db_container_name",
+          "value": "azurerm_cosmosdb_sql_container.main.name",
+          "attribute": "name",
+          "description": "Name of the Cosmos DB container",
+          "sensitive": false
+        }
+      ]
+    }
+  ]
+}

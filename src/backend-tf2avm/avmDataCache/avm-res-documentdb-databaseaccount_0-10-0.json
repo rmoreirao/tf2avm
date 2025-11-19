@@ -1,0 +1,462 @@
+{
+  "module": {
+    "name": "avm-res-documentdb-databaseaccount",
+    "display_name": "Azure/avm-res-documentdb-databaseaccount",
+    "version": "0.10.0",
+    "description": "Terraform Azure Verified Resource Module for CosmosDB Database Account",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-documentdb-databaseaccount/azurerm",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-documentdb-databaseaccount",
+    "requirements": [
+      "azurerm ~> 4.0",
+      "modtm ~> 0.3",
+      "random ~> 3.6",
+      "time ~> 0.12"
+    ],
+    "resources": [
+      "azurerm_cosmosdb_sql_stored_procedure",
+      "azurerm_cosmosdb_gremlin_database",
+      "azurerm_cosmosdb_gremlin_graph",
+      "azurerm_management_lock",
+      "azurerm_cosmosdb_mongo_database",
+      "azurerm_private_endpoint",
+      "azurerm_private_endpoint_application_security_group_association",
+      "azurerm_cosmosdb_sql_database",
+      "azurerm_monitor_diagnostic_setting",
+      "azurerm_cosmosdb_sql_trigger",
+      "random_uuid",
+      "modtm_telemetry",
+      "azurerm_cosmosdb_account",
+      "time_sleep",
+      "azurerm_cosmosdb_mongo_collection",
+      "azurerm_private_endpoint",
+      "azurerm_role_assignment",
+      "azurerm_cosmosdb_sql_container",
+      "azurerm_cosmosdb_sql_function",
+      "azurerm_cosmosdb_sql_dedicated_gateway"
+    ],
+    "inputs": [
+      {
+        "name": "consistency_policy",
+        "type": "object({\n    max_interval_in_seconds = optional(number, 5)\n    max_staleness_prefix    = optional(number, 100)\n    consistency_level       = optional(string, \"BoundedStaleness\")\n  })",
+        "required": false
+      },
+      {
+        "name": "free_tier_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "geo_locations",
+        "type": "set(object({\n    location          = string\n    failover_priority = number\n    zone_redundant    = optional(bool, true)\n  }))",
+        "required": false
+      },
+      {
+        "name": "customer_managed_key",
+        "type": "object({\n    key_name              = string\n    key_vault_resource_id = string\n\n    key_version = optional(string, null) # Not supported in CosmosDB\n\n    user_assigned_identity = optional(object({\n      resource_id = string\n    }), null)\n  })",
+        "required": false
+      },
+      {
+        "name": "diagnostic_settings",
+        "type": "map(object({\n    name                                     = optional(string, null)\n    log_categories                           = optional(set(string), [])\n    log_groups                               = optional(set(string), [\"allLogs\"])\n    metric_categories                        = optional(set(string), [\"AllMetrics\"])\n    log_analytics_destination_type           = optional(string, \"Dedicated\")\n    workspace_resource_id                    = optional(string, null)\n    storage_account_resource_id              = optional(string, null)\n    event_hub_authorization_rule_resource_id = optional(string, null)\n    event_hub_name                           = optional(string, null)\n    marketplace_partner_resource_id          = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "access_key_metadata_writes_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "analytical_storage_config",
+        "type": "object({\n    schema_type = string\n  })",
+        "required": false
+      },
+      {
+        "name": "analytical_storage_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "local_authentication_disabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "location",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "automatic_failover_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "cors_rule",
+        "type": "object({\n    allowed_headers    = set(string)\n    allowed_methods    = set(string)\n    allowed_origins    = set(string)\n    exposed_headers    = set(string)\n    max_age_in_seconds = optional(number, null)\n  })",
+        "required": false
+      },
+      {
+        "name": "gremlin_databases",
+        "type": "map(object({\n    name = string\n\n    throughput = optional(number, null)\n\n    autoscale_settings = optional(object({\n      max_throughput = number\n    }), null)\n\n    graphs = optional(map(object({\n      name = string\n\n      partition_key_path    = string\n      partition_key_version = optional(string, null)\n      throughput            = optional(number, null)\n\n      default_ttl            = optional(number, null)\n      analytical_storage_ttl = optional(number, null)\n\n      autoscale_settings = optional(object({\n        max_throughput = number\n      }), null)\n\n      index_policy = optional(object({\n        automatic      = optional(bool, true)\n        indexing_mode  = string\n        included_paths = list(string)\n        excluded_paths = list(string)\n\n        composite_index = optional(list(object({\n          index = set(object({\n            path  = string\n            order = string\n          }))\n        })), null)\n\n        spatial_index = optional(list(object({\n          path = string\n        })), null)\n      }), null)\n\n      conflict_resolution_policy = optional(object({\n        mode                          = string\n        conflict_resolution_path      = optional(string, null)\n        conflict_resolution_procedure = optional(string, null)\n      }), null)\n\n      unique_key = optional(object({\n        paths = list(string)\n      }), null)\n    })), {})\n  }))",
+        "required": false
+      },
+      {
+        "name": "private_endpoints_manage_dns_zone_group",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "resource_group_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "minimal_tls_version",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "network_acl_bypass_for_azure_services",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "virtual_network_rules",
+        "type": "set(object({\n    subnet_id = string\n  }))",
+        "required": false
+      },
+      {
+        "name": "capabilities",
+        "type": "set(object({\n    name = string\n  }))",
+        "required": false
+      },
+      {
+        "name": "private_endpoints",
+        "type": "map(object({\n    subnet_resource_id = string\n    subresource_name   = string\n\n    name                                    = optional(string, null)\n    private_dns_zone_group_name             = optional(string, \"default\")\n    private_dns_zone_resource_ids           = optional(set(string), [])\n    application_security_group_associations = optional(map(string), {})\n    private_service_connection_name         = optional(string, null)\n    network_interface_name                  = optional(string, null)\n    location                                = optional(string, null)\n    resource_group_name                     = optional(string, null)\n\n    ip_configurations = optional(map(object({\n      name               = string\n      private_ip_address = string\n    })), {})\n\n    tags = optional(map(string), null)\n\n    lock = optional(object({\n      kind = string\n      name = optional(string, null)\n    }), null)\n\n    role_assignments = optional(map(object({\n      role_definition_id_or_name = string\n      principal_id               = string\n\n      description                            = optional(string, null)\n      skip_service_principal_aad_check       = optional(bool, false)\n      delegated_managed_identity_resource_id = optional(string, null)\n\n      principal_type    = optional(string, null) # forced to be here by lint, not supported\n      condition         = optional(string, null) # forced to be here by lint, not supported\n      condition_version = optional(string, null) # forced to be here by lint, not supported\n    })), {})\n  }))",
+        "required": false
+      },
+      {
+        "name": "sql_dedicated_gateway",
+        "type": "object({\n    instance_size  = string\n    instance_count = optional(number, 1)\n  })",
+        "required": false
+      },
+      {
+        "name": "backup",
+        "type": "object({\n    retention_in_hours  = optional(number, 8)\n    interval_in_minutes = optional(number, 240)\n    storage_redundancy  = optional(string, \"Geo\")\n    type                = optional(string, \"Continuous\")\n    tier                = optional(string, \"Continuous30Days\")\n  })",
+        "required": false
+      },
+      {
+        "name": "multiple_write_locations_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "mongo_databases",
+        "type": "map(object({\n    name = string\n\n    throughput = optional(number, null)\n\n    autoscale_settings = optional(object({\n      max_throughput = number\n    }), null)\n\n    collections = optional(map(object({\n      name = string\n\n      default_ttl_seconds = optional(string, null)\n      shard_key           = optional(string, null)\n      throughput          = optional(number, null)\n\n      autoscale_settings = optional(object({\n        max_throughput = number\n      }), null)\n\n      index = optional(object({\n        keys   = list(string)\n        unique = optional(bool, false)\n      }), null)\n\n    })), {})\n  }))",
+        "required": false
+      },
+      {
+        "name": "mongo_server_version",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "sql_databases",
+        "type": "map(object({\n    name = string\n\n    throughput = optional(number, null)\n\n    autoscale_settings = optional(object({\n      max_throughput = number\n    }), null)\n\n    containers = optional(map(object({\n      partition_key_paths    = list(string)\n      name                   = string\n      partition_key_version  = optional(number, 2)\n      throughput             = optional(number, null)\n      default_ttl            = optional(number, null)\n      analytical_storage_ttl = optional(number, null)\n\n      unique_keys = optional(list(object({\n        paths = set(string)\n      })), [])\n\n      autoscale_settings = optional(object({\n        max_throughput = number\n      }), null)\n\n      functions = optional(map(object({\n        body = string\n        name = string\n      })), {})\n\n      stored_procedures = optional(map(object({\n        body = string\n        name = string\n      })), {})\n\n      triggers = optional(map(object({\n        body      = string\n        type      = string\n        operation = string\n        name      = string\n      })), {})\n\n      conflict_resolution_policy = optional(object({\n        mode                          = string\n        conflict_resolution_path      = optional(string, null)\n        conflict_resolution_procedure = optional(string, null)\n      }), null)\n\n      indexing_policy = optional(object({\n        indexing_mode = string\n\n        included_paths = optional(set(object({\n          path = string\n        })), [])\n\n        excluded_paths = optional(set(object({\n          path = string\n        })), [])\n\n        composite_indexes = optional(set(object({\n          indexes = set(object({\n            path  = string\n            order = string\n          }))\n        })), [])\n\n        spatial_indexes = optional(set(object({\n          path = string\n        })), [])\n      }), null)\n\n    })), {})\n  }))",
+        "required": false
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "partition_merge_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "network_acl_bypass_resource_ids",
+        "type": "set(string)",
+        "required": false
+      },
+      {
+        "name": "public_network_access_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "lock",
+        "type": "object({\n    kind = string\n    name = optional(string, null)\n  })",
+        "required": false
+      },
+      {
+        "name": "managed_identities",
+        "type": "object({\n    system_assigned            = optional(bool, false)\n    user_assigned_resource_ids = optional(set(string), [])\n  })",
+        "required": false
+      },
+      {
+        "name": "role_assignments",
+        "type": "map(object({\n    role_definition_id_or_name             = string\n    principal_id                           = string\n    description                            = optional(string, null)\n    skip_service_principal_aad_check       = optional(bool, false)\n    delegated_managed_identity_resource_id = optional(string, null)\n\n    principal_type    = optional(string, null) # forced to be here by lint, not supported\n    condition         = optional(string, null) # forced to be here by lint, not supported\n    condition_version = optional(string, null) # forced to be here by lint, not supported\n  }))",
+        "required": false
+      },
+      {
+        "name": "ip_range_filter",
+        "type": "set(string)",
+        "required": false
+      },
+      {
+        "name": "capacity",
+        "type": "object({\n    total_throughput_limit = optional(number, -1)\n  })",
+        "required": false
+      }
+    ],
+    "outputs": [
+      {
+        "name": "analytical_storage",
+        "description": "The analytical storage configuration for the CosmosDB Account.",
+        "sensitive": false
+      },
+      {
+        "name": "backup",
+        "description": "The backup configuration for the CosmosDB Account.",
+        "sensitive": false
+      },
+      {
+        "name": "free_tier_enabled",
+        "description": "Whether the free tier is enabled for the CosmosDB Account.",
+        "sensitive": false
+      },
+      {
+        "name": "location",
+        "description": "The location/region where the CosmosDB Account is created.",
+        "sensitive": false
+      },
+      {
+        "name": "partition_merge_enabled",
+        "description": "Whether partition merge is enabled for the CosmosDB Account.",
+        "sensitive": false
+      },
+      {
+        "name": "resource_private_endpoints_application_security_group_association",
+        "description": "The IDs of the private endpoint application security group associations created.",
+        "sensitive": false
+      },
+      {
+        "name": "resource_role_assignments",
+        "description": "A map of the role assignments created, with the assignment key as the map key and the assignment value as the map value.",
+        "sensitive": false
+      },
+      {
+        "name": "sql_databases",
+        "description": "A map of the SQL databases created, with the database name as the key and the database ID, containers, functions, stored_procedures and triggers as the value.",
+        "sensitive": false
+      },
+      {
+        "name": "identity",
+        "description": "The managed identity configuration for the CosmosDB Account.",
+        "sensitive": false
+      },
+      {
+        "name": "minimal_tls_version",
+        "description": "The minimal TLS version for the CosmosDB Account.",
+        "sensitive": false
+      },
+      {
+        "name": "mongo_databases",
+        "description": "A map of the MongoDB databases created, with the database name as the key and the database id and collections as the value.",
+        "sensitive": false
+      },
+      {
+        "name": "mongo_server_version",
+        "description": "The MongoDB server version for the CosmosDB Account.",
+        "sensitive": false
+      },
+      {
+        "name": "access_key_metadata_writes_enabled",
+        "description": "Whether access key metadata writes are enabled for the CosmosDB Account.",
+        "sensitive": false
+      },
+      {
+        "name": "cosmosdb_sql_connection_strings",
+        "description": "The SQL connection strings for the CosmosDB Account.",
+        "sensitive": false
+      },
+      {
+        "name": "read_endpoints",
+        "description": "A list of read endpoints available for this CosmosDB account.",
+        "sensitive": false
+      },
+      {
+        "name": "resource_private_endpoints",
+        "description": "A map of the management locks created, with the lock name as the key and the lock ID as the value.",
+        "sensitive": false
+      },
+      {
+        "name": "analytical_storage_enabled",
+        "description": "Whether analytical storage is enabled for the CosmosDB Account.",
+        "sensitive": false
+      },
+      {
+        "name": "capabilities",
+        "description": "The capabilities enabled for the CosmosDB Account.",
+        "sensitive": false
+      },
+      {
+        "name": "cosmosdb_mongodb_connection_strings",
+        "description": "The MongoDB connection strings for the CosmosDB Account.",
+        "sensitive": false
+      },
+      {
+        "name": "key_vault_key_id",
+        "description": "The Key Vault key ID used for encryption.",
+        "sensitive": false
+      },
+      {
+        "name": "kind",
+        "description": "The kind of the CosmosDB Account (GlobalDocumentDB, MongoDB, Parse).",
+        "sensitive": false
+      },
+      {
+        "name": "multiple_write_locations_enabled",
+        "description": "Whether multiple write locations are enabled for the CosmosDB Account.",
+        "sensitive": false
+      },
+      {
+        "name": "resource_diagnostic_settings",
+        "description": "A map of the diagnostic settings created, with the diagnostic setting name as the key and the diagnostic setting ID as the value.",
+        "sensitive": false
+      },
+      {
+        "name": "resource_id",
+        "description": "The resource ID of the cosmos db account created.",
+        "sensitive": false
+      },
+      {
+        "name": "consistency_policy",
+        "description": "The consistency policy configuration for the CosmosDB Account.",
+        "sensitive": false
+      },
+      {
+        "name": "local_authentication_disabled",
+        "description": "Whether local authentication is disabled for the CosmosDB Account.",
+        "sensitive": false
+      },
+      {
+        "name": "name",
+        "description": "The name of the cosmos db account created.",
+        "sensitive": false
+      },
+      {
+        "name": "public_network_access_enabled",
+        "description": "Whether public network access is enabled for the CosmosDB Account.",
+        "sensitive": false
+      },
+      {
+        "name": "write_endpoints",
+        "description": "A list of write endpoints available for this CosmosDB account.",
+        "sensitive": false
+      },
+      {
+        "name": "automatic_failover_enabled",
+        "description": "Whether automatic failover is enabled for the CosmosDB Account.",
+        "sensitive": false
+      },
+      {
+        "name": "endpoint",
+        "description": "The endpoint for the CosmosDB Account.",
+        "sensitive": false
+      },
+      {
+        "name": "resource_locks",
+        "description": "A map of the management locks created, with the lock name as the key and the lock ID as the value.",
+        "sensitive": false
+      },
+      {
+        "name": "virtual_network_rule",
+        "description": "The virtual network rules configured for the CosmosDB Account.",
+        "sensitive": false
+      },
+      {
+        "name": "cors_rule",
+        "description": "The CORS rule configuration for the CosmosDB Account.",
+        "sensitive": false
+      },
+      {
+        "name": "default_identity_type",
+        "description": "The default identity type for the CosmosDB Account.",
+        "sensitive": false
+      },
+      {
+        "name": "ip_range_filter",
+        "description": "The IP range filter for the CosmosDB Account.",
+        "sensitive": false
+      },
+      {
+        "name": "is_virtual_network_filter_enabled",
+        "description": "Whether virtual network filtering is enabled for the CosmosDB Account.",
+        "sensitive": false
+      },
+      {
+        "name": "network_acl_bypass_ids",
+        "description": "The list of resource IDs that are allowed to bypass network ACLs.",
+        "sensitive": false
+      },
+      {
+        "name": "offer_type",
+        "description": "The offer type for the CosmosDB Account.",
+        "sensitive": false
+      },
+      {
+        "name": "resource",
+        "description": "This is the full output for the resource.",
+        "sensitive": false
+      },
+      {
+        "name": "resource_group_name",
+        "description": "The name of the resource group in which the CosmosDB Account is created.",
+        "sensitive": false
+      },
+      {
+        "name": "capacity",
+        "description": "The capacity configuration for the CosmosDB Account.",
+        "sensitive": false
+      },
+      {
+        "name": "cosmosdb_keys",
+        "description": "The keys for the CosmosDB Account.",
+        "sensitive": false
+      },
+      {
+        "name": "geo_location",
+        "description": "The geo-location configuration for the CosmosDB Account.",
+        "sensitive": false
+      },
+      {
+        "name": "network_acl_bypass_for_azure_services",
+        "description": "Whether network ACL bypass is enabled for Azure services.",
+        "sensitive": false
+      },
+      {
+        "name": "sql_dedicated_gateway",
+        "description": "The IDs of the SQL dedicated gateways created.",
+        "sensitive": false
+      },
+      {
+        "name": "tags",
+        "description": "The tags assigned to the CosmosDB Account.",
+        "sensitive": false
+      }
+    ]
+  }
+}

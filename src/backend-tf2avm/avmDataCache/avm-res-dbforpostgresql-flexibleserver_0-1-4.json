@@ -1,0 +1,255 @@
+{
+  "module": {
+    "name": "avm-res-dbforpostgresql-flexibleserver",
+    "display_name": "Azure/avm-res-dbforpostgresql-flexibleserver",
+    "version": "0.1.4",
+    "description": "",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-dbforpostgresql-flexibleserver/azurerm",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-dbforpostgresql-flexibleserver",
+    "requirements": [
+      "azurerm ~> 4.12",
+      "modtm ~> 0.3",
+      "random ~> 3.6"
+    ],
+    "resources": [
+      "azurerm_management_lock",
+      "azurerm_role_assignment",
+      "azurerm_postgresql_flexible_server_configuration",
+      "random_uuid",
+      "azurerm_monitor_diagnostic_setting",
+      "azurerm_postgresql_flexible_server_virtual_endpoint",
+      "azurerm_postgresql_flexible_server_firewall_rule",
+      "azurerm_private_endpoint",
+      "azurerm_private_endpoint",
+      "azurerm_private_endpoint_application_security_group_association",
+      "azurerm_postgresql_flexible_server_database",
+      "modtm_telemetry",
+      "azurerm_postgresql_flexible_server",
+      "azurerm_postgresql_flexible_server_active_directory_administrator"
+    ],
+    "inputs": [
+      {
+        "name": "timeouts",
+        "type": "object({\n    create = optional(string)\n    delete = optional(string)\n    read   = optional(string)\n    update = optional(string)\n  })",
+        "required": false
+      },
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "delegated_subnet_id",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "geo_redundant_backup_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "role_assignments",
+        "type": "map(object({\n    role_definition_id_or_name             = string\n    principal_id                           = string\n    description                            = optional(string, null)\n    skip_service_principal_aad_check       = optional(bool, false)\n    condition                              = optional(string, null)\n    condition_version                      = optional(string, null)\n    delegated_managed_identity_resource_id = optional(string, null)\n    principal_type                         = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "databases",
+        "type": "map(object({\n    name      = string\n    charset   = optional(string)\n    collation = optional(string)\n    timeouts = optional(object({\n      create = optional(string)\n      delete = optional(string)\n      read   = optional(string)\n    }))\n  }))",
+        "required": false
+      },
+      {
+        "name": "point_in_time_restore_time_in_utc",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "storage_tier",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "ad_administrator",
+        "type": "map(object({\n    tenant_id      = string\n    object_id      = string\n    principal_name = string\n    principal_type = string\n  }))",
+        "required": false
+      },
+      {
+        "name": "managed_identities",
+        "type": "object({\n    system_assigned            = optional(bool, false)\n    user_assigned_resource_ids = optional(set(string), [])\n  })",
+        "required": false
+      },
+      {
+        "name": "virtual_endpoint",
+        "type": "map(object({\n    name              = string\n    replica_server_id = string\n    type              = string\n  }))",
+        "required": false
+      },
+      {
+        "name": "authentication",
+        "type": "object({\n    active_directory_auth_enabled = optional(bool)\n    password_auth_enabled         = optional(bool)\n    tenant_id                     = optional(string)\n  })",
+        "required": false
+      },
+      {
+        "name": "high_availability",
+        "type": "object({\n    mode                      = string\n    standby_availability_zone = optional(string)\n  })",
+        "required": false
+      },
+      {
+        "name": "server_version",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "lock",
+        "type": "object({\n    kind = string\n    name = optional(string, null)\n  })",
+        "required": false
+      },
+      {
+        "name": "private_endpoints_manage_dns_zone_group",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "maintenance_window",
+        "type": "object({\n    day_of_week  = optional(string)\n    start_hour   = optional(number)\n    start_minute = optional(number)\n  })",
+        "required": false
+      },
+      {
+        "name": "replication_role",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "sku_name",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "source_server_id",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "customer_managed_key",
+        "type": "object({\n    key_vault_key_id                     = string\n    geo_backup_key_vault_key_id          = optional(string)\n    geo_backup_user_assigned_identity_id = optional(string)\n    primary_user_assigned_identity_id    = optional(string)\n  })",
+        "required": false
+      },
+      {
+        "name": "server_configuration",
+        "type": "map(object({\n    name   = string\n    config = string\n  }))",
+        "required": false
+      },
+      {
+        "name": "auto_grow_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "create_mode",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "storage_mb",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "private_endpoints",
+        "type": "map(object({\n    name = optional(string, null)\n    role_assignments = optional(map(object({\n      role_definition_id_or_name             = string\n      principal_id                           = string\n      description                            = optional(string, null)\n      skip_service_principal_aad_check       = optional(bool, false)\n      condition                              = optional(string, null)\n      condition_version                      = optional(string, null)\n      delegated_managed_identity_resource_id = optional(string, null)\n      principal_type                         = optional(string, null)\n    })), {})\n    lock = optional(object({\n      kind = string\n      name = optional(string, null)\n    }), null)\n    tags                                    = optional(map(string), null)\n    subnet_resource_id                      = string\n    private_dns_zone_group_name             = optional(string, \"default\")\n    private_dns_zone_resource_ids           = optional(set(string), [])\n    application_security_group_associations = optional(map(string), {})\n    private_service_connection_name         = optional(string, null)\n    network_interface_name                  = optional(string, null)\n    location                                = optional(string, null)\n    resource_group_name                     = optional(string, null)\n    ip_configurations = optional(map(object({\n      name               = string\n      private_ip_address = string\n    })), {})\n  }))",
+        "required": false
+      },
+      {
+        "name": "firewall_rules",
+        "type": "map(object({\n    name             = string\n    end_ip_address   = string\n    start_ip_address = string\n  }))",
+        "required": false
+      },
+      {
+        "name": "administrator_login",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "public_network_access_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "zone",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "location",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "resource_group_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "administrator_password",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "backup_retention_days",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "private_dns_zone_id",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "diagnostic_settings",
+        "type": "map(object({\n    name                                     = optional(string, null)\n    log_categories                           = optional(set(string), [])\n    log_groups                               = optional(set(string), [\"allLogs\"])\n    metric_categories                        = optional(set(string), [\"AllMetrics\"])\n    log_analytics_destination_type           = optional(string, \"Dedicated\")\n    workspace_resource_id                    = optional(string, null)\n    storage_account_resource_id              = optional(string, null)\n    event_hub_authorization_rule_resource_id = optional(string, null)\n    event_hub_name                           = optional(string, null)\n    marketplace_partner_resource_id          = optional(string, null)\n  }))",
+        "required": false
+      }
+    ],
+    "outputs": [
+      {
+        "name": "database_name",
+        "description": "A map of database keys to database name.",
+        "sensitive": false
+      },
+      {
+        "name": "database_resource_ids",
+        "description": "A map of database keys to resource ids.",
+        "sensitive": false
+      },
+      {
+        "name": "fqdn",
+        "description": "The fully qualified domain name of the PostgreSQL Flexible Server.",
+        "sensitive": false
+      },
+      {
+        "name": "name",
+        "description": "The resource ID for the resource.",
+        "sensitive": false
+      },
+      {
+        "name": "private_endpoints",
+        "description": "  A map of the private endpoints created.\n",
+        "sensitive": false
+      },
+      {
+        "name": "resource_id",
+        "description": "The resource ID for the resource.",
+        "sensitive": false
+      }
+    ]
+  }
+}

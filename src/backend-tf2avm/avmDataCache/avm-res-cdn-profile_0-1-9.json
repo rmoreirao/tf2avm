@@ -1,0 +1,234 @@
+{
+  "module": {
+    "name": "avm-res-cdn-profile",
+    "display_name": "Azure/avm-res-cdn-profile",
+    "version": "0.1.9",
+    "description": "Terraform Azure Verified Resource Module for CDN Profile",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-cdn-profile/azurerm",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-cdn-profile",
+    "requirements": [
+      "azapi ~> 2.4",
+      "azurerm ~> 4.0",
+      "modtm ~> 0.3",
+      "random >= 3.5.0"
+    ],
+    "resources": [
+      "azurerm_dns_cname_record",
+      "azurerm_cdn_frontdoor_route",
+      "azurerm_cdn_frontdoor_security_policy",
+      "azurerm_management_lock",
+      "azurerm_monitor_metric_alert",
+      "random_uuid",
+      "azurerm_cdn_frontdoor_origin",
+      "azurerm_cdn_frontdoor_rule_set",
+      "azurerm_cdn_frontdoor_secret",
+      "azurerm_cdn_frontdoor_firewall_policy",
+      "azurerm_monitor_diagnostic_setting",
+      "modtm_telemetry",
+      "azurerm_cdn_frontdoor_custom_domain",
+      "azurerm_cdn_frontdoor_endpoint",
+      "azapi_resource",
+      "azurerm_cdn_frontdoor_rule",
+      "azurerm_role_assignment",
+      "azurerm_cdn_frontdoor_custom_domain_association",
+      "azurerm_cdn_frontdoor_origin_group",
+      "azurerm_monitor_diagnostic_setting",
+      "azurerm_cdn_endpoint",
+      "azurerm_cdn_endpoint_custom_domain"
+    ],
+    "inputs": [
+      {
+        "name": "response_timeout_seconds",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "sku",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "location",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "resource_group_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "cdn_endpoints",
+        "type": "map(object({\n    name                      = string\n    tags                      = optional(map(any))\n    is_http_allowed           = optional(bool, false)\n    is_https_allowed          = optional(bool, true)\n    content_types_to_compress = optional(list(string), [])\n\n    geo_filters = optional(map(object({\n      relative_path = string       # must be \"/\" for Standard_Microsoft. Must be unique across all filters. Only one allowed for Standard_Microsoft\n      action        = string       # allowed values: Allow or Block\n      country_codes = list(string) # Two letter country codes allows e.g. [\"US\", \"CA\"]\n    })), {})\n\n    is_compression_enabled        = optional(bool)\n    querystring_caching_behaviour = optional(string, \"IgnoreQueryString\") # allowed values: IgnoreQueryString,BypassCaching ,UseQueryString,NotSet for premium verizon.\n    optimization_type             = optional(string)                      # allowed values: DynamicSiteAcceleration,GeneralMediaStreaming,GeneralWebDelivery,LargeFileDownload ,VideoOnDemandMediaStreaming\n\n    origins = map(object({\n      name       = string\n      host_name  = string\n      http_port  = optional(number, 80)\n      https_port = optional(number, 443)\n    }))\n\n    origin_host_header = optional(string)\n    origin_path        = optional(string) # must start with '/' e.g. \"/media\"\n    probe_path         = optional(string) # must start with '/' e.g. \"/foo.bar\"\n\n    global_delivery_rule = optional(object({\n      cache_expiration_action = optional(list(object({\n        behavior = string           # Allowed Values: BypassCache, Override and SetIfMissing\n        duration = optional(string) # Only allowed when behavior is Override or SetIfMissing. Format: [d.]hh:mm:ss e.g \"1.10:30:00\"\n      })), [])\n      cache_key_query_string_action = optional(list(object({\n        behavior   = string           # Allowed Values: Exclude, ExcludeAll, Include and IncludeAll\n        parameters = optional(string) # Documentation says it is a list but string e.g \"*\"\n      })), [])\n      modify_request_header_action = optional(list(object({\n        action = string # Allowed Values: Append, Delete and Overwrite\n        name   = string\n        value  = optional(string) # Only needed if action = Append or Overwrite\n      })), [])\n      modify_response_header_action = optional(list(object({\n        action = string # Allowed Values: Append, Delete and Overwrite\n        name   = string\n        value  = optional(string) # Only needed if action = Append or Overwrite\n      })), [])\n      url_redirect_action = optional(list(object({\n        redirect_type = string                    # Allowed Values: Found, Moved, PermanentRedirect and TemporaryRedirect\n        protocol      = optional(string, \"Https\") # Allowed Values: MatchRequest, Http and Https\n        hostname      = optional(string)\n        path          = optional(string) # Should begin with '/'\n        fragment      = optional(string) # Specifies the fragment part of the URL. This value must not start with a '#'\n        query_string  = optional(string) # Specifies the query string part of the URL. This value must not start with a '?' or '&' and must be in <key>=<value> format separated by '&'.\n      })), [])\n      url_rewrite_action = optional(list(object({\n        source_pattern          = string # (Required) This value must start with a '/' and can't be longer than 260 characters.\n        destination             = string # This value must start with a '/' and can't be longer than 260 characters.\n        preserve_unmatched_path = optional(bool, true)\n      })), [])\n    }), {})\n\n    delivery_rules = optional(list(object({\n      name  = string\n      order = number\n      cache_expiration_action = optional(object({\n        behavior = string\n        duration = optional(string)\n      }))\n      cache_key_query_string_action = optional(object({\n        behavior   = string\n        parameters = optional(string)\n      }))\n      cookies_condition = optional(object({\n        selector         = string\n        operator         = string\n        negate_condition = optional(bool, false)\n        match_values     = optional(list(string))\n        transforms       = optional(list(string))\n      }))\n      device_condition = optional(object({\n        operator         = optional(string, \"Equal\")\n        negate_condition = optional(bool, false)\n        match_values     = list(string)\n      }))\n      http_version_condition = optional(object({\n        operator         = optional(string, \"Equal\")\n        negate_condition = optional(bool, false)\n        match_values     = list(string)\n      }))\n      modify_request_header_action = optional(object({\n        action = string\n        name   = string\n        value  = optional(string)\n      }))\n      modify_response_header_action = optional(object({\n        action = string\n        name   = string\n        value  = optional(string)\n      }))\n      post_arg_condition = optional(object({\n        selector         = string\n        operator         = string\n        negate_condition = optional(bool, false)\n        match_values     = optional(list(string))\n        transforms       = optional(list(string))\n      }))\n      query_string_condition = optional(object({\n        operator         = string\n        negate_condition = optional(bool, false)\n        match_values     = optional(list(string))\n        transforms       = optional(list(string))\n      }))\n      remote_address_condition = optional(object({\n        operator         = string\n        negate_condition = optional(bool, false)\n        match_values     = optional(list(string))\n      }))\n\n      request_body_condition = optional(object({\n        operator         = string\n        negate_condition = optional(bool, false)\n        match_values     = optional(list(string))\n        transforms       = optional(list(string))\n      }))\n      request_header_condition = optional(object({\n        selector         = string\n        operator         = string\n        negate_condition = optional(bool, false)\n        match_values     = optional(list(string))\n        transforms       = optional(list(string))\n      }))\n      request_method_condition = optional(object({\n        operator         = optional(string, \"Equal\")\n        negate_condition = optional(bool, false)\n        match_values     = list(string)\n      }))\n      request_scheme_condition = optional(object({\n        operator         = optional(string, \"Equal\")\n        negate_condition = optional(bool, false)\n        match_values     = list(string)\n      }))\n      request_uri_condition = optional(object({\n        operator         = string\n        negate_condition = optional(bool, false)\n        match_values     = optional(list(string))\n        transforms       = optional(list(string))\n      }))\n      url_file_extension_condition = optional(object({\n        operator         = string\n        negate_condition = optional(bool, false)\n        match_values     = optional(list(string))\n        transforms       = optional(list(string))\n      }))\n      url_file_name_condition = optional(object({\n        operator         = string\n        negate_condition = optional(bool, false)\n        match_values     = optional(list(string))\n        transforms       = optional(list(string))\n      }))\n      url_path_condition = optional(object({\n        operator         = string\n        negate_condition = optional(bool, false)\n        match_values     = optional(list(string))\n        transforms       = optional(list(string))\n      }))\n      url_redirect_action = optional(object({\n        redirect_type = string\n        protocol      = optional(string, \"MatchRequest\")\n        hostname      = optional(string)\n        path          = optional(string)\n        fragment      = optional(string)\n        query_string  = optional(string)\n      }))\n      url_rewrite_action = optional(object({\n        source_pattern          = string\n        destination             = string\n        preserve_unmatched_path = optional(bool, true)\n      }))\n    })))\n    diagnostic_setting = optional(object({\n      name                                     = optional(string, null)\n      log_categories                           = optional(set(string), [])\n      log_groups                               = optional(set(string), [])\n      metric_categories                        = optional(set(string), [])\n      log_analytics_destination_type           = optional(string, \"Dedicated\")\n      workspace_resource_id                    = optional(string, null)\n      storage_account_resource_id              = optional(string, null)\n      event_hub_authorization_rule_resource_id = optional(string, null)\n      event_hub_name                           = optional(string, null)\n      marketplace_partner_resource_id          = optional(string, null)\n    }), null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "diagnostic_settings",
+        "type": "map(object({\n    name                                     = optional(string, null)\n    log_categories                           = optional(set(string), [])\n    log_groups                               = optional(set(string), [\"allLogs\"])\n    metric_categories                        = optional(set(string), [\"AllMetrics\"])\n    log_analytics_destination_type           = optional(string, \"Dedicated\")\n    workspace_resource_id                    = optional(string, null)\n    storage_account_resource_id              = optional(string, null)\n    event_hub_authorization_rule_resource_id = optional(string, null)\n    event_hub_name                           = optional(string, null)\n    marketplace_partner_resource_id          = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "front_door_custom_domains",
+        "type": "map(object({\n    name        = string\n    dns_zone_id = optional(string, null)\n    host_name   = string\n    tls = object({\n      certificate_type         = optional(string, \"ManagedCertificate\")\n      cdn_frontdoor_secret_key = optional(string, null)\n    })\n  }))",
+        "required": false
+      },
+      {
+        "name": "front_door_endpoints",
+        "type": "map(object({\n    name    = string\n    enabled = optional(bool, true)\n    tags    = optional(map(any))\n  }))",
+        "required": false
+      },
+      {
+        "name": "managed_identities",
+        "type": "object({\n    system_assigned            = optional(bool, false)\n    user_assigned_resource_ids = optional(set(string), [])\n  })",
+        "required": false
+      },
+      {
+        "name": "front_door_firewall_policies",
+        "type": "map(object({\n    name                              = string\n    resource_group_name               = string\n    sku_name                          = string\n    enabled                           = optional(bool, true)\n    mode                              = string\n    request_body_check_enabled        = optional(bool, true)\n    redirect_url                      = optional(string)\n    custom_block_response_status_code = optional(number)\n    custom_block_response_body        = optional(string)\n    custom_rules = optional(map(object({\n      name                           = string\n      enabled                        = optional(bool, true)\n      priority                       = optional(number, 1)\n      rate_limit_duration_in_minutes = optional(number, 1)\n      rate_limit_threshold           = optional(number, 10)\n      type                           = string\n      action                         = string\n      match_conditions = map(object({\n        match_variable     = string\n        operator           = string\n        negation_condition = optional(bool)\n        match_values       = list(string)\n        selector           = optional(string)\n        transforms         = optional(list(string))\n      }))\n    })), {})\n    managed_rules = optional(map(object({\n      type    = string\n      version = string\n      action  = string\n      exclusions = optional(map(object({\n        match_variable = string\n        operator       = string\n        selector       = optional(string)\n      })), {})\n      overrides = optional(map(object({\n        rule_group_name = string\n        exclusions = optional(map(object({\n          match_variable = string\n          operator       = string\n          selector       = optional(string)\n        })), {})\n        rules = optional(map(object({\n          rule_id = string\n          action  = string\n          enabled = optional(bool, false)\n          exclusions = optional(map(object({\n            match_variable = string\n            operator       = string\n            selector       = optional(string)\n          })), {})\n        })), {})\n      })), {})\n    })), {})\n    tags = optional(map(any))\n  }))",
+        "required": false
+      },
+      {
+        "name": "front_door_secrets",
+        "type": "map(object({\n    name                     = string\n    key_vault_certificate_id = string\n  }))",
+        "required": false
+      },
+      {
+        "name": "lock",
+        "type": "object({\n    kind = string\n    name = optional(string, null)\n  })",
+        "required": false
+      },
+      {
+        "name": "metric_alerts",
+        "type": "map(object({\n    name = string\n    criterias = optional(list(object({\n      metric_namespace       = string\n      metric_name            = string\n      aggregation            = string # Possible values are Average, Count, Minimum, Maximum and Total\n      operator               = string # Possible values are Equals, GreaterThan, GreaterThanOrEqual, LessThan and LessThanOrEqual\n      threshold              = number\n      skip_metric_validation = optional(bool, false)\n      dimensions = optional(list(object({\n        name     = string\n        operator = string\n        values   = list(string)\n      })))\n    })), [])\n    actions = optional(list(object({\n      action_group_id    = string\n      webhook_properties = optional(map(string))\n    })), [])\n    dynamic_criterias = optional(list(object({\n      alert_sensitivity = string # Possible values are 'Low', 'Medium' and 'High'\n      aggregation       = string # Possible values are 'Average', 'Count', 'Minimum', 'Maximum' and 'Total'.\n      operator          = string # Possible values are 'GreaterThan', 'LessThan', 'GreaterOrLessThan'.\n      dimension = optional(list(object({\n        name     = string\n        operator = string # Possible values are 'Include', 'Exclude' and 'StartsWith'.\n        values   = list(string)\n      })), [])\n      evaluation_failure_count = optional(number, 4)\n      evaluation_total_count   = optional(number, 4)\n      ignore_data_before       = optional(string) # The ISO8601 date from which to start learning the metric historical data and calculate the dynamic thresholds.\n      metric_namespace         = string\n      metric_name              = string\n      skip_metric_validation   = optional(bool, false)\n    })), [])\n    application_insights_web_test_location_availability_criterias = optional(list(object({\n      component_id          = string\n      failed_location_count = number\n      web_test_id           = string\n    })), [])\n    auto_mitigate            = optional(bool, true)\n    description              = optional(string)\n    enabled                  = optional(bool, true)\n    frequency                = optional(string, \"PT1M\") # Possible values are PT1M, PT5M, PT15M, PT30M and PT1H\n    severity                 = optional(number, 3)      # Possible values are 0, 1, 2, 3 and 4\n    target_resource_type     = optional(string)         # This is Required when using a Subscription as scope, a Resource Group as scope or Multiple Scopes.\n    target_resource_location = optional(string)         # This is Required when using a Subscription as scope, a Resource Group as scope or Multiple Scopes.\n    window_size              = optional(string, \"PT5M\") # This value must be greater than 'frequency'. Possible values are PT1M, PT5M, PT15M, PT30M, PT1H, PT6H, PT12H and P1D\n    tags                     = optional(map(string))\n  }))",
+        "required": false
+      },
+      {
+        "name": "tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "front_door_origin_groups",
+        "type": "map(object({\n    name = string\n    health_probe = optional(map(object({\n      interval_in_seconds = number\n      path                = optional(string, \"/\")\n      protocol            = string\n      request_type        = optional(string, \"HEAD\")\n    })), {})\n    load_balancing = map(object({\n      additional_latency_in_milliseconds = optional(number, 50)\n      sample_size                        = optional(number, 4)\n      successful_samples_required        = optional(number, 3)\n    }))\n  }))",
+        "required": false
+      },
+      {
+        "name": "front_door_origins",
+        "type": "map(object({\n    name                           = string\n    origin_group_key               = string\n    host_name                      = string\n    certificate_name_check_enabled = string\n    enabled                        = optional(bool, true)\n    http_port                      = optional(number, 80)\n    https_port                     = optional(number, 443)\n    host_header                    = optional(string, null)\n    priority                       = optional(number, 1)\n    weight                         = optional(number, 500)\n    private_link = optional(map(object({\n      request_message        = string\n      target_type            = optional(string, null)\n      location               = string\n      private_link_target_id = string\n    })), null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "front_door_routes",
+        "type": "map(object({\n    name                      = string\n    origin_group_key          = string\n    origin_keys               = list(string)\n    endpoint_key              = string\n    forwarding_protocol       = optional(string, \"HttpsOnly\")\n    supported_protocols       = list(string)\n    patterns_to_match         = list(string)\n    link_to_default_domain    = optional(bool, true)\n    https_redirect_enabled    = optional(bool, true)\n    custom_domain_keys        = optional(list(string), [])\n    enabled                   = optional(bool, true)\n    rule_set_names            = optional(list(string))\n    cdn_frontdoor_origin_path = optional(string, null)\n    cache = optional(map(object({\n      query_string_caching_behavior = optional(string, \"IgnoreQueryString\")\n      query_strings                 = optional(list(string))\n      compression_enabled           = optional(bool, false)\n      content_types_to_compress     = optional(list(string))\n    })), {})\n  }))",
+        "required": false
+      },
+      {
+        "name": "front_door_rule_sets",
+        "type": "set(string)",
+        "required": false
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "cdn_endpoint_custom_domains",
+        "type": "map(object({\n    cdn_endpoint_key = string\n    dns_zone = optional(object({\n      is_azure_dns_zone                  = bool\n      name                               = string\n      cname_record_name                  = string\n      ttl                                = number\n      tags                               = optional(map(string))\n      azure_dns_zone_resource_group_name = optional(string, null)\n    }))\n    name = string\n    cdn_managed_https = optional(object({\n      certificate_type = string\n      protocol_type    = string\n      tls_version      = optional(string, \"TLS12\")\n    }))\n    user_managed_https = optional(object({\n      key_vault_certificate_id = optional(string)\n      key_vault_secret_id      = optional(string)\n      tls_version              = optional(string)\n    }))\n  }))",
+        "required": false
+      },
+      {
+        "name": "front_door_security_policies",
+        "type": "map(object({\n    name = string\n    firewall = object({\n      front_door_firewall_policy_key = string\n      association = object({\n        domain_keys       = optional(list(string), [])\n        endpoint_keys     = optional(list(string), [])\n        patterns_to_match = list(string)\n      })\n    })\n  }))",
+        "required": false
+      },
+      {
+        "name": "role_assignments",
+        "type": "map(object({\n    role_definition_id_or_name             = string\n    principal_id                           = string\n    description                            = optional(string, null)\n    skip_service_principal_aad_check       = optional(bool, false) # Note: only set `skip_service_principal_aad_check` to true if you are assigning a role to a service principal.\n    condition                              = optional(string, null)\n    condition_version                      = optional(string, null)\n    delegated_managed_identity_resource_id = optional(string, null)\n    principal_type                         = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "front_door_rules",
+        "type": "map(object({\n    name              = string\n    order             = number\n    origin_group_key  = string\n    rule_set_name     = string\n    behavior_on_match = optional(string, \"Continue\")\n\n    actions = object({\n      url_rewrite_actions = optional(list(object({\n        source_pattern          = string\n        destination             = string\n        preserve_unmatched_path = optional(bool, false)\n      })), [])\n      url_redirect_actions = optional(list(object({\n        redirect_type        = string\n        destination_hostname = string\n        redirect_protocol    = optional(string, \"Https\")\n        destination_path     = optional(string, \"\")\n        query_string         = optional(string, \"\")\n        destination_fragment = optional(string, \"\")\n      })), [])\n      route_configuration_override_actions = optional(list(object({\n        set_origin_groupid            = bool\n        cache_duration                = optional(string) # d.HH:MM:SS (365.23:59:59)\n        forwarding_protocol           = optional(string, \"HttpsOnly\")\n        query_string_caching_behavior = optional(string)\n        query_string_parameters       = optional(list(string))\n        compression_enabled           = optional(bool, false)\n        cache_behavior                = optional(string)\n      })), [])\n      request_header_actions = optional(list(object({\n        header_action = string\n        header_name   = string\n        value         = optional(string)\n      })), [])\n      response_header_actions = optional(list(object({\n        header_action = string\n        header_name   = string\n        value         = optional(string)\n      })), [])\n    })\n    conditions = optional(object({\n      remote_address_conditions = optional(list(object({\n        operator         = optional(string, \"IPMatch\")\n        negate_condition = optional(bool, false)\n        match_values     = optional(list(string))\n      })), [])\n      request_method_conditions = optional(list(object({\n        match_values     = list(string)\n        operator         = optional(string, \"Equal\")\n        negate_condition = optional(bool, false)\n      })), [])\n      query_string_conditions = optional(list(object({\n        operator         = string\n        negate_condition = optional(bool, false)\n        match_values     = optional(list(string))\n        transforms       = optional(list(string))\n      })), [])\n      post_args_conditions = optional(list(object({\n        post_args_name   = string\n        operator         = string\n        negate_condition = optional(bool, false)\n        match_values     = optional(list(string))\n        transforms       = optional(list(string))\n      })), [])\n      request_uri_conditions = optional(list(object({\n        operator         = string\n        negate_condition = optional(bool)\n        match_values     = optional(list(string))\n        transforms       = optional(list(string))\n      })), [])\n      request_header_conditions = optional(list(object({\n        header_name      = string\n        operator         = string\n        negate_condition = optional(bool, false)\n        match_values     = optional(list(string))\n        transforms       = optional(list(string))\n      })), [])\n      request_body_conditions = optional(list(object({\n        operator         = string\n        match_values     = list(string)\n        negate_condition = optional(bool, false)\n        transforms       = optional(list(string))\n      })), [])\n      request_scheme_conditions = optional(list(object({\n        operator         = optional(string, \"Equal\")\n        negate_condition = optional(bool, false)\n        match_values     = optional(list(string))\n      })), [])\n      url_path_conditions = optional(list(object({\n        operator         = string\n        negate_condition = optional(bool, false)\n        match_values     = optional(list(string))\n        transforms       = optional(list(string))\n      })), [])\n      url_file_extension_conditions = optional(list(object({\n        operator         = string\n        negate_condition = optional(bool, false)\n        match_values     = list(string)\n        transforms       = optional(list(string))\n      })), [])\n      url_filename_conditions = optional(list(object({\n        operator         = string\n        match_values     = optional(list(string))\n        negate_condition = optional(bool, false)\n        transforms       = optional(list(string))\n      })), [])\n      http_version_conditions = optional(list(object({\n        operator         = optional(string, \"Equal\")\n        match_values     = list(string)\n        negate_condition = optional(bool, false)\n      })), [])\n      cookies_conditions = optional(list(object({\n        cookie_name      = string\n        operator         = string\n        negate_condition = optional(bool, false)\n        match_values     = optional(list(string))\n        transforms       = optional(list(string))\n      })), [])\n      is_device_conditions = optional(list(object({\n        operator         = optional(string)\n        negate_condition = optional(bool, false)\n        match_values     = optional(list(string))\n      })), [])\n      socket_address_conditions = optional(list(object({\n        operator         = optional(string, \"IPMatch\")\n        negate_condition = optional(bool, false)\n        match_values     = optional(list(string))\n      })), [])\n      client_port_conditions = optional(list(object({\n        operator         = string\n        negate_condition = optional(bool, false)\n        match_values     = optional(list(number))\n      })), [])\n      server_port_conditions = optional(list(object({\n        operator         = string\n        negate_condition = optional(bool, false)\n        match_values     = list(number)\n      })), [])\n      host_name_conditions = optional(list(object({\n        operator         = string\n        match_values     = optional(list(string))\n        transforms       = optional(list(string))\n        negate_condition = optional(bool, false)\n      })), [])\n      ssl_protocol_conditions = optional(list(object({\n        match_values     = list(string)\n        operator         = optional(string, \"Equal\")\n        negate_condition = optional(bool, false)\n      })), [])\n    }))\n  }))",
+        "required": false
+      }
+    ],
+    "outputs": [
+      {
+        "name": "cdn_endpoints",
+        "description": "CDN endpoint output object",
+        "sensitive": false
+      },
+      {
+        "name": "frontdoor_custom_domains",
+        "description": "Azure front door custom domains output object",
+        "sensitive": false
+      },
+      {
+        "name": "frontdoor_rule_sets",
+        "description": "Azure front door rule sets output object",
+        "sensitive": false
+      },
+      {
+        "name": "resource",
+        "description": "Full resource output object",
+        "sensitive": false
+      },
+      {
+        "name": "resource_name",
+        "description": "The resource name of the Front door profile",
+        "sensitive": false
+      },
+      {
+        "name": "system_assigned_mi_principal_id",
+        "description": "The system assigned managed identity of the front door profile",
+        "sensitive": false
+      },
+      {
+        "name": "cdn_endpoint_custom_domains",
+        "description": "CDN endpoint custom domains output object",
+        "sensitive": false
+      },
+      {
+        "name": "frontdoor_endpoints",
+        "description": "Azure front door endpoint output object",
+        "sensitive": false
+      },
+      {
+        "name": "frontdoor_firewall_policies",
+        "description": "Azure front door firewall policies output object",
+        "sensitive": false
+      },
+      {
+        "name": "frontdoor_origin_groups",
+        "description": "Azure front door origin groups output object",
+        "sensitive": false
+      },
+      {
+        "name": "frontdoor_origins",
+        "description": "Azure front door origins output object",
+        "sensitive": false
+      },
+      {
+        "name": "frontdoor_rules",
+        "description": "Azure front door rules output object",
+        "sensitive": false
+      },
+      {
+        "name": "frontdoor_security_policies",
+        "description": "Azure front door security policies output object",
+        "sensitive": false
+      },
+      {
+        "name": "resource_id",
+        "description": "The resource id of the Front door profile",
+        "sensitive": false
+      }
+    ]
+  }
+}

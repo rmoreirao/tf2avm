@@ -1,0 +1,128 @@
+{
+  "planning_summary": "The azurerm_monitor_diagnostic_setting 'cosmos_db' resource is to be migrated as a parameter input ('diagnostic_settings') within the AVM module 'avm-res-documentdb-databaseaccount'. All required configuration from the diagnostic setting is mapped to the corresponding AVM module's diagnostic_settings map attribute. No new variables are required for required fields, but mapping transformation is necessary to convert nested diagnostic setting structure to the AVM-compatible map/object format.",
+  "source_file": "monitoring.tf",
+  "original_resource_type": "azurerm_monitor_diagnostic_setting",
+  "original_resource_name": "cosmos_db",
+  "target_file": "storage.tf",
+  "target_avm_module": "avm-res-documentdb-databaseaccount",
+  "target_avm_version": "0.10.0",
+  "target_avm_module_name": "cosmosdb_account_main",
+  "transformation_type": "convert_resource_to_avm_module_parameter",
+  "transformation_description": "The azurerm_monitor_diagnostic_setting 'cosmos_db' resource configuration will be migrated as an entry in the 'diagnostic_settings' input parameter map of the AVM module instance. The original resource will be removed, and its details supplied as configuration in the AVM module.",
+  "transformation_issue_reason": null,
+  "attribute_mappings": [
+    {
+      "target_avm_input_name": "diagnostic_settings.cosmos-db-diagnostics.name",
+      "target_avm_input_value": "\"cosmos-db-diagnostics\"",
+      "target_avm_is_required": false,
+      "original_resource_input_name": "name",
+      "original_resource_input_value": "cosmos-db-diagnostics",
+      "handling": "mapping_from_resource_to_avm_with_format_transformation",
+      "handling_reason": "The name field from diagnostic setting maps to the AVM map entry.",
+      "format_transformation_description": "Value is the key for the map entry and is also set on the object.",
+      "additional_notes": null
+    },
+    {
+      "target_avm_input_name": "diagnostic_settings.cosmos-db-diagnostics.workspace_resource_id",
+      "target_avm_input_value": "azurerm_log_analytics_workspace.main.id",
+      "target_avm_is_required": false,
+      "original_resource_input_name": "log_analytics_workspace_id",
+      "original_resource_input_value": "azurerm_log_analytics_workspace.main.id",
+      "handling": "direct_mapping_from_resource_to_avm",
+      "handling_reason": "Direct mapping for workspace id to destination workspace.",
+      "format_transformation_description": null,
+      "additional_notes": null
+    },
+    {
+      "target_avm_input_name": "diagnostic_settings.cosmos-db-diagnostics.log_categories",
+      "target_avm_input_value": "[\"DataPlaneRequests\", \"QueryRuntimeStatistics\"]",
+      "target_avm_is_required": false,
+      "original_resource_input_name": "enabled_log.category",
+      "original_resource_input_value": "[\"DataPlaneRequests\", \"QueryRuntimeStatistics\"]",
+      "handling": "mapping_from_resource_to_avm_with_format_transformation",
+      "handling_reason": "Multiple enabled_log blocks must be aggregated to a string set for log_categories.",
+      "format_transformation_description": "Aggregate unique category fields from enabled_log blocks into a set input.",
+      "additional_notes": null
+    },
+    {
+      "target_avm_input_name": "diagnostic_settings.cosmos-db-diagnostics.metric_categories",
+      "target_avm_input_value": "[\"Requests\"]",
+      "target_avm_is_required": false,
+      "original_resource_input_name": "metric.category",
+      "original_resource_input_value": "[\"Requests\"]",
+      "handling": "mapping_from_resource_to_avm_with_format_transformation",
+      "handling_reason": "Metric block category must be aggregated into a string set.",
+      "format_transformation_description": "Aggregate unique metric.category fields into a set input.",
+      "additional_notes": null
+    },
+    {
+      "target_avm_input_name": "diagnostic_settings.cosmos-db-diagnostics.log_analytics_destination_type",
+      "target_avm_input_value": "\"Dedicated\"",
+      "target_avm_is_required": false,
+      "original_resource_input_name": null,
+      "original_resource_input_value": null,
+      "handling": "direct_mapping_from_resource_to_avm",
+      "handling_reason": "Use default AVM value. No explicit mapping in resource.",
+      "format_transformation_description": null,
+      "additional_notes": "No equivalent in original resource; use AVM default."
+    },
+    {
+      "target_avm_input_name": "diagnostic_settings.cosmos-db-diagnostics.storage_account_resource_id",
+      "target_avm_input_value": "null",
+      "target_avm_is_required": false,
+      "original_resource_input_name": null,
+      "original_resource_input_value": null,
+      "handling": "no_mapping_required_avm_input_not_available",
+      "handling_reason": "No storage account referenced in original resource; leave blank.",
+      "format_transformation_description": null,
+      "additional_notes": null
+    },
+    {
+      "target_avm_input_name": "diagnostic_settings.cosmos-db-diagnostics.event_hub_authorization_rule_resource_id",
+      "target_avm_input_value": "null",
+      "target_avm_is_required": false,
+      "original_resource_input_name": null,
+      "original_resource_input_value": null,
+      "handling": "no_mapping_required_avm_input_not_available",
+      "handling_reason": "No event hub referenced in original resource; leave blank.",
+      "format_transformation_description": null,
+      "additional_notes": null
+    },
+    {
+      "target_avm_input_name": "diagnostic_settings.cosmos-db-diagnostics.event_hub_name",
+      "target_avm_input_value": "null",
+      "target_avm_is_required": false,
+      "original_resource_input_name": null,
+      "original_resource_input_value": null,
+      "handling": "no_mapping_required_avm_input_not_available",
+      "handling_reason": "No event hub name in original resource; leave blank.",
+      "format_transformation_description": null,
+      "additional_notes": null
+    },
+    {
+      "target_avm_input_name": "diagnostic_settings.cosmos-db-diagnostics.marketplace_partner_resource_id",
+      "target_avm_input_value": "null",
+      "target_avm_is_required": false,
+      "original_resource_input_name": null,
+      "original_resource_input_value": null,
+      "handling": "no_mapping_required_avm_input_not_available",
+      "handling_reason": "No marketplace partner resource ID present; leave blank.",
+      "format_transformation_description": null,
+      "additional_notes": null
+    }
+  ],
+  "existing_variables_reused": [
+    "log_analytics_workspace_name",
+    "tags"
+  ],
+  "new_variables_required": [],
+  "output_mappings": [],
+  "required_providers": [
+    "azurerm ~> 4.0",
+    "modtm ~> 0.3",
+    "random ~> 3.6",
+    "time ~> 0.12"
+  ],
+  "risk_level": "Low",
+  "risk_notes": "The transformation is low risk as all required mapping parameters for diagnostic settings are covered and AVM module explicitly supports this subresource as input configuration. No unmappable attributes exist in this scenario."
+}

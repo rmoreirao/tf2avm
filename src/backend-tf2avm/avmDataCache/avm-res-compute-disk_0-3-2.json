@@ -1,0 +1,259 @@
+{
+  "module": {
+    "name": "avm-res-compute-disk",
+    "display_name": "Azure/avm-res-compute-disk",
+    "version": "0.3.2",
+    "description": "Azure Verified Module for Azure Disk",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-compute-disk/azurerm",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-compute-disk",
+    "requirements": [
+      "azurerm ~> 4.0",
+      "modtm ~> 0.3",
+      "random ~> 3.6.2"
+    ],
+    "resources": [
+      "azurerm_private_endpoint",
+      "azurerm_private_endpoint_application_security_group_association",
+      "random_uuid",
+      "modtm_telemetry",
+      "azurerm_management_lock",
+      "azurerm_role_assignment",
+      "azurerm_managed_disk",
+      "azurerm_private_endpoint"
+    ],
+    "inputs": [
+      {
+        "name": "create_option",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "image_reference_id",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "network_access_policy",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "storage_account_id",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "private_endpoints_manage_dns_zone_group",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "secure_vm_disk_encryption_set_id",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "trusted_launch_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "zone",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "disk_access_id",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "disk_encryption_set_id",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "disk_iops_read_only",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "disk_mbps_read_only",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "edge_zone",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "hyper_v_generation",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "private_endpoints",
+        "type": "map(object({\n    name = optional(string, null)\n    role_assignments = optional(map(object({\n      role_definition_id_or_name             = string\n      principal_id                           = string\n      description                            = optional(string, null)\n      skip_service_principal_aad_check       = optional(bool, false)\n      condition                              = optional(string, null)\n      condition_version                      = optional(string, null)\n      delegated_managed_identity_resource_id = optional(string, null)\n      principal_type                         = optional(string, null)\n    })), {})\n    lock = optional(object({\n      kind = string\n      name = optional(string, null)\n    }), null)\n    tags                                    = optional(map(string), null)\n    subnet_resource_id                      = string\n    private_dns_zone_group_name             = optional(string, \"default\")\n    private_dns_zone_resource_ids           = optional(set(string), [])\n    application_security_group_associations = optional(map(string), {})\n    private_service_connection_name         = optional(string, null)\n    network_interface_name                  = optional(string, null)\n    location                                = optional(string, null)\n    resource_group_name                     = optional(string, null)\n    ip_configurations = optional(map(object({\n      name               = string\n      private_ip_address = string\n    })), {})\n  }))",
+        "required": false
+      },
+      {
+        "name": "location",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "disk_size_gb",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "performance_plus_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "public_network_access_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "source_uri",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "storage_account_type",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "on_demand_bursting_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "disk_mbps_read_write",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "lock",
+        "type": "object({\n    kind = string\n    name = optional(string, null)\n  })",
+        "required": false
+      },
+      {
+        "name": "logical_sector_size",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "tier",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "disk_iops_read_write",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "encryption_settings",
+        "type": "object({\n    enabled = optional(bool)\n    disk_encryption_key = optional(object({\n      secret_url      = string\n      source_vault_id = string\n    }))\n    key_encryption_key = optional(object({\n      key_url         = string\n      source_vault_id = string\n    }))\n  })",
+        "required": false
+      },
+      {
+        "name": "max_shares",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "optimized_frequent_attach_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "os_type",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "role_assignments",
+        "type": "map(object({\n    role_definition_id_or_name             = string\n    principal_id                           = string\n    description                            = optional(string, null)\n    skip_service_principal_aad_check       = optional(bool, false)\n    condition                              = optional(string, null)\n    condition_version                      = optional(string, null)\n    delegated_managed_identity_resource_id = optional(string, null)\n    principal_type                         = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "security_type",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "resource_group_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "customer_managed_key",
+        "type": "object({\n    key_vault_resource_id = string\n    key_name              = string\n    key_version           = optional(string, null)\n    user_assigned_identity = optional(object({\n      resource_id = string\n    }), null)\n  })",
+        "required": false
+      },
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "gallery_image_reference_id",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "source_resource_id",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "upload_size_bytes",
+        "type": "number",
+        "required": false
+      }
+    ],
+    "outputs": [
+      {
+        "name": "resource",
+        "description": "This is the full output for the resource.",
+        "sensitive": false
+      },
+      {
+        "name": "resource_group_name",
+        "description": "The name of the Resource Group.",
+        "sensitive": false
+      },
+      {
+        "name": "resource_id",
+        "description": "This is the full output for the resource.",
+        "sensitive": false
+      },
+      {
+        "name": "location",
+        "description": "The deployment region.",
+        "sensitive": false
+      },
+      {
+        "name": "private_endpoints",
+        "description": "A map of the private endpoints created.\n",
+        "sensitive": false
+      }
+    ]
+  }
+}

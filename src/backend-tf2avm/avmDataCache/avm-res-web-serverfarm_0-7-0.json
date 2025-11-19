@@ -1,0 +1,116 @@
+{
+  "module": {
+    "name": "avm-res-web-serverfarm",
+    "display_name": "Azure/avm-res-web-serverfarm",
+    "version": "0.7.0",
+    "description": "",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-web-serverfarm/azurerm",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-web-serverfarm",
+    "requirements": [
+      "azurerm >= 4.19.0, < 5.0.0",
+      "modtm ~> 0.3",
+      "random ~> 3.5"
+    ],
+    "resources": [
+      "random_uuid",
+      "modtm_telemetry",
+      "azurerm_service_plan",
+      "azurerm_management_lock",
+      "azurerm_role_assignment"
+    ],
+    "inputs": [
+      {
+        "name": "resource_group_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "lock",
+        "type": "object({\n    kind = string\n    name = optional(string, null)\n  })",
+        "required": false
+      },
+      {
+        "name": "premium_plan_auto_scale_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "role_assignments",
+        "type": "map(object({\n    role_definition_id_or_name             = string\n    principal_id                           = string\n    description                            = optional(string, null)\n    skip_service_principal_aad_check       = optional(bool, false)\n    condition                              = optional(string, null)\n    condition_version                      = optional(string, null)\n    delegated_managed_identity_resource_id = optional(string, null)\n    principal_type                         = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "maximum_elastic_worker_count",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "sku_name",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "zone_balancing_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "app_service_environment_id",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "location",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "per_site_scaling_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "worker_count",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "os_type",
+        "type": "string",
+        "required": true
+      }
+    ],
+    "outputs": [
+      {
+        "name": "name",
+        "description": "Name of the app service plan",
+        "sensitive": false
+      },
+      {
+        "name": "resource",
+        "description": "The full output of the resource.",
+        "sensitive": false
+      },
+      {
+        "name": "resource_id",
+        "description": "Resource id of the app service plan",
+        "sensitive": false
+      }
+    ]
+  }
+}

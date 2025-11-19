@@ -1,0 +1,121 @@
+{
+  "module": {
+    "name": "avm-res-network-dnsresolver",
+    "display_name": "Azure/avm-res-network-dnsresolver",
+    "version": "0.8.0",
+    "description": "Terraform Azure Verified Resource Module for DNS Resolver",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-network-dnsresolver/azurerm",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-network-dnsresolver",
+    "requirements": [
+      "azapi ~> 2.0",
+      "azurerm ~> 4.36",
+      "modtm ~> 0.3",
+      "random >= 3.5.0"
+    ],
+    "resources": [
+      "azurerm_private_dns_resolver_forwarding_rule",
+      "azurerm_private_dns_resolver_virtual_network_link",
+      "azurerm_management_lock",
+      "azurerm_role_assignment",
+      "azurerm_role_assignment",
+      "random_uuid",
+      "azurerm_private_dns_resolver_outbound_endpoint",
+      "terraform_data",
+      "azurerm_private_dns_resolver_dns_forwarding_ruleset",
+      "azurerm_private_dns_resolver_virtual_network_link",
+      "azurerm_management_lock",
+      "modtm_telemetry",
+      "azurerm_private_dns_resolver",
+      "azurerm_private_dns_resolver_inbound_endpoint"
+    ],
+    "inputs": [
+      {
+        "name": "location",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "virtual_network_resource_id",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "lock",
+        "type": "object({\n    kind = string\n    name = optional(string, null)\n  })",
+        "required": false
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "resource_group_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "inbound_endpoints",
+        "type": "map(object({\n    name                         = optional(string)\n    subnet_name                  = string\n    private_ip_allocation_method = optional(string, \"Dynamic\")\n    private_ip_address           = optional(string, null)\n    tags                         = optional(map(string), null)\n    merge_with_module_tags       = optional(bool, true)\n  }))",
+        "required": false
+      },
+      {
+        "name": "outbound_endpoints",
+        "type": "map(object({\n    name                   = optional(string)\n    tags                   = optional(map(string), null)\n    merge_with_module_tags = optional(bool, true)\n    subnet_name            = string\n    forwarding_ruleset = optional(map(object({\n      name                                                = optional(string)\n      link_with_outbound_endpoint_virtual_network         = optional(bool, true)\n      metadata_for_outbound_endpoint_virtual_network_link = optional(map(string), null)\n      tags                                                = optional(map(string), null)\n      merge_with_module_tags                              = optional(bool, true)\n      additional_outbound_endpoint_link = optional(object({\n        outbound_endpoint_key = optional(string)\n      }), null)\n      additional_virtual_network_links = optional(map(object({\n        name     = optional(string)\n        vnet_id  = string\n        metadata = optional(map(string), null)\n      })), {})\n      rules = optional(map(object({\n        name                     = optional(string)\n        domain_name              = string\n        destination_ip_addresses = map(string)\n        enabled                  = optional(bool, true)\n        metadata                 = optional(map(string), null)\n      })))\n    })))\n  }))",
+        "required": false
+      },
+      {
+        "name": "role_assignments",
+        "type": "map(object({\n    role_definition_id_or_name             = string\n    principal_id                           = string\n    description                            = optional(string, null)\n    skip_service_principal_aad_check       = optional(bool, false)\n    condition                              = optional(string, null)\n    condition_version                      = optional(string, null)\n    delegated_managed_identity_resource_id = optional(string, null)\n    principal_type                         = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "tags",
+        "type": "map(string)",
+        "required": false
+      }
+    ],
+    "outputs": [
+      {
+        "name": "resource",
+        "description": "This is the full output for the resource.",
+        "sensitive": false
+      },
+      {
+        "name": "resource_id",
+        "description": "The ID of the DNS resolver.",
+        "sensitive": false
+      },
+      {
+        "name": "forwarding_rulesets",
+        "description": "The forwarding rulesets of the DNS resolver.",
+        "sensitive": false
+      },
+      {
+        "name": "inbound_endpoint_ips",
+        "description": "The IP addresses of the inbound endpoints.",
+        "sensitive": false
+      },
+      {
+        "name": "inbound_endpoints",
+        "description": "The inbound endpoints of the DNS resolver.",
+        "sensitive": false
+      },
+      {
+        "name": "name",
+        "description": "The name of the DNS resolver.",
+        "sensitive": false
+      },
+      {
+        "name": "outbound_endpoints",
+        "description": "The outbound endpoints of the DNS resolver.",
+        "sensitive": false
+      }
+    ]
+  }
+}

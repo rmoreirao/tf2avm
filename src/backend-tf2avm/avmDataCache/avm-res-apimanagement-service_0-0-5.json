@@ -1,0 +1,275 @@
+{
+  "module": {
+    "name": "avm-res-apimanagement-service",
+    "display_name": "Azure/avm-res-apimanagement-service",
+    "version": "0.0.5",
+    "description": "Terraform Azure Verified Resource Module for API Management Service",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-apimanagement-service/azurerm",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-apimanagement-service",
+    "requirements": [
+      "azurerm >= 4.0, < 5.0",
+      "modtm >= 0.3, < 1.0",
+      "random >= 3.5, < 4.0"
+    ],
+    "resources": [
+      "azurerm_role_assignment",
+      "modtm_telemetry",
+      "azurerm_management_lock",
+      "azurerm_monitor_diagnostic_setting",
+      "azurerm_private_endpoint",
+      "azurerm_private_endpoint",
+      "azurerm_private_endpoint_application_security_group_association",
+      "random_uuid",
+      "azurerm_api_management"
+    ],
+    "inputs": [
+      {
+        "name": "location",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "publisher_email",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "client_certificate_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "diagnostic_settings",
+        "type": "map(object({\n    name                                     = optional(string, null)\n    log_categories                           = optional(set(string), [])\n    log_groups                               = optional(set(string), [\"allLogs\"])\n    metric_categories                        = optional(set(string), [\"AllMetrics\"])\n    log_analytics_destination_type           = optional(string, \"Dedicated\")\n    workspace_resource_id                    = optional(string, null)\n    storage_account_resource_id              = optional(string, null)\n    event_hub_authorization_rule_resource_id = optional(string, null)\n    event_hub_name                           = optional(string, null)\n    marketplace_partner_resource_id          = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "zones",
+        "type": "list(string)",
+        "required": false
+      },
+      {
+        "name": "additional_location",
+        "type": "list(object({\n    location             = string\n    capacity             = optional(number, null)\n    zones                = optional(list(string), null)\n    public_ip_address_id = optional(string, null)\n    gateway_disabled     = optional(bool, null)\n    virtual_network_configuration = optional(object({\n      subnet_id = string\n    }), null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "delegation",
+        "type": "object({\n    subscriptions_enabled     = optional(bool, false)\n    user_registration_enabled = optional(bool, false)\n    url                       = optional(string, null)\n    validation_key            = optional(string, null)\n  })",
+        "required": false
+      },
+      {
+        "name": "public_network_access_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "min_api_version",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "notification_sender_email",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "private_endpoints_manage_dns_zone_group",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "protocols",
+        "type": "object({\n    enable_http2 = optional(bool, false)\n  })",
+        "required": false
+      },
+      {
+        "name": "security",
+        "type": "object({\n    enable_backend_ssl30                                = optional(bool, false)\n    enable_backend_tls10                                = optional(bool, false)\n    enable_backend_tls11                                = optional(bool, false)\n    enable_frontend_ssl30                               = optional(bool, false)\n    enable_frontend_tls10                               = optional(bool, false)\n    enable_frontend_tls11                               = optional(bool, false)\n    tls_ecdhe_ecdsa_with_aes128_cbc_sha_ciphers_enabled = optional(bool, false)\n    tls_ecdhe_ecdsa_with_aes256_cbc_sha_ciphers_enabled = optional(bool, false)\n    tls_ecdhe_rsa_with_aes128_cbc_sha_ciphers_enabled   = optional(bool, false)\n    tls_ecdhe_rsa_with_aes256_cbc_sha_ciphers_enabled   = optional(bool, false)\n    tls_rsa_with_aes128_cbc_sha256_ciphers_enabled      = optional(bool, false)\n    tls_rsa_with_aes128_cbc_sha_ciphers_enabled         = optional(bool, false)\n    tls_rsa_with_aes128_gcm_sha256_ciphers_enabled      = optional(bool, false)\n    tls_rsa_with_aes256_gcm_sha384_ciphers_enabled      = optional(bool, false)\n    tls_rsa_with_aes256_cbc_sha256_ciphers_enabled      = optional(bool, false)\n    tls_rsa_with_aes256_cbc_sha_ciphers_enabled         = optional(bool, false)\n    triple_des_ciphers_enabled                          = optional(bool, false)\n  })",
+        "required": false
+      },
+      {
+        "name": "virtual_network_subnet_id",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "sku_name",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "hostname_configuration",
+        "type": "object({\n    management = optional(list(object({\n      host_name                       = string\n      key_vault_id                    = optional(string, null)\n      certificate                     = optional(string, null)\n      certificate_password            = optional(string, null)\n      negotiate_client_certificate    = optional(bool, false)\n      ssl_keyvault_identity_client_id = optional(string, null)\n    })), [])\n    portal = optional(list(object({\n      host_name                       = string\n      key_vault_id                    = optional(string, null)\n      certificate                     = optional(string, null)\n      certificate_password            = optional(string, null)\n      negotiate_client_certificate    = optional(bool, false)\n      ssl_keyvault_identity_client_id = optional(string, null)\n    })), [])\n    developer_portal = optional(list(object({\n      host_name                       = string\n      key_vault_id                    = optional(string, null)\n      certificate                     = optional(string, null)\n      certificate_password            = optional(string, null)\n      negotiate_client_certificate    = optional(bool, false)\n      ssl_keyvault_identity_client_id = optional(string, null)\n    })), [])\n    proxy = optional(list(object({\n      host_name                       = string\n      default_ssl_binding             = optional(bool, false)\n      key_vault_id                    = optional(string, null)\n      certificate                     = optional(string, null)\n      certificate_password            = optional(string, null)\n      negotiate_client_certificate    = optional(bool, false)\n      ssl_keyvault_identity_client_id = optional(string, null)\n    })), [])\n    scm = optional(list(object({\n      host_name                       = string\n      key_vault_id                    = optional(string, null)\n      certificate                     = optional(string, null)\n      certificate_password            = optional(string, null)\n      negotiate_client_certificate    = optional(bool, false)\n      ssl_keyvault_identity_client_id = optional(string, null)\n    })), [])\n  })",
+        "required": false
+      },
+      {
+        "name": "managed_identities",
+        "type": "object({\n    system_assigned            = optional(bool, false)\n    user_assigned_resource_ids = optional(set(string), [])\n  })",
+        "required": false
+      },
+      {
+        "name": "private_endpoints",
+        "type": "map(object({\n    name = optional(string, null)\n    role_assignments = optional(map(object({\n      role_definition_id_or_name             = string\n      principal_id                           = string\n      description                            = optional(string, null)\n      skip_service_principal_aad_check       = optional(bool, false)\n      condition                              = optional(string, null)\n      condition_version                      = optional(string, null)\n      delegated_managed_identity_resource_id = optional(string, null)\n      principal_type                         = optional(string, null)\n    })), {})\n    lock = optional(object({\n      kind = string\n      name = optional(string, null)\n    }), null)\n    tags                                    = optional(map(string), null)\n    subnet_resource_id                      = string\n    private_dns_zone_group_name             = optional(string, \"default\")\n    private_dns_zone_resource_ids           = optional(set(string), [])\n    application_security_group_associations = optional(map(string), {})\n    private_service_connection_name         = optional(string, null)\n    network_interface_name                  = optional(string, null)\n    location                                = optional(string, null)\n    resource_group_name                     = optional(string, null)\n    ip_configurations = optional(map(object({\n      name               = string\n      private_ip_address = string\n    })), {})\n  }))",
+        "required": false
+      },
+      {
+        "name": "publisher_name",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "sign_up",
+        "type": "object({\n    enabled = bool\n    terms_of_service = object({\n      consent_required = bool\n      enabled          = bool\n      text             = optional(string, null)\n    })\n  })",
+        "required": false
+      },
+      {
+        "name": "resource_group_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "gateway_disabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "lock",
+        "type": "object({\n    kind = string\n    name = optional(string, null)\n  })",
+        "required": false
+      },
+      {
+        "name": "public_ip_address_id",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "virtual_network_type",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "certificate",
+        "type": "list(object({\n    encoded_certificate  = string\n    store_name           = string\n    certificate_password = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "role_assignments",
+        "type": "map(object({\n    role_definition_id_or_name             = string\n    principal_id                           = string\n    description                            = optional(string, null)\n    skip_service_principal_aad_check       = optional(bool, false)\n    condition                              = optional(string, null)\n    condition_version                      = optional(string, null)\n    delegated_managed_identity_resource_id = optional(string, null)\n    principal_type                         = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "sign_in",
+        "type": "object({\n    enabled = bool\n  })",
+        "required": false
+      },
+      {
+        "name": "tenant_access",
+        "type": "object({\n    enabled = bool\n  })",
+        "required": false
+      }
+    ],
+    "outputs": [
+      {
+        "name": "additional_locations",
+        "description": "Information about additional locations for the API Management Service.",
+        "sensitive": false
+      },
+      {
+        "name": "apim_gateway_url",
+        "description": "The gateway URL of the API Management service.",
+        "sensitive": false
+      },
+      {
+        "name": "developer_portal_url",
+        "description": "The publisher URL of the API Management service.",
+        "sensitive": false
+      },
+      {
+        "name": "public_ip_addresses",
+        "description": "The Public IP addresses of the API Management Service.",
+        "sensitive": false
+      },
+      {
+        "name": "resource",
+        "description": "The API Management service resource.",
+        "sensitive": false
+      },
+      {
+        "name": "workspace_identity",
+        "description": "The identity for the created workspace.",
+        "sensitive": false
+      },
+      {
+        "name": "resource_id",
+        "description": "The ID of the API Management service.",
+        "sensitive": false
+      },
+      {
+        "name": "scm_url",
+        "description": "The URL for the SCM (Source Code Management) Endpoint associated with this API Management service.",
+        "sensitive": false
+      },
+      {
+        "name": "tenant_access",
+        "description": "The tenant access information for the API Management Service.",
+        "sensitive": false
+      },
+      {
+        "name": "apim_management_url",
+        "description": "The management URL of the API Management service.",
+        "sensitive": false
+      },
+      {
+        "name": "name",
+        "description": "The name of the API Management service.",
+        "sensitive": false
+      },
+      {
+        "name": "private_ip_addresses",
+        "description": "The private IP addresses of the private endpoints created by this module",
+        "sensitive": false
+      },
+      {
+        "name": "certificates",
+        "description": "Certificate information for the API Management Service.",
+        "sensitive": false
+      },
+      {
+        "name": "gateway_regional_url",
+        "description": "The Region URL for the Gateway of the API Management Service.",
+        "sensitive": false
+      },
+      {
+        "name": "hostname_configuration",
+        "description": "The hostname configuration for the API Management Service.",
+        "sensitive": false
+      },
+      {
+        "name": "portal_url",
+        "description": "The URL for the Publisher Portal associated with this API Management service.",
+        "sensitive": false
+      },
+      {
+        "name": "private_endpoints",
+        "description": "A map of the private endpoints created.",
+        "sensitive": false
+      }
+    ]
+  }
+}

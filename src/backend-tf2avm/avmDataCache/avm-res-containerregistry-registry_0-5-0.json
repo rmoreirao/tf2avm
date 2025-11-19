@@ -1,0 +1,191 @@
+{
+  "module": {
+    "name": "avm-res-containerregistry-registry",
+    "display_name": "Azure/avm-res-containerregistry-registry",
+    "version": "0.5.0",
+    "description": "Terraform Azure Verified Resource Module for Azure Container Registry (ACR)",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-containerregistry-registry/azurerm",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-containerregistry-registry",
+    "requirements": [
+      "azapi ~> 2.4",
+      "azurerm >= 4, < 5.0.0",
+      "modtm ~> 0.3",
+      "random >= 3.5.0, < 5.0.0"
+    ],
+    "resources": [
+      "random_uuid",
+      "modtm_telemetry",
+      "azurerm_management_lock",
+      "azurerm_role_assignment",
+      "azurerm_monitor_diagnostic_setting",
+      "azurerm_private_endpoint",
+      "azurerm_private_endpoint",
+      "azurerm_private_endpoint_application_security_group_association",
+      "azurerm_container_registry"
+    ],
+    "inputs": [
+      {
+        "name": "admin_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "export_policy_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "georeplications",
+        "type": "list(object({\n    location                  = string\n    regional_endpoint_enabled = optional(bool, true)\n    zone_redundancy_enabled   = optional(bool, true)\n    tags                      = optional(map(any), null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "customer_managed_key",
+        "type": "object({\n    key_vault_resource_id = string\n    key_name              = string\n    key_version           = optional(string, null)\n    user_assigned_identity = optional(object({\n      resource_id = string\n    }), null)\n  })",
+        "required": false
+      },
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "managed_identities",
+        "type": "object({\n    system_assigned            = optional(bool, false)\n    user_assigned_resource_ids = optional(set(string), [])\n  })",
+        "required": false
+      },
+      {
+        "name": "tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "anonymous_pull_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "public_network_access_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "zone_redundancy_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "location",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "lock",
+        "type": "object({\n    kind = string\n    name = optional(string, null)\n  })",
+        "required": false
+      },
+      {
+        "name": "private_endpoints_manage_dns_zone_group",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "role_assignments",
+        "type": "map(object({\n    role_definition_id_or_name             = string\n    principal_id                           = string\n    description                            = optional(string, null)\n    skip_service_principal_aad_check       = optional(bool, false)\n    condition                              = optional(string, null)\n    condition_version                      = optional(string, null)\n    delegated_managed_identity_resource_id = optional(string, null)\n    principal_type                         = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "data_endpoint_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "network_rule_set",
+        "type": "object({\n    default_action = optional(string, \"Deny\")\n    ip_rule = optional(list(object({\n      # since the `action` property only permits `Allow`, this is hard-coded.\n      action   = optional(string, \"Allow\")\n      ip_range = string\n    })), [])\n  })",
+        "required": false
+      },
+      {
+        "name": "retention_policy_in_days",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "sku",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "diagnostic_settings",
+        "type": "map(object({\n    name                                     = optional(string, null)\n    log_categories                           = optional(set(string), [])\n    log_groups                               = optional(set(string), [\"allLogs\"])\n    metric_categories                        = optional(set(string), [\"AllMetrics\"])\n    log_analytics_destination_type           = optional(string, \"Dedicated\")\n    workspace_resource_id                    = optional(string, null)\n    storage_account_resource_id              = optional(string, null)\n    event_hub_authorization_rule_resource_id = optional(string, null)\n    event_hub_name                           = optional(string, null)\n    marketplace_partner_resource_id          = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "network_rule_bypass_option",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "quarantine_policy_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "scope_maps",
+        "type": "map(object({\n    name        = string\n    actions     = list(string)\n    description = optional(string, null)\n    registry_tokens = optional(map(object({\n      name    = string\n      enabled = optional(bool, true)\n      passwords = optional(object({\n        password1 = object({\n          expiry = optional(string)\n        })\n        password2 = optional(object({\n          expiry = optional(string)\n        }))\n      }))\n    })))\n  }))",
+        "required": false
+      },
+      {
+        "name": "resource_group_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "enable_trust_policy",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "private_endpoints",
+        "type": "map(object({\n    name = optional(string, null)\n    role_assignments = optional(map(object({\n      role_definition_id_or_name             = string\n      principal_id                           = string\n      description                            = optional(string, null)\n      skip_service_principal_aad_check       = optional(bool, false)\n      condition                              = optional(string, null)\n      condition_version                      = optional(string, null)\n      delegated_managed_identity_resource_id = optional(string, null)\n      principal_type                         = optional(string, null)\n    })), {})\n    lock = optional(object({\n      kind = string\n      name = optional(string, null)\n    }), null)\n    tags                                    = optional(map(string), null)\n    subnet_resource_id                      = string\n    private_dns_zone_group_name             = optional(string, \"default\")\n    private_dns_zone_resource_ids           = optional(set(string), [])\n    application_security_group_associations = optional(map(string), {})\n    private_service_connection_name         = optional(string, null)\n    network_interface_name                  = optional(string, null)\n    location                                = optional(string, null)\n    resource_group_name                     = optional(string, null)\n    ip_configurations = optional(map(object({\n      name               = string\n      private_ip_address = string\n    })), {})\n  }))",
+        "required": false
+      }
+    ],
+    "outputs": [
+      {
+        "name": "name",
+        "description": "The name of the parent resource.",
+        "sensitive": false
+      },
+      {
+        "name": "private_endpoints",
+        "description": "A map of private endpoints. The map key is the supplied input to var.private_endpoints. The map value is the entire azurerm_private_endpoint resource.",
+        "sensitive": false
+      },
+      {
+        "name": "resource",
+        "description": "This is the full output for the resource.",
+        "sensitive": false
+      },
+      {
+        "name": "resource_id",
+        "description": "The resource id for the parent resource.",
+        "sensitive": false
+      },
+      {
+        "name": "system_assigned_mi_principal_id",
+        "description": "The system assigned managed identity principal ID of the parent resource.",
+        "sensitive": false
+      },
+      {
+        "name": "scope_maps",
+        "description": "A map of scope maps. The map key is the supplied input to var.scope_maps. The map value is the entire scope map module.\nThe scope map module contains the following outputs:\n- `id` - The ID of the Container Registry Scope Map.\n- `registry_tokens` - The registry token object.\n  - `id` - The ID of the Container Registry token.\n  - `registry_token_passwords` - The registry token password object.\n    - `id` - The ID of the Container Registry token password.\n    - `password1` - The first password object of the token.\n    - `password2` - The second password object of the token.\n",
+        "sensitive": false
+      }
+    ]
+  }
+}

@@ -1,0 +1,166 @@
+{
+  "module": {
+    "name": "avm-res-network-privatednszone",
+    "display_name": "Azure/avm-res-network-privatednszone",
+    "version": "0.4.2",
+    "description": "Terraform Azure Verified Resource Module for Private DNS Zone",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-network-privatednszone/azurerm",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-network-privatednszone",
+    "requirements": [
+      "azapi ~> 2.4",
+      "modtm ~> 0.3",
+      "random >= 3.5.1, < 5.0"
+    ],
+    "resources": [
+      "random_uuid",
+      "modtm_telemetry",
+      "azapi_resource",
+      "azapi_update_resource",
+      "azapi_resource"
+    ],
+    "inputs": [
+      {
+        "name": "mx_records",
+        "type": "map(object({\n    name = optional(string, \"@\")\n    ttl  = number\n    records = map(object({\n      preference = number\n      exchange   = string\n    }))\n  }))",
+        "required": false
+      },
+      {
+        "name": "srv_records",
+        "type": "map(object({\n    name = string\n    ttl  = number\n    records = map(object({\n      priority = number\n      weight   = number\n      port     = number\n      target   = string\n    }))\n  }))",
+        "required": false
+      },
+      {
+        "name": "timeouts",
+        "type": "object({\n    dns_zones = optional(object({\n      create = optional(string, \"30m\")\n      delete = optional(string, \"30m\")\n      update = optional(string, \"30m\")\n      read   = optional(string, \"5m\")\n      }), {}\n    )\n    vnet_links = optional(object({\n      create = optional(string, \"30m\")\n      delete = optional(string, \"30m\")\n      update = optional(string, \"30m\")\n      read   = optional(string, \"5m\")\n      }), {}\n    )\n  })",
+        "required": false
+      },
+      {
+        "name": "retry",
+        "type": "object({\n    error_message_regex  = optional(list(string), [\"ReferencedResourceNotProvisioned\", \"CannotDeleteResource\"])\n    interval_seconds     = optional(number, 10)\n    max_interval_seconds = optional(number, 180)\n    multiplier           = optional(number, 1.5)\n    randomization_factor = optional(number, 0.5)\n  })",
+        "required": false
+      },
+      {
+        "name": "parent_id",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "a_records",
+        "type": "map(object({\n    name         = string\n    ttl          = number\n    records      = optional(list(string))\n    ip_addresses = optional(set(string), null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "cname_records",
+        "type": "map(object({\n    name   = string\n    ttl    = number\n    record = optional(string, null)\n    cname  = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "role_assignments",
+        "type": "map(object({\n    role_definition_id_or_name             = string\n    principal_id                           = string\n    description                            = optional(string, null)\n    skip_service_principal_aad_check       = optional(bool, false)\n    condition                              = optional(string, null)\n    condition_version                      = optional(string, null)\n    delegated_managed_identity_resource_id = optional(string, null)\n    principal_type                         = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "virtual_network_links",
+        "type": "map(object({\n    vnetlinkname                           = optional(string, null)\n    name                                   = optional(string, null)\n    vnetid                                 = optional(string, null)\n    virtual_network_id                     = optional(string, null)\n    autoregistration                       = optional(bool, false)\n    registration_enabled                   = optional(bool, null)\n    private_dns_zone_supports_private_link = optional(bool, false)\n    resolution_policy                      = optional(string, \"Default\")\n    tags                                   = optional(map(string), null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "domain_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "aaaa_records",
+        "type": "map(object({\n    name         = string\n    ttl          = number\n    records      = optional(list(string))\n    ip_addresses = optional(set(string), null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "ptr_records",
+        "type": "map(object({\n    name         = string\n    ttl          = number\n    records      = optional(list(string), null)\n    domain_names = optional(set(string), null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "soa_record",
+        "type": "object({\n    email        = string\n    name         = optional(string, \"@\")\n    expire_time  = optional(number, 2419200)\n    minimum_ttl  = optional(number, 10)\n    refresh_time = optional(number, 3600)\n    retry_time   = optional(number, 300)\n    ttl          = optional(number, 3600)\n  })",
+        "required": false
+      },
+      {
+        "name": "txt_records",
+        "type": "map(object({\n    name = string\n    ttl  = number\n    records = map(object({\n      value = list(string)\n    }))\n  }))",
+        "required": false
+      }
+    ],
+    "outputs": [
+      {
+        "name": "resource",
+        "description": "The private dns zone output",
+        "sensitive": false
+      },
+      {
+        "name": "soa_record_outputs",
+        "description": "The srv record output",
+        "sensitive": false
+      },
+      {
+        "name": "srv_record_outputs",
+        "description": "The srv record output",
+        "sensitive": false
+      },
+      {
+        "name": "aaaa_record_outputs",
+        "description": "The aaaa record output",
+        "sensitive": false
+      },
+      {
+        "name": "cname_record_outputs",
+        "description": "The cname record output",
+        "sensitive": false
+      },
+      {
+        "name": "mx_record_outputs",
+        "description": "The mx record output",
+        "sensitive": false
+      },
+      {
+        "name": "ptr_record_outputs",
+        "description": "The ptr record output",
+        "sensitive": false
+      },
+      {
+        "name": "resource_id",
+        "description": "The resource id of private DNS zone",
+        "sensitive": false
+      },
+      {
+        "name": "txt_record_outputs",
+        "description": "The txt record output",
+        "sensitive": false
+      },
+      {
+        "name": "virtual_network_link_outputs",
+        "description": "The virtual network link output",
+        "sensitive": false
+      },
+      {
+        "name": "a_record_outputs",
+        "description": "The a record output",
+        "sensitive": false
+      },
+      {
+        "name": "name",
+        "description": "The name of private DNS zone",
+        "sensitive": false
+      }
+    ]
+  }
+}

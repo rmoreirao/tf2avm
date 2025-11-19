@@ -1,0 +1,92 @@
+{
+  "module": {
+    "name": "avm-res-compute-gallery",
+    "display_name": "Azure/avm-res-compute-gallery",
+    "version": "0.2.0",
+    "description": "AVM Terraform module for Compute gallery ",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-compute-gallery/azurerm",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-compute-gallery",
+    "requirements": [
+      "azurerm >= 3.108",
+      "modtm ~> 0.3",
+      "random >= 3.5.0"
+    ],
+    "resources": [
+      "random_uuid",
+      "modtm_telemetry",
+      "azurerm_shared_image_gallery",
+      "azurerm_shared_image",
+      "azurerm_management_lock",
+      "azurerm_role_assignment"
+    ],
+    "inputs": [
+      {
+        "name": "description",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "lock",
+        "type": "object({\n    kind = string\n    name = optional(string, null)\n  })",
+        "required": false
+      },
+      {
+        "name": "role_assignments",
+        "type": "map(object({\n    role_definition_id_or_name             = string\n    principal_id                           = string\n    description                            = optional(string, null)\n    skip_service_principal_aad_check       = optional(bool, false)\n    condition                              = optional(string, null)\n    condition_version                      = optional(string, null)\n    delegated_managed_identity_resource_id = optional(string, null)\n    principal_type                         = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "shared_image_definitions",
+        "type": "map(object({\n    name = string\n    identifier = object({\n      publisher = string\n      offer     = string\n      sku       = string\n    })\n    os_type = string\n    purchase_plan = optional(object({\n      name      = string\n      publisher = optional(string)\n      product   = optional(string)\n    }))\n    description                         = optional(string)\n    disk_types_not_allowed              = optional(list(string))\n    end_of_life_date                    = optional(string)\n    eula                                = optional(string)\n    specialized                         = optional(bool)\n    architecture                        = optional(string, \"x64\")\n    hyper_v_generation                  = optional(string, \"V1\")\n    max_recommended_vcpu_count          = optional(number)\n    min_recommended_vcpu_count          = optional(number)\n    max_recommended_memory_in_gb        = optional(number)\n    min_recommended_memory_in_gb        = optional(number)\n    privacy_statement_uri               = optional(string)\n    release_note_uri                    = optional(string)\n    trusted_launch_enabled              = optional(bool)\n    confidential_vm_supported           = optional(bool)\n    confidential_vm_enabled             = optional(bool)\n    accelerated_network_support_enabled = optional(bool)\n    tags                                = optional(map(string))\n  }))",
+        "required": false
+      },
+      {
+        "name": "sharing",
+        "type": "object({\n    permission = string\n    community_gallery = optional(object({\n      eula            = string\n      prefix          = string\n      publisher_email = string\n      publisher_uri   = string\n    }))\n  })",
+        "required": false
+      },
+      {
+        "name": "timeouts",
+        "type": "object({\n    create = optional(string)\n    delete = optional(string)\n    read   = optional(string)\n    update = optional(string)\n  })",
+        "required": false
+      },
+      {
+        "name": "location",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "resource_group_name",
+        "type": "string",
+        "required": true
+      }
+    ],
+    "outputs": [
+      {
+        "name": "name",
+        "description": "The name of the Image Gallery.",
+        "sensitive": false
+      },
+      {
+        "name": "resource_id",
+        "description": "The id of the Image Gallery.",
+        "sensitive": false
+      }
+    ]
+  }
+}

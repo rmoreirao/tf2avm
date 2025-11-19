@@ -1,0 +1,144 @@
+{
+  "module": {
+    "name": "avm-res-redhatopenshift-openshiftcluster",
+    "display_name": "Azure/avm-res-redhatopenshift-openshiftcluster",
+    "version": "0.0.2",
+    "description": "Terraform Azure Verified Resource Module for OpenShift Cluster",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-redhatopenshift-openshiftcluster/azurerm",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-redhatopenshift-openshiftcluster",
+    "requirements": [
+      "azapi ~> 2.4",
+      "azurerm ~> 4.0",
+      "modtm ~> 0.3",
+      "random ~> 3.5"
+    ],
+    "resources": [
+      "azurerm_private_endpoint",
+      "azurerm_private_endpoint",
+      "azurerm_private_endpoint_application_security_group_association",
+      "random_uuid",
+      "modtm_telemetry",
+      "azapi_resource",
+      "azurerm_role_assignment"
+    ],
+    "inputs": [
+      {
+        "name": "cluster_profile",
+        "type": "object({\n    domain                      = string\n    version                     = string\n    fips_enabled                = optional(bool, false)\n    managed_resource_group_name = optional(string, null)\n    pull_secret                 = optional(string, null)\n  })",
+        "required": true
+      },
+      {
+        "name": "ingress_profile",
+        "type": "object({\n    visibility = string\n  })",
+        "required": true
+      },
+      {
+        "name": "location",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "customer_managed_key",
+        "type": "object({\n    key_vault_resource_id = string\n    key_name              = string\n    key_version           = optional(string, null)\n    user_assigned_identity = optional(object({\n      resource_id = string\n    }), null)\n  })",
+        "required": false
+      },
+      {
+        "name": "platform_workload_identities",
+        "type": "map(object({\n    resource_id                    = string\n    federated_identity_client_id   = optional(string, null)\n    federated_service_account_name = optional(string, null)\n    federated_service_account_ns   = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "service_principal",
+        "type": "object({\n    client_id     = string\n    client_secret = string\n  })",
+        "required": false
+      },
+      {
+        "name": "api_server_profile",
+        "type": "object({\n    visibility = string\n  })",
+        "required": true
+      },
+      {
+        "name": "main_profile",
+        "type": "object({\n    subnet_id                  = string\n    vm_size                    = string\n    disk_encryption_set_id     = optional(string, null)\n    encryption_at_host_enabled = optional(bool, false)\n  })",
+        "required": true
+      },
+      {
+        "name": "private_endpoints",
+        "type": "map(object({\n    name = optional(string, null)\n    role_assignments = optional(map(object({\n      role_definition_id_or_name             = string\n      principal_id                           = string\n      description                            = optional(string, null)\n      skip_service_principal_aad_check       = optional(bool, false)\n      condition                              = optional(string, null)\n      condition_version                      = optional(string, null)\n      delegated_managed_identity_resource_id = optional(string, null)\n      principal_type                         = optional(string, null)\n    })), {})\n    lock = optional(object({\n      kind = string\n      name = optional(string, null)\n    }), null)\n    tags                                    = optional(map(string), null)\n    subnet_resource_id                      = string\n    private_dns_zone_group_name             = optional(string, \"default\")\n    private_dns_zone_resource_ids           = optional(set(string), [])\n    application_security_group_associations = optional(map(string), {})\n    private_service_connection_name         = optional(string, null)\n    network_interface_name                  = optional(string, null)\n    location                                = optional(string, null)\n    resource_group_name                     = optional(string, null)\n    ip_configurations = optional(map(object({\n      name               = string\n      private_ip_address = string\n    })), {})\n  }))",
+        "required": false
+      },
+      {
+        "name": "timeouts",
+        "type": "object({\n    create = optional(string, null)\n    read   = optional(string, null)\n    update = optional(string, null)\n    delete = optional(string, null)\n  })",
+        "required": false
+      },
+      {
+        "name": "network_profile",
+        "type": "object({\n    pod_cidr                                     = string\n    service_cidr                                 = string\n    outbound_type                                = optional(string, null) # Loadbalancer | UserDefinedRouting\n    preconfigured_network_security_group_enabled = optional(bool, false)\n  })",
+        "required": true
+      },
+      {
+        "name": "resource_group_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "worker_profile",
+        "type": "object({\n    subnet_id                  = string\n    vm_size                    = string\n    node_count                 = number\n    disk_size_gb               = number\n    disk_encryption_set_id     = optional(string, null)\n    encryption_at_host_enabled = optional(bool, false)\n  })",
+        "required": true
+      },
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "role_assignments",
+        "type": "map(object({\n    role_definition_id_or_name             = string\n    principal_id                           = string\n    description                            = optional(string, null)\n    skip_service_principal_aad_check       = optional(bool, false)\n    condition                              = optional(string, null)\n    condition_version                      = optional(string, null)\n    delegated_managed_identity_resource_id = optional(string, null)\n    principal_type                         = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "subscription_id",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "managed_identities",
+        "type": "object({\n    system_assigned            = optional(bool, false)\n    user_assigned_resource_ids = optional(set(string), [])\n  })",
+        "required": false
+      },
+      {
+        "name": "private_endpoints_manage_dns_zone_group",
+        "type": "bool",
+        "required": false
+      }
+    ],
+    "outputs": [
+      {
+        "name": "private_endpoints",
+        "description": "  A map of the private endpoints created.\n",
+        "sensitive": false
+      },
+      {
+        "name": "resource",
+        "description": "This is the full output for the Red Hat OpenShift cluster resource.",
+        "sensitive": false
+      },
+      {
+        "name": "resource_id",
+        "description": "The resource ID of the Red Hat OpenShift cluster.",
+        "sensitive": false
+      }
+    ]
+  }
+}

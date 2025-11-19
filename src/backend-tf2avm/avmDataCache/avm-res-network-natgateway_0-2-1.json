@@ -1,0 +1,126 @@
+{
+  "module": {
+    "name": "avm-res-network-natgateway",
+    "display_name": "Azure/avm-res-network-natgateway",
+    "version": "0.2.1",
+    "description": "Terraform Module for Nat Gateway",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-network-natgateway/azurerm",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-network-natgateway",
+    "requirements": [
+      "azurerm ~> 4.0",
+      "modtm ~> 0.3",
+      "random ~> 3.6"
+    ],
+    "resources": [
+      "modtm_telemetry",
+      "azurerm_nat_gateway_public_ip_prefix_association",
+      "azurerm_nat_gateway_public_ip_association",
+      "random_uuid",
+      "azurerm_public_ip_prefix",
+      "azurerm_public_ip",
+      "azurerm_nat_gateway",
+      "azurerm_subnet_nat_gateway_association",
+      "azurerm_management_lock",
+      "azurerm_role_assignment"
+    ],
+    "inputs": [
+      {
+        "name": "lock",
+        "type": "object({\n    kind = string\n    name = optional(string, null)\n  })",
+        "required": false
+      },
+      {
+        "name": "public_ip_configuration",
+        "type": "object({\n    allocation_method       = optional(string, \"Static\")\n    ddos_protection_mode    = optional(string, \"VirtualNetworkInherited\")\n    ddos_protection_plan_id = optional(string)\n    domain_name_label       = optional(string)\n    idle_timeout_in_minutes = optional(number, 30)\n    inherit_tags            = optional(bool, false)\n    ip_version              = optional(string, \"IPv4\")\n    lock_level              = optional(string, null)\n    sku                     = optional(string, \"Standard\")\n    sku_tier                = optional(string, \"Regional\")\n    tags                    = optional(map(string), null)\n    zones                   = optional(list(string), [\"1\", \"2\", \"3\"])\n  })",
+        "required": false
+      },
+      {
+        "name": "public_ips",
+        "type": "map(object({\n    name = string\n  }))",
+        "required": false
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "resource_group_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "timeouts",
+        "type": "object({\n    create = optional(string)\n    delete = optional(string)\n    read   = optional(string)\n    update = optional(string)\n  })",
+        "required": false
+      },
+      {
+        "name": "zones",
+        "type": "set(string)",
+        "required": false
+      },
+      {
+        "name": "role_assignments",
+        "type": "map(object({\n    role_definition_id_or_name             = string\n    principal_id                           = string\n    description                            = optional(string, null)\n    skip_service_principal_aad_check       = optional(bool, false)\n    condition                              = optional(string, null)\n    condition_version                      = optional(string, null)\n    delegated_managed_identity_resource_id = optional(string, null)\n    principal_type                         = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "subnet_associations",
+        "type": "map(object({\n    resource_id = string\n    }\n  ))",
+        "required": false
+      },
+      {
+        "name": "location",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "sku_name",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "idle_timeout_in_minutes",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "public_ip_prefix_length",
+        "type": "number",
+        "required": false
+      }
+    ],
+    "outputs": [
+      {
+        "name": "public_ip_prefix_value",
+        "description": "The CIDR provisioned for the public IP prefix",
+        "sensitive": false
+      },
+      {
+        "name": "public_ip_resource",
+        "description": "The public IP resource.",
+        "sensitive": false
+      },
+      {
+        "name": "resource",
+        "description": "The NAT Gateway resource.",
+        "sensitive": false
+      },
+      {
+        "name": "resource_id",
+        "description": "The ID of the NAT Gateway.",
+        "sensitive": false
+      }
+    ]
+  }
+}

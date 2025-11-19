@@ -1,0 +1,79 @@
+{
+  "module": {
+    "name": "avm-res-insights-datacollectionendpoint",
+    "display_name": "Azure/avm-res-insights-datacollectionendpoint",
+    "version": "0.1.0",
+    "description": "AVM Terraform module for Data collectionEndpoint",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-insights-datacollectionendpoint/azurerm",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-insights-datacollectionendpoint",
+    "requirements": [
+      "azurerm ~> 3.71",
+      "modtm ~> 0.3",
+      "random ~> 3.5"
+    ],
+    "resources": [
+      "random_uuid",
+      "modtm_telemetry",
+      "azurerm_monitor_data_collection_endpoint"
+    ],
+    "inputs": [
+      {
+        "name": "location",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "public_network_access_enabled",
+        "type": "bool",
+        "required": true
+      },
+      {
+        "name": "resource_group_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "kind",
+        "type": "string",
+        "required": true
+      }
+    ],
+    "outputs": [
+      {
+        "name": "immutable_id",
+        "description": "The immutable ID of the Data Collection Endpoint.",
+        "sensitive": false
+      },
+      {
+        "name": "logs_ingestion_endpoint",
+        "description": "The endpoint used for ingesting logs",
+        "sensitive": false
+      },
+      {
+        "name": "resource_id",
+        "description": "This is the full output for the resource.",
+        "sensitive": false
+      },
+      {
+        "name": "configuration_access_endpoint",
+        "description": "TThe endpoint used for accessing configuration.",
+        "sensitive": false
+      }
+    ]
+  }
+}

@@ -1,0 +1,223 @@
+{
+  "module": {
+    "name": "avm-res-servicebus-namespace",
+    "display_name": "Azure/avm-res-servicebus-namespace",
+    "version": "0.4.0",
+    "description": "",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-servicebus-namespace/azurerm",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-servicebus-namespace",
+    "requirements": [
+      "azurerm ~> 4.14",
+      "modtm ~> 0.3",
+      "random ~> 3.6"
+    ],
+    "resources": [
+      "azurerm_management_lock",
+      "azurerm_private_endpoint",
+      "azurerm_private_endpoint",
+      "azurerm_private_endpoint_application_security_group_association",
+      "azurerm_servicebus_queue",
+      "azurerm_servicebus_namespace",
+      "azurerm_servicebus_namespace_authorization_rule",
+      "azurerm_monitor_diagnostic_setting",
+      "azurerm_servicebus_queue_authorization_rule",
+      "azurerm_servicebus_topic",
+      "azurerm_servicebus_topic_authorization_rule",
+      "azurerm_servicebus_subscription",
+      "azurerm_servicebus_subscription",
+      "azurerm_servicebus_queue",
+      "azurerm_role_assignment",
+      "random_uuid",
+      "modtm_telemetry"
+    ],
+    "inputs": [
+      {
+        "name": "network_rule_config",
+        "type": "object({\n    trusted_services_allowed = optional(bool, false)\n    cidr_or_ip_rules         = optional(set(string), [])\n    default_action           = optional(string, \"Allow\")\n\n    network_rules = optional(set(object({\n      subnet_id = string\n    })), [])\n  })",
+        "required": false
+      },
+      {
+        "name": "queues",
+        "type": "map(object({\n    name                                    = optional(string, null)\n    max_delivery_count                      = optional(number, 10)\n    enable_batched_operations               = optional(bool, true)\n    requires_duplicate_detection            = optional(bool, false)\n    requires_session                        = optional(bool, false)\n    dead_lettering_on_message_expiration    = optional(bool, false)\n    enable_partitioning                     = optional(bool, null)\n    enable_express                          = optional(bool, null)\n    max_message_size_in_kilobytes           = optional(number, null)\n    default_message_ttl                     = optional(string, null)\n    forward_to                              = optional(string, null)\n    forward_dead_lettered_messages_to       = optional(string, null)\n    auto_delete_on_idle                     = optional(string, null)\n    max_size_in_megabytes                   = optional(number, 1024)\n    lock_duration                           = optional(string, \"PT1M\")\n    duplicate_detection_history_time_window = optional(string, \"PT10M\")\n    status                                  = optional(string, \"Active\")\n\n    authorization_rules = optional(map(object({\n      name   = optional(string, null)\n      send   = optional(bool, false)\n      listen = optional(bool, false)\n      manage = optional(bool, false)\n    })), {})\n\n    role_assignments = optional(map(object({\n      role_definition_id_or_name = string\n      principal_id               = string\n\n      description                            = optional(string, null)\n      skip_service_principal_aad_check       = optional(bool, false)\n      delegated_managed_identity_resource_id = optional(string, null)\n    })), {})\n  }))",
+        "required": false
+      },
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "location",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "authorization_rules",
+        "type": "map(object({\n    name   = optional(string, null)\n    send   = optional(bool, false)\n    listen = optional(bool, false)\n    manage = optional(bool, false)\n  }))",
+        "required": false
+      },
+      {
+        "name": "capacity",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "sku",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "infrastructure_encryption_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "customer_managed_key",
+        "type": "object({\n    key_name              = string\n    key_vault_resource_id = string\n\n    key_version = optional(string, null)\n\n    user_assigned_identity = optional(object({\n      resource_id = string\n    }), null)\n  })",
+        "required": false
+      },
+      {
+        "name": "managed_identities",
+        "type": "object({\n    system_assigned            = optional(bool, false)\n    user_assigned_resource_ids = optional(set(string), [])\n  })",
+        "required": false
+      },
+      {
+        "name": "public_network_access_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "local_auth_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "diagnostic_settings",
+        "type": "map(object({\n    name                                     = optional(string, null)\n    log_categories                           = optional(set(string), [])\n    log_groups                               = optional(set(string), [\"allLogs\"])\n    metric_categories                        = optional(set(string), [\"AllMetrics\"])\n    log_analytics_destination_type           = optional(string, \"Dedicated\")\n    workspace_resource_id                    = optional(string, null)\n    storage_account_resource_id              = optional(string, null)\n    event_hub_authorization_rule_resource_id = optional(string, null)\n    event_hub_name                           = optional(string, null)\n    marketplace_partner_resource_id          = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "private_endpoints",
+        "type": "map(object({\n    subnet_resource_id = string\n\n    name                                    = optional(string, null)\n    private_dns_zone_group_name             = optional(string, \"default\")\n    private_dns_zone_resource_ids           = optional(set(string), [])\n    application_security_group_associations = optional(map(string), {})\n    private_service_connection_name         = optional(string, null)\n    network_interface_name                  = optional(string, null)\n    location                                = optional(string, null)\n    resource_group_name                     = optional(string, null)\n\n    ip_configurations = optional(map(object({\n      name               = string\n      private_ip_address = string\n    })), {})\n\n    tags = optional(map(string), null)\n\n    lock = optional(object({\n      kind = string\n      name = optional(string, null)\n    }), null)\n\n    role_assignments = optional(map(object({\n      role_definition_id_or_name = string\n      principal_id               = string\n\n      description                            = optional(string, null)\n      skip_service_principal_aad_check       = optional(bool, false)\n      delegated_managed_identity_resource_id = optional(string, null)\n\n      principal_type    = optional(string, null) # forced to be here by lint, not supported\n      condition         = optional(string, null) # forced to be here by lint, not supported\n      condition_version = optional(string, null) # forced to be here by lint, not supported\n    })), {})\n  }))",
+        "required": false
+      },
+      {
+        "name": "tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "resource_group_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "minimum_tls_version",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "premium_messaging_partitions",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "timeouts",
+        "type": "object({\n    create = optional(string)\n    delete = optional(string)\n    read   = optional(string)\n    update = optional(string)\n  })",
+        "required": false
+      },
+      {
+        "name": "lock",
+        "type": "object({\n    kind = string\n    name = optional(string, null)\n  })",
+        "required": false
+      },
+      {
+        "name": "private_endpoints_manage_dns_zone_group",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "role_assignments",
+        "type": "map(object({\n    role_definition_id_or_name = string\n    principal_id               = string\n\n    description                            = optional(string, null)\n    skip_service_principal_aad_check       = optional(bool, false)\n    delegated_managed_identity_resource_id = optional(string, null)\n\n    principal_type    = optional(string, null) # forced to be here by lint, not supported\n    condition         = optional(string, null) # forced to be here by lint, not supported\n    condition_version = optional(string, null) # forced to be here by lint, not supported\n  }))",
+        "required": false
+      },
+      {
+        "name": "topics",
+        "type": "map(object({\n    name                                    = optional(string, null)\n    enable_batched_operations               = optional(bool, true)\n    requires_duplicate_detection            = optional(bool, false)\n    enable_partitioning                     = optional(bool, null)\n    enable_express                          = optional(bool, null)\n    support_ordering                        = optional(bool, false)\n    max_message_size_in_kilobytes           = optional(number, null)\n    default_message_ttl                     = optional(string, null)\n    auto_delete_on_idle                     = optional(string, null)\n    max_size_in_megabytes                   = optional(number, 1024)\n    duplicate_detection_history_time_window = optional(string, \"PT10M\")\n    status                                  = optional(string, \"Active\")\n\n    authorization_rules = optional(map(object({\n      name   = optional(string, null)\n      send   = optional(bool, false)\n      listen = optional(bool, false)\n      manage = optional(bool, false)\n    })), {})\n\n    subscriptions = optional(map(object({\n      name                                      = optional(string, null)\n      max_delivery_count                        = optional(number, 10)\n      dead_lettering_on_filter_evaluation_error = optional(bool, true)\n      enable_batched_operations                 = optional(bool, true)\n      dead_lettering_on_message_expiration      = optional(bool, false)\n      requires_session                          = optional(bool, false)\n      forward_to                                = optional(string, null)\n      forward_dead_lettered_messages_to         = optional(string, null)\n      auto_delete_on_idle                       = optional(string, null)\n      default_message_ttl                       = optional(string, null)\n      lock_duration                             = optional(string, \"PT1M\")\n      status                                    = optional(string, \"Active\")\n    })), {})\n\n    role_assignments = optional(map(object({\n      role_definition_id_or_name = string\n      principal_id               = string\n\n      description                            = optional(string, null)\n      skip_service_principal_aad_check       = optional(bool, false)\n      delegated_managed_identity_resource_id = optional(string, null)\n    })), {})\n  }))",
+        "required": false
+      }
+    ],
+    "outputs": [
+      {
+        "name": "resource_authorization_rules",
+        "description": "The service bus namespace authorization rules created. More info: https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/servicebus_namespace_authorization_rule#attributes-reference",
+        "sensitive": false
+      },
+      {
+        "name": "resource_diagnostic_settings",
+        "description": "The diagnostic settings created. More info: https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_diagnostic_setting#attributes-reference",
+        "sensitive": false
+      },
+      {
+        "name": "resource_id",
+        "description": "The resource ID of the service bus namespace created.",
+        "sensitive": false
+      },
+      {
+        "name": "resource_locks",
+        "description": "The management locks created. More info: https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/management_lock#attributes-reference",
+        "sensitive": false
+      },
+      {
+        "name": "resource_private_endpoints",
+        "description": "A map of the private endpoints created. More info: https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint#attributes-reference",
+        "sensitive": false
+      },
+      {
+        "name": "resource_queues_authorization_rules",
+        "description": "The service bus queues authorization rules created. More info: https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/servicebus_queue_authorization_rule#attributes-reference",
+        "sensitive": false
+      },
+      {
+        "name": "resource_role_assignments",
+        "description": "The role assignments created. More info: https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment#attributes-reference",
+        "sensitive": false
+      },
+      {
+        "name": "resource_topics",
+        "description": "The service bus topics created. More info: https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/servicebus_topic.html#attributes-reference",
+        "sensitive": false
+      },
+      {
+        "name": "resource",
+        "description": "The service bus namespace created. More info: https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/servicebus_namespace.html#attributes-reference",
+        "sensitive": false
+      },
+      {
+        "name": "resource_private_endpoints_application_security_group_association",
+        "description": "The private endpoint application security group associations created",
+        "sensitive": false
+      },
+      {
+        "name": "resource_queues",
+        "description": "The service bus queues created. More info: https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint_application_security_group_association#attributes-reference",
+        "sensitive": false
+      },
+      {
+        "name": "resource_topics_authorization_rules",
+        "description": "The service bus topics authorization rules created. More info: https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/servicebus_topic_authorization_rule#attributes-reference",
+        "sensitive": false
+      },
+      {
+        "name": "resource_topics_subscriptions",
+        "description": "The service bus topic subscriptions created. More info: https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/servicebus_subscription#attributes-reference",
+        "sensitive": false
+      }
+    ]
+  }
+}

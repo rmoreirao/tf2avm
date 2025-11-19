@@ -1,0 +1,98 @@
+{
+  "module": {
+    "name": "avm-res-network-routetable",
+    "display_name": "Azure/avm-res-network-routetable",
+    "version": "0.4.1",
+    "description": "AVM Terraform Module for Azure Route Table",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-network-routetable/azurerm",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-network-routetable",
+    "requirements": [
+      "azurerm ~> 4.0",
+      "modtm ~> 0.3",
+      "random >= 3.5.0, < 4.0"
+    ],
+    "resources": [
+      "modtm_telemetry",
+      "azurerm_route_table",
+      "azurerm_route",
+      "azurerm_subnet_route_table_association",
+      "azurerm_management_lock",
+      "azurerm_role_assignment",
+      "random_uuid"
+    ],
+    "inputs": [
+      {
+        "name": "resource_group_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "bgp_route_propagation_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "routes",
+        "type": "map(object({\n    name                   = string\n    address_prefix         = string\n    next_hop_type          = string\n    next_hop_in_ip_address = optional(string)\n  }))",
+        "required": false
+      },
+      {
+        "name": "subnet_resource_ids",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "location",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "lock",
+        "type": "object({\n    kind = string\n    name = optional(string, null)\n  })",
+        "required": false
+      },
+      {
+        "name": "role_assignments",
+        "type": "map(object({\n    role_definition_id_or_name             = string\n    principal_id                           = string\n    description                            = optional(string, null)\n    skip_service_principal_aad_check       = optional(bool, false)\n    condition                              = optional(string, null)\n    condition_version                      = optional(string, null)\n    delegated_managed_identity_resource_id = optional(string, null)\n    principal_type                         = optional(string, null)\n  }))",
+        "required": false
+      }
+    ],
+    "outputs": [
+      {
+        "name": "name",
+        "description": "The route table name",
+        "sensitive": false
+      },
+      {
+        "name": "resource",
+        "description": "This is the full output for the route table.",
+        "sensitive": false
+      },
+      {
+        "name": "resource_id",
+        "description": "The ID of the route table",
+        "sensitive": false
+      },
+      {
+        "name": "routes",
+        "description": "This is the full output of the routes.",
+        "sensitive": false
+      }
+    ]
+  }
+}

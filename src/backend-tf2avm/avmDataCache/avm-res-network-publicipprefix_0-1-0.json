@@ -1,0 +1,95 @@
+{
+  "module": {
+    "name": "avm-res-network-publicipprefix",
+    "display_name": "Azure/avm-res-network-publicipprefix",
+    "version": "0.1.0",
+    "description": "AVM TF Module for Public IP Address Prefix ",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-network-publicipprefix/azurerm",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-network-publicipprefix",
+    "requirements": [
+      "azurerm ~> 4.0",
+      "modtm ~> 0.3",
+      "random ~> 3.6"
+    ],
+    "resources": [
+      "random_uuid",
+      "modtm_telemetry",
+      "azurerm_public_ip_prefix",
+      "azurerm_management_lock"
+    ],
+    "inputs": [
+      {
+        "name": "resource_group_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "ip_version",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "lock",
+        "type": "object({\n    kind = string\n    name = optional(string, null)\n  })",
+        "required": false
+      },
+      {
+        "name": "sku_tier",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "zones",
+        "type": "set(string)",
+        "required": false
+      },
+      {
+        "name": "location",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "prefix_length",
+        "type": "number",
+        "required": true
+      },
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "sku_name",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "required": true
+      }
+    ],
+    "outputs": [
+      {
+        "name": "resource_id",
+        "description": "The ID of the Public IP Prefix",
+        "sensitive": false
+      },
+      {
+        "name": "public_ip_prefix_address",
+        "description": "The Public IP Prefix address",
+        "sensitive": false
+      },
+      {
+        "name": "resource",
+        "description": "This is the full output for the resource.",
+        "sensitive": false
+      }
+    ]
+  }
+}

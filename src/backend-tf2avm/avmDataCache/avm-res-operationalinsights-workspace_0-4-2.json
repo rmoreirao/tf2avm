@@ -1,0 +1,173 @@
+{
+  "module": {
+    "name": "avm-res-operationalinsights-workspace",
+    "display_name": "Azure/avm-res-operationalinsights-workspace",
+    "version": "0.4.2",
+    "description": "Azure Log Analytics Workspace AVM Module",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-operationalinsights-workspace/azurerm",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-operationalinsights-workspace",
+    "requirements": [
+      "azapi ~> 2.0",
+      "azurerm >= 3.71, < 5.0.0",
+      "modtm ~> 0.3",
+      "random ~> 3.5"
+    ],
+    "resources": [
+      "azurerm_management_lock",
+      "azurerm_monitor_diagnostic_setting",
+      "azurerm_role_assignment",
+      "azurerm_private_endpoint",
+      "azurerm_private_endpoint_application_security_group_association",
+      "azapi_resource",
+      "azurerm_monitor_private_link_scoped_service",
+      "azapi_resource",
+      "random_uuid",
+      "azurerm_log_analytics_workspace",
+      "modtm_telemetry"
+    ],
+    "inputs": [
+      {
+        "name": "log_analytics_workspace_local_authentication_disabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "private_endpoints_manage_dns_zone_group",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "role_assignments",
+        "type": "map(object({\n    role_definition_id_or_name             = string\n    principal_id                           = string\n    description                            = optional(string, null)\n    skip_service_principal_aad_check       = optional(bool, false)\n    condition                              = optional(string, null)\n    condition_version                      = optional(string, null)\n    delegated_managed_identity_resource_id = optional(string, null)\n    principal_type                         = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "diagnostic_settings",
+        "type": "map(object({\n    name                                     = optional(string, null)\n    log_categories                           = optional(set(string), [])\n    log_groups                               = optional(set(string), [\"allLogs\"])\n    metric_categories                        = optional(set(string), [\"AllMetrics\"])\n    log_analytics_destination_type           = optional(string, \"Dedicated\")\n    workspace_resource_id                    = optional(string, null)\n    storage_account_resource_id              = optional(string, null)\n    event_hub_authorization_rule_resource_id = optional(string, null)\n    event_hub_name                           = optional(string, null)\n    marketplace_partner_resource_id          = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "log_analytics_workspace_internet_ingestion_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "log_analytics_workspace_sku",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "log_analytics_workspace_timeouts",
+        "type": "object({\n    create = optional(string)\n    delete = optional(string)\n    read   = optional(string)\n    update = optional(string)\n  })",
+        "required": false
+      },
+      {
+        "name": "location",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "resource_group_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "customer_managed_key",
+        "type": "object({\n    key_vault_resource_id = string\n    key_name              = string\n    key_version           = optional(string, null)\n    user_assigned_identity = optional(object({\n      resource_id = string\n    }), null)\n  })",
+        "required": false
+      },
+      {
+        "name": "monitor_private_link_scoped_service_name",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "log_analytics_workspace_identity",
+        "type": "object({\n    identity_ids = optional(set(string))\n    type         = string\n  })",
+        "required": false
+      },
+      {
+        "name": "log_analytics_workspace_internet_query_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "log_analytics_workspace_retention_in_days",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "monitor_private_link_scoped_resource",
+        "type": "map(object({\n    name        = optional(string)\n    resource_id = string\n  }))",
+        "required": false
+      },
+      {
+        "name": "tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "log_analytics_workspace_cmk_for_query_forced",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "log_analytics_workspace_daily_quota_gb",
+        "type": "number",
+        "required": false
+      },
+      {
+        "name": "monitor_private_link_scope",
+        "type": "map(object({\n    name        = optional(string)\n    resource_id = string\n  }))",
+        "required": false
+      },
+      {
+        "name": "private_endpoints",
+        "type": "map(object({\n    name = optional(string, null)\n    role_assignments = optional(map(object({\n      role_definition_id_or_name             = string\n      principal_id                           = string\n      description                            = optional(string, null)\n      skip_service_principal_aad_check       = optional(bool, false)\n      condition                              = optional(string, null)\n      condition_version                      = optional(string, null)\n      delegated_managed_identity_resource_id = optional(string, null)\n      principal_type                         = optional(string, null)\n    })), {})\n    lock = optional(object({\n      kind = string\n      name = optional(string, null)\n    }), null)\n    tags                                    = optional(map(string), null)\n    subnet_resource_id                      = string\n    private_dns_zone_group_name             = optional(string, \"default\")\n    private_dns_zone_resource_ids           = optional(set(string), [])\n    application_security_group_associations = optional(map(string), {})\n    private_service_connection_name         = optional(string, null)\n    network_interface_name                  = optional(string, null)\n    location                                = optional(string, null)\n    resource_group_name                     = optional(string, null)\n    ip_configurations = optional(map(object({\n      name               = string\n      private_ip_address = string\n    })), {})\n  }))",
+        "required": false
+      },
+      {
+        "name": "lock",
+        "type": "object({\n    kind = string\n    name = optional(string, null)\n  })",
+        "required": false
+      },
+      {
+        "name": "log_analytics_workspace_allow_resource_only_permissions",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "log_analytics_workspace_reservation_capacity_in_gb_per_day",
+        "type": "number",
+        "required": false
+      }
+    ],
+    "outputs": [
+      {
+        "name": "resource",
+        "description": "\"This is the full output for the Log Analytics resource. This is the default output for the module following AVM standards. Review the examples below for the correct output to use in your module.\"\nExamples:\n- module.log_analytics.resource.id\n- module.log_analytics.resource.name\n",
+        "sensitive": false
+      },
+      {
+        "name": "resource_id",
+        "description": "This is the full output for the Log Analytics resource ID. This is the default output for the module following AVM standards. Review the examples below for the correct output to use in your module.",
+        "sensitive": false
+      },
+      {
+        "name": "private_endpoints",
+        "description": "  A map of the private endpoints created.\n",
+        "sensitive": false
+      }
+    ]
+  }
+}

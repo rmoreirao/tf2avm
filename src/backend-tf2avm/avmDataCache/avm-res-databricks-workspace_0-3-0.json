@@ -1,0 +1,252 @@
+{
+  "module": {
+    "name": "avm-res-databricks-workspace",
+    "display_name": "Azure/avm-res-databricks-workspace",
+    "version": "0.3.0",
+    "description": "",
+    "terraform_registry_url": "https://registry.terraform.io/modules/Azure/avm-res-databricks-workspace/azurerm",
+    "source_code_url": "https://github.com/Azure/terraform-azurerm-avm-res-databricks-workspace",
+    "requirements": [
+      "azurerm >= 3.117, < 5.0.0",
+      "modtm ~> 0.3",
+      "random ~> 3.5"
+    ],
+    "resources": [
+      "azurerm_databricks_workspace_root_dbfs_customer_managed_key",
+      "azurerm_databricks_virtual_network_peering",
+      "azurerm_databricks_access_connector",
+      "azurerm_private_endpoint_application_security_group_association",
+      "random_uuid",
+      "azurerm_role_assignment",
+      "azurerm_monitor_diagnostic_setting",
+      "azurerm_private_endpoint",
+      "modtm_telemetry",
+      "azurerm_databricks_workspace",
+      "azurerm_management_lock"
+    ],
+    "inputs": [
+      {
+        "name": "network_security_group_rules_required",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "virtual_network_peering",
+        "type": "map(object({\n    name                          = optional(string, null)\n    resource_group_name           = optional(string, null)\n    remote_address_space_prefixes = list(string)\n    remote_virtual_network_id     = string\n    allow_virtual_network_access  = optional(bool, true)\n    allow_forwarded_traffic       = optional(bool, false)\n    allow_gateway_transit         = optional(bool, false)\n    use_remote_gateways           = optional(bool, false)\n  }))",
+        "required": false
+      },
+      {
+        "name": "sku",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "access_connector",
+        "type": "map(object({\n    name                = string\n    resource_group_name = optional(string, null)\n    location            = optional(string, null)\n    identity = optional(object({\n      type         = string\n      identity_ids = optional(list(string))\n    }))\n    tags = optional(map(string))\n  }))",
+        "required": false
+      },
+      {
+        "name": "public_network_access_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "role_assignments",
+        "type": "map(object({\n    role_definition_id_or_name             = string\n    principal_id                           = string\n    description                            = optional(string, null)\n    skip_service_principal_aad_check       = optional(bool, false)\n    condition                              = optional(string, null)\n    condition_version                      = optional(string, null)\n    delegated_managed_identity_resource_id = optional(string, null)\n    principal_type                         = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "tags",
+        "type": "map(string)",
+        "required": false
+      },
+      {
+        "name": "location",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "custom_parameters",
+        "type": "object({\n    machine_learning_workspace_id                        = optional(string, null)\n    nat_gateway_name                                     = optional(string)\n    public_ip_name                                       = optional(string)\n    no_public_ip                                         = optional(bool, false)\n    public_subnet_name                                   = optional(string, null)\n    public_subnet_network_security_group_association_id  = optional(string, null)\n    private_subnet_name                                  = optional(string, null)\n    private_subnet_network_security_group_association_id = optional(string, null)\n    storage_account_name                                 = optional(string, null) # Defaults to a randomized name\n    storage_account_sku_name                             = optional(string, \"Standard_GRS\")\n    virtual_network_id                                   = optional(string, null)\n    vnet_address_prefix                                  = optional(string)\n  })",
+        "required": false
+      },
+      {
+        "name": "default_storage_firewall_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "enable_telemetry",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "enhanced_security_compliance",
+        "type": "object({\n    automatic_cluster_update_enabled      = optional(bool, false)\n    compliance_security_profile_enabled   = optional(bool, false)\n    compliance_security_profile_standards = optional(list(string), [])\n    enhanced_security_monitoring_enabled  = optional(bool, false)\n  })",
+        "required": false
+      },
+      {
+        "name": "lock",
+        "type": "object({\n    kind = string\n    name = optional(string, null)\n  })",
+        "required": false
+      },
+      {
+        "name": "managed_disk_cmk_key_vault_key_id",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "access_connector_id",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "dbfs_root_cmk_key_vault_key_id",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "diagnostic_settings",
+        "type": "map(object({\n    name                                     = optional(string, null)\n    log_categories                           = optional(set(string), [])\n    log_groups                               = optional(set(string), [\"allLogs\"])\n    metric_categories                        = optional(set(string), [\"AllMetrics\"])\n    log_analytics_destination_type           = optional(string, \"Dedicated\")\n    workspace_resource_id                    = optional(string, null)\n    storage_account_resource_id              = optional(string, null)\n    event_hub_authorization_rule_resource_id = optional(string, null)\n    event_hub_name                           = optional(string, null)\n    marketplace_partner_resource_id          = optional(string, null)\n  }))",
+        "required": false
+      },
+      {
+        "name": "load_balancer_backend_address_pool_id",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "managed_disk_cmk_key_vault_id",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "managed_services_cmk_key_vault_id",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "managed_services_cmk_key_vault_key_id",
+        "type": "string",
+        "required": false
+      },
+      {
+        "name": "private_endpoints",
+        "type": "map(object({\n    name = optional(string, null)\n    role_assignments = optional(map(object({\n      role_definition_id_or_name             = string\n      principal_id                           = string\n      description                            = optional(string, null)\n      skip_service_principal_aad_check       = optional(bool, false)\n      condition                              = optional(string, null)\n      condition_version                      = optional(string, null)\n      delegated_managed_identity_resource_id = optional(string, null)\n      principal_type                         = optional(string, null)\n    })), {})\n    lock = optional(object({\n      kind = string\n      name = optional(string, null)\n    }), null)\n    tags                                    = optional(map(string), null)\n    subnet_resource_id                      = string\n    subresource_name                        = string # NOTE: `subresource_name` can be excluded if the resource does not support multiple sub resource types (e.g. storage account supports blob, queue, etc)\n    private_dns_zone_group_name             = optional(string, \"default\")\n    private_dns_zone_resource_ids           = optional(set(string), [])\n    application_security_group_associations = optional(map(string), {})\n    private_service_connection_name         = optional(string, null)\n    network_interface_name                  = optional(string, null)\n    location                                = optional(string, null)\n    resource_group_name                     = optional(string, null)\n    ip_configurations = optional(map(object({\n      name               = string\n      private_ip_address = string\n    })), {})\n  }))",
+        "required": false
+      },
+      {
+        "name": "infrastructure_encryption_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "resource_group_name",
+        "type": "string",
+        "required": true
+      },
+      {
+        "name": "customer_managed_key_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "managed_disk_cmk_rotation_to_latest_version_enabled",
+        "type": "bool",
+        "required": false
+      },
+      {
+        "name": "managed_resource_group_name",
+        "type": "string",
+        "required": false
+      }
+    ],
+    "outputs": [
+      {
+        "name": "resource",
+        "description": "This is the full output for the resource.",
+        "sensitive": false
+      },
+      {
+        "name": "databricks_access_connector_ids",
+        "description": "Map of the id's of each Databricks Access Connector.",
+        "sensitive": false
+      },
+      {
+        "name": "databricks_workspace_id",
+        "description": "The unique identifier of the databricks workspace in Databricks control plane.",
+        "sensitive": false
+      },
+      {
+        "name": "databricks_workspace_managed_resource_group_id",
+        "description": "The ID of the Managed Resource Group created by the Databricks Workspace.",
+        "sensitive": false
+      },
+      {
+        "name": "databricks_virtual_network_peering_address_space_prefixes",
+        "description": "A list of address blocks reserved for this virtual network in CIDR notation.",
+        "sensitive": false
+      },
+      {
+        "name": "name",
+        "description": "The name of the Databricks Workspace.",
+        "sensitive": false
+      },
+      {
+        "name": "resource_id",
+        "description": "The ID of the Databricks Workspace in the Azure management plane.",
+        "sensitive": false
+      },
+      {
+        "name": "databricks_id",
+        "description": "The ID of the Databricks Workspace in the Azure management plane.",
+        "sensitive": false
+      },
+      {
+        "name": "databricks_workspace_disk_encryption_set_id",
+        "description": "The ID of Managed Disk Encryption Set created by the Databricks Workspace.",
+        "sensitive": false
+      },
+      {
+        "name": "databricks_workspace_managed_disk_identity",
+        "description": "  A managed_disk_identity block as documented below\n\n  - `principal_id` - The principal UUID for the internal databricks disks identity needed to provide access to the workspace for enabling Customer Managed Keys.\n  - `tenant_id` - The UUID of the tenant where the internal databricks disks identity was created.\n  - `type` - The type of the internal databricks disks identity.\n",
+        "sensitive": false
+      },
+      {
+        "name": "databricks_workspace_storage_account_identity",
+        "description": "  A storage_account_identity block as documented below\n\n  - `principal_id` - The principal UUID for the internal databricks storage account needed to provide access to the workspace for enabling Customer Managed Keys.\n  - `tenant_id` - The UUID of the tenant where the internal databricks storage account was created.\n  - `type` - The type of the internal databricks storage account.\n",
+        "sensitive": false
+      },
+      {
+        "name": "private_endpoints",
+        "description": "A map of private endpoints. The map key is the supplied input to var.private_endpoints. The map value is the entire azurerm_private_endpoint resource.",
+        "sensitive": false
+      },
+      {
+        "name": "databricks_access_connector_principal_ids",
+        "description": "Map of the principal_id's of each Databricks Access Connector.",
+        "sensitive": false
+      },
+      {
+        "name": "databricks_virtual_network_peering_id",
+        "description": "The IDs of the internal Virtual Networks used by the DataBricks Workspace.",
+        "sensitive": false
+      },
+      {
+        "name": "databricks_virtual_network_peering_virtual_network_id",
+        "description": "The ID of the internal Virtual Network used by the DataBricks Workspace.",
+        "sensitive": false
+      },
+      {
+        "name": "databricks_workspace_url",
+        "description": "The workspace URL which is of the format 'adb-{workspaceId}.{random}.azuredatabricks.net'.",
+        "sensitive": false
+      }
+    ]
+  }
+}
