@@ -1,5 +1,5 @@
 ---
-mode: 'agent'
+agent: 'agent'
 model: GPT-5
 tools: ['codebase','search_modules','get_module_details','createFile','createDirectory']
 description: 'Terraform → Azure Verified Modules (AVM) Conversion Agent'

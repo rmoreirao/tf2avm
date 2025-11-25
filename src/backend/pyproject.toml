@@ -21,7 +21,7 @@ profile = "black"
 multi_line_output = 3
 line_length = 88
 [tool.pytest.ini_options]
-testpaths = ["tests"]  # Ensure this points to your test folder
+testpaths = ["tests", "src/tests", "src/tests-tf2avm"]  # Ensure this points to your test folder
 python_files = ["test_*.py", "*_test.py"]  # Recognize test files
 python_classes = ["Test*"]  # Recognize test classes
 python_functions = ["test_*"]  # Recognize test functions
